@@ -1,1 +1,18 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://containers-us-west-58.railway.app:5663/topic_registration_dev
+    username: root
+    password: pWs2AboQw4WCzh9V5PC1
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
