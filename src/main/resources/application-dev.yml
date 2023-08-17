@@ -8,6 +8,13 @@ spring:
     url: jdbc:mysql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_SCHEMA}
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${CLIENT_ID}
+            client-secret: ${CLIENT_SECRET}
   jpa:
     hibernate:
       ddl-auto: update
