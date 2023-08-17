@@ -20,4 +20,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .message(ex.getMessage())
                 .build();
     }
+
+    @ExceptionHandler({BadRequestException.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ExceptionResponse handleBadRequestException(Exception ex) {
+        log.info(ex.getMessage());
+        return ExceptionResponse.builder()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .message(ex.getMessage())
+                .build();
+    }
 }

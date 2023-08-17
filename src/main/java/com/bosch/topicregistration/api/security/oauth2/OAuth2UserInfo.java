@@ -1,6 +1,5 @@
 package com.bosch.topicregistration.api.security.oauth2;
 
-import javax.validation.Valid;
 import java.util.Map;
 
 public abstract class OAuth2UserInfo {

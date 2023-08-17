@@ -39,10 +39,10 @@ public class User {
     @Column(name = "password_column")
     private String password = null;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @Column(name = "provider_column", nullable = false)
     private AuthProvider provider;
 
-    @Column(name = "provider_id", nullable = false)
+    @Column(name = "provider_id_column", nullable = false)
     private String providerId;
 }
