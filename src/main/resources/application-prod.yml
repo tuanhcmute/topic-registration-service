@@ -19,9 +19,8 @@ spring:
     hibernate:
       ddl-auto: update
 app:
-  app:
-    jwt:
-      secret-key: ${SECRET_KEY}
+  jwt:
+    secret-key: ${SECRET_KEY}
   security:
     permit-all:
       ant-pattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status
