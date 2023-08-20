@@ -23,6 +23,9 @@ spring:
       hibernate:
         format_sql: true
 app:
+  app:
+    jwt:
+      secret-key: ${SECRET_KEY}
   security:
     permit-all:
       ant-pattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status

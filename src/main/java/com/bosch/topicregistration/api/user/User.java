@@ -1,6 +1,6 @@
 package com.bosch.topicregistration.api.user;
 
-import com.bosch.topicregistration.api.security.AuthProvider;
+import com.bosch.topicregistration.api.security.oauth2.OAuth2Provider;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -46,7 +46,7 @@ public class User implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "provider_column", nullable = false)
-    private AuthProvider provider;
+    private OAuth2Provider provider;
 
     @Column(name = "provider_id_column", nullable = false)
     private String providerId;

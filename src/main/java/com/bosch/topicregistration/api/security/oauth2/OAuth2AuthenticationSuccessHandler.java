@@ -2,6 +2,7 @@ package com.bosch.topicregistration.api.security.oauth2;
 
 import com.bosch.topicregistration.api.security.CookieUtils;
 import com.bosch.topicregistration.api.security.HttpCookieOAuth2AuthorizationRequestRepositoryImpl;
+import com.bosch.topicregistration.api.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -13,7 +14,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.UUID;
 
 
 @Slf4j
@@ -22,6 +22,7 @@ import java.util.UUID;
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final HttpCookieOAuth2AuthorizationRequestRepositoryImpl httpCookieOAuth2AuthorizationRequestRepository;
+    private final JwtService jwtService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -41,10 +42,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String targetUrl = CookieUtils.getCookie(request, HttpCookieOAuth2AuthorizationRequestRepositoryImpl.REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue).orElse(getDefaultTargetUrl());
         log.info("Target url: {}", targetUrl);
-        String accessToken = UUID.randomUUID().toString();
-        log.info("Access token: {}", accessToken);
+        String token = jwtService.createToken(authentication);
+        log.info("Token: {}", token);
         return UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("access_token", accessToken)
+                .queryParam("token", token)
                 .build().toUriString();
     }
 
