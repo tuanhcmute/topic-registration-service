@@ -2,6 +2,7 @@ package com.bosch.topicregistration.api.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -24,6 +25,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({BadRequestException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ExceptionResponse handleBadRequestException(Exception ex) {
+        log.info(ex.getMessage());
+        return ExceptionResponse.builder()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .message(ex.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler({AccessDeniedException.class})
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ExceptionResponse handleAccessDeniedException(Exception ex) {
         log.info(ex.getMessage());
         return ExceptionResponse.builder()
                 .statusCode(HttpStatus.BAD_REQUEST.value())

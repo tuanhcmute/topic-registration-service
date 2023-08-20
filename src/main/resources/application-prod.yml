@@ -1,1 +1,24 @@
-
+server:
+  port: 90001
+  servlet:
+    context-path: /api/v1
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_SCHEMA}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${CLIENT_ID}
+            client-secret: ${CLIENT_SECRET}
+  jpa:
+    hibernate:
+      ddl-auto: update
+app:
+  security:
+    permit-all:
+      ant-pattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status

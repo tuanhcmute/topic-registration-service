@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 90000
   servlet:
     context-path: /api/v1
 spring:
@@ -22,4 +22,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+app:
+  security:
+    permit-all:
+      ant-pattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status
 
