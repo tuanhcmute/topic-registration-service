@@ -6,12 +6,33 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Check tools information') {
             steps {
+                echo 'Check tools information'
                 sh 'mvn --version'
                 sh 'java -version'
-                sh 'mvn clean install -DskipTest=true'
             }
         }
+
+        stage('Test') {
+            steps {
+                echo 'Test'
+                sh 'mvn test'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Build'
+                sh 'mvn clean install -DskipTests'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deployment'
+            }
+        }
+
     }
 }
