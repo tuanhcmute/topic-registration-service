@@ -1,4 +1,4 @@
-package com.bosch.topicregistration.api.security;
+package com.bosch.topicregistration.api.security.jwt;
 
 import com.bosch.topicregistration.api.user.User;
 import lombok.*;

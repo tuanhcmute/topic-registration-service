@@ -1,8 +1,7 @@
 package com.bosch.topicregistration.api.security.oauth2;
 
 import com.bosch.topicregistration.api.exception.OAuth2AuthenticationProcessingException;
-import com.bosch.topicregistration.api.security.AuthProvider;
-import com.bosch.topicregistration.api.security.UserPrincipal;
+import com.bosch.topicregistration.api.security.jwt.UserPrincipal;
 import com.bosch.topicregistration.api.user.User;
 import com.bosch.topicregistration.api.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +16,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -47,7 +47,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User user;
         if (userOptional.isPresent()) {
             user = userOptional.get();
-            if (!user.getProvider().equals(AuthProvider.valueOf(userRequest.getClientRegistration().getRegistrationId()))) {
+            if (!user.getProvider().equals(OAuth2Provider.valueOf(userRequest.getClientRegistration().getRegistrationId()))) {
                 throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
                         user.getProvider() + " account. Please use your " + user.getProvider() +
                         " account to login.");
@@ -64,8 +64,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .name(oAuth2UserInfo.getName())
                 .email(oAuth2UserInfo.getEmail())
                 .imageUrl(oAuth2UserInfo.getImageUrl())
-                .provider(AuthProvider.valueOf(userRequest.getClientRegistration().getRegistrationId()))
+                .provider(OAuth2Provider.valueOf(userRequest.getClientRegistration().getRegistrationId()))
                 .providerId(oAuth2UserInfo.getId())
+                .ntid(UUID.randomUUID().toString())
+                .phoneNumber(UUID.randomUUID().toString().substring(0, 9))
                 .build();
         userRepository.save(user);
         log.info("Register new user: {}", user.getEmail());
