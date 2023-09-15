@@ -10,7 +10,7 @@ const dbHost: string = process.env.DB_HOST || "localhost";
 
 const db = new Sequelize(dbName, dbUser, dbPasswd, {
   host: dbHost,
-  dialect: "mysql",
+  dialect: "postgres",
   timezone: "UTC",
 });
 

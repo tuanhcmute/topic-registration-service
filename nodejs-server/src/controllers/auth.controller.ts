@@ -1,14 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import AuthService from "../services/auth.service";
 import { AccountInstance } from "../models/account.model";
-import { hashPassword } from "../utils/bcypt.util";
 import { ConfirmTokenInstance } from "../models/confirmToken.model";
-import { sendTokenEmail } from "../utils/mail.util";
 import UserService from "../services/user.service";
-import { UserInstance } from "../models/user.model";
 import AccountService from "../services/account.service";
 import { getConfirmToken } from "../utils/confirmToken.util";
-import { createJwtToken, verifyToken } from "../utils/jwt.util";
+import { CreateUserData } from "../params/user.params";
 
 export default class AuthController {
   public authService: AuthService = new AuthService();
@@ -17,89 +14,47 @@ export default class AuthController {
   // RERGISTER A NEW ACCOUNT CONTROLLER
   public register = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userInfo = req.body;
+      const userInfo = req.body as CreateUserData;
 
-      // Check if the username is already exists
-      const isUsernameTaken: boolean =
-        await this.authService.checkDuplicatedUserName(userInfo.username);
+      const jwtToken = await this.authService.registerUser(userInfo);
 
-      if (isUsernameTaken || !userInfo.username) {
-        throw new Error("The Username already exists");
-      }
+      res.cookie("jwt", jwtToken);
 
-      // Password validation
-      const isValidPassword: boolean = this.authService.checkPasswordPolicies(
-        req.body.password
-      );
-
-      if (!isValidPassword) {
-        throw new Error(
-          "Invalid password. Password must meet policy requirements."
-        );
-      }
-
-      // Hash the password
-      const hashedPassword = await hashPassword(req.body.password);
-
-      // // send email
-      // await sendTokenEmail(req.body.email);
-
-      // Save account
-      const account: AccountInstance = await this.authService.saveAccount({
-        ...req.body,
-        password: hashedPassword,
-      });
-
-      // create jwt token
-      const token = createJwtToken(account.id!, account.role);
-      res.cookie("jwt", token);
-
-      // create token instance
-      const confirmToken: ConfirmTokenInstance =
-        await this.authService.createToken(account.id!);
-
-      // send email
-      const user: UserInstance | null = await this.userService.getUserById(
-        account.userId!
-      );
-
-      await sendTokenEmail(user?.email!, confirmToken.token);
-
-      return res.status(201).json({ confirmToken });
+      return res.status(201).json({ token: jwtToken });
     } catch (err) {
-      if (err instanceof Error) {
-        next(err);
-      } else {
-        res.status(400).json({ message: "Unexpected error" });
-      }
+      return next(err);
     }
   };
 
   // LOGIN TO THE SYSTEM
   public login = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const token = req.cookies.jwt;
-      const data = await verifyToken(token);
-      if (data.id) {
-        const account: AccountInstance =
-          await this.accountService.getAccountById(data.id);
+      const token: string = req.cookies.jwt;
 
-        if (
-          await this.authService.loggedIn(account.username, account.password)
-        ) {
-          res.status(200).json({ msg: "Login successful" });
-        } else {
-          res.status(401).json({ msg: "Login failure" });
-        }
-      } else {
-        throw new Error("Expired token. Please refresh");
+      try {
+        // Attempt JWT authentication
+        const authenticatedToken = await this.authService.loginWithJwtToken(
+          token
+        );
+
+        // JWT authentication succeeded, return a success response
+        return res.status(200).json({ token: authenticatedToken });
+      } catch (jwtError) {
+        // JWT authentication failed, try username and password
+        const loginInfo = req.body as { password: string; username: string };
+        const newToken = await this.authService.loginWithUsernamePassword(
+          loginInfo.username,
+          loginInfo.password
+        );
+
+        // Set the new JWT token as a cookie in the response
+        res.cookie("jwt", newToken);
+
+        // Return a success response
+        return res.status(200).json({ msg: "Login successfully" });
       }
     } catch (err) {
-      if (err instanceof Error) {
-        next(err);
-      } else {
-        res.status(400).json({ message: "Unexpected error" });
-      }
+      return next(err);
     }
   };
 
@@ -123,14 +78,10 @@ export default class AuthController {
         throw new Error("Token not found");
       } else {
         await this.accountService.updateAccountStatus(account);
-        res.status(201).json({ account });
+        return res.status(201).json({ account });
       }
     } catch (err) {
-      if (err instanceof Error) {
-        next(err);
-      } else {
-        res.status(400).json({ message: "Unexpected error" });
-      }
+      return next(err);
     }
   };
 

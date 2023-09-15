@@ -7,6 +7,17 @@ import {
   ConfirmTokenInstance,
 } from "../models/confirmToken.model";
 import { generateConfirmToken } from "../utils/confirmToken.util";
+import { CreateUserData } from "../params/user.params";
+import { comparePasswords, hashPassword } from "../utils/bcypt.util";
+import { createJwtToken, verifyToken } from "../utils/jwt.util";
+import { sendTokenEmail } from "../utils/mail.util";
+import {
+  NotFoundError,
+  PasswordNotCorrectError,
+  UnauthorizedError,
+  ValidatorError,
+} from "../exceptions/AppError";
+import { TokenExpiredError } from "jsonwebtoken";
 
 export default class AuthService {
   // this function to confirm if the specified username is exist
@@ -26,7 +37,7 @@ export default class AuthService {
         return true; // the username was exist
       }
     } catch (error) {
-      throw new Error("Can't communicate with database");
+      throw error;
     }
   };
 
@@ -98,6 +109,44 @@ export default class AuthService {
     }
   };
 
+  public registerUser = async (data: CreateUserData): Promise<string> => {
+    try {
+      //Check if the username is already exists
+      const isUsernameTaken: boolean = await this.checkDuplicatedUserName(
+        data.username
+      );
+      if (isUsernameTaken) {
+        throw new ValidatorError("The Username already exists", 400);
+      }
+      // Password validation
+      const isValidPassword: boolean = this.checkPasswordPolicies(
+        data.password
+      );
+      if (!isValidPassword) {
+        throw new ValidatorError("Invalid password", 400);
+      }
+      // Hash the password
+      const hashedPassword = await hashPassword(data.password);
+      // Save account
+      const account: AccountInstance = await this.saveAccount({
+        ...data,
+        password: hashedPassword,
+      });
+      // create jwt token
+      const token = createJwtToken(account.id!, account.role);
+      // create token instance
+      const confirmToken: ConfirmTokenInstance = await this.createToken(
+        account.id!
+      );
+      // send email code
+      await sendTokenEmail(data.email, confirmToken.token);
+
+      return token;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   public createToken = async (
     accountId: number
   ): Promise<ConfirmTokenInstance> => {
@@ -109,29 +158,46 @@ export default class AuthService {
     return confirmToken;
   };
 
-  // login to the system
-  public loggedIn = async (
+  public loginWithJwtToken = async (token: string): Promise<string> => {
+    try {
+      const decodedData = await verifyToken(token);
+
+      const account = await Account.findByPk(decodedData.id);
+
+      if (!account) {
+        throw new NotFoundError("Account not found", 404);
+      }
+
+      if (!account.enable) {
+        throw new UnauthorizedError("Account not authorized", 403);
+      }
+
+      return token;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  public loginWithUsernamePassword = async (
     username: string,
     password: string
-  ): Promise<boolean> => {
+  ): Promise<string> => {
     try {
-      const foundAccount = await Account.findOne({
+      const foundAccount: AccountInstance | null = await Account.findOne({
         where: { username: username },
       });
 
       if (!foundAccount) {
-        throw new Error("Not found account");
+        throw new NotFoundError("Account not found", 404);
       } else {
-        // TODO: check the password
-        const isCorrect: boolean = foundAccount.enable!;
-        if (isCorrect) {
-          return true;
+        if (await comparePasswords(password, foundAccount.password)) {
+          const token = createJwtToken(foundAccount.id!, foundAccount.role);
+          return token;
         } else {
-          throw new Error("Password was not correct");
+          throw new PasswordNotCorrectError("Password Incorrect", 400);
         }
       }
     } catch (err) {
-      console.log(err);
       throw err;
     }
   };
