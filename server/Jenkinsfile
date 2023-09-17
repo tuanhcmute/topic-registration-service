@@ -14,21 +14,24 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Testing') {
             steps {
-                echo 'Test'
+                echo 'Switch to server folder'
+                sh 'cd server'
+                echo 'Running unit test'
                 sh 'mvn test'
+                echo 'Test cases passed'
             }
         }
 
-        stage('Build') {
+        stage('Build docker image') {
             steps {
-                echo 'Build'
+                echo 'Building docker image'
                 sh 'mvn clean install -DskipTests'
             }
         }
 
-        stage('Deploy') {
+        stage('Deployment') {
             steps {
                 echo 'Deployment'
             }
