@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Check tools information') {
             steps {
-                echo 'Check tools information'
+                echo 'Check tools information...'
                 sh 'mvn --version'
                 sh 'java -version'
             }
@@ -17,24 +17,28 @@ pipeline {
         stage('Testing') {
             steps {
                 dir('server') {
-                    echo 'Running unit test'
+                    echo 'Running unit test...'
                     sh 'mvn test'
-                    echo 'Test cases passed'
+                    echo 'Test cases passed...'
                 }
             }
         }
 
         stage('Build docker image') {
             steps {
+                dir('server') {
+                    echo 'Building jar file...'
+                    sh 'mvn clean install -DskipTests'
+                    echo 'Jar file created successfully...'
 
-                echo 'Building docker image'
-                sh 'mvn clean install -DskipTests'
+                    echo 'Building docker image...'
+                }
             }
         }
 
         stage('Deployment') {
             steps {
-                echo 'Deployment'
+                echo 'Running docker-compose file...'
             }
         }
 
