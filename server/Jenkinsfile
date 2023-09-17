@@ -16,7 +16,7 @@ pipeline {
 
         stage('Testing') {
             steps {
-                dir('/var/jenkins_home/workspace/topic-registration-dev/server') {
+                dir('server') {
                     echo 'Running unit test'
                     sh 'mvn test'
                     echo 'Test cases passed'
