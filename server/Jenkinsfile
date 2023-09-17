@@ -16,16 +16,17 @@ pipeline {
 
         stage('Testing') {
             steps {
-                echo 'Switch to server folder'
-                sh 'cd server'
-                echo 'Running unit test'
-                sh 'mvn test'
-                echo 'Test cases passed'
+                dir('/var/jenkins_home/workspace/topic-registration-dev/server') {
+                    echo 'Running unit test'
+                    sh 'mvn test'
+                    echo 'Test cases passed'
+                }
             }
         }
 
         stage('Build docker image') {
             steps {
+
                 echo 'Building docker image'
                 sh 'mvn clean install -DskipTests'
             }
