@@ -38,7 +38,7 @@ pipeline {
 
                     echo 'Login in dockerhub...'
                     withCredentials([usernamePassword(credentialsId: 'dockerhub-credential', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                        sh 'echo $DOCKERHUB_PASSWORD | docker login -u --username $DOCKERHUB_USERNAME --password-stdin'
+                        sh 'echo $DOCKERHUB_PASSWORD | sudo docker login -u --username $DOCKERHUB_USERNAME --password-stdin'
                     }
                     echo 'Login successfully...'
 
