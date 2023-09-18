@@ -1,0 +1,77 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'maven-3.9.4'
+    }
+
+    environment {
+        DOCKER_IMAGE = 'doduongthaituan/spring-docker'
+        DOCKER_TAG = "${GIT_BRANCH.tokenize('/').pop()}-${BUILD_NUMBER}-${GIT_COMMIT.substring(0, 7)}"
+    }
+
+    stages {
+        stage('Check tools information') {
+            steps {
+                echo 'Check tools information...'
+                sh 'mvn --version'
+                sh 'java -version'
+            }
+        }
+
+        stage('Testing') {
+            steps {
+                dir('server') {
+                    echo 'Running unit test...'
+                    sh 'mvn test'
+                    echo 'Test cases passed...'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('server') {
+                    echo 'Building jar file...'
+                    sh 'mvn clean install -DskipTests'
+                    echo 'Jar file created successfully...'
+
+                    echo 'Login in dockerhub...'
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credential', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        sh 'echo $DOCKERHUB_PASSWORD | docker login -u --username $DOCKERHUB_USERNAME --password-stdin'
+                    }
+                    echo 'Login successfully...'
+
+//                     echo 'Building docker image...'
+//                     sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
+//                     sh 'docker push ${DOCKER_IMAGE}:${DOCKER_TAG}'
+//
+//                     script {
+//                         if (GIT_BRANCH ==~ /.*main.*/) {
+//                             sh 'docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest'
+//                             sh 'docker push ${DOCKER_IMAGE}:latest'
+//                         }
+//                     }
+//
+//                     // Clean to save disk
+//                     sh 'docker image rm ${DOCKER_IMAGE}:${DOCKER_TAG}'
+                }
+            }
+        }
+
+        stage('Deployment') {
+            steps {
+                echo 'Running docker-compose file...'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'successfully...'
+        }
+        failure {
+            echo 'failure...'
+        }
+    }
+}
