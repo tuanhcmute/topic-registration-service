@@ -1,5 +1,6 @@
 import db from "../configs/db.config";
 import { DataTypes, Model } from "sequelize";
+import { User } from "./user.model";
 interface ConfirmTokenAttributes {
   id?: number;
   token: string;
@@ -41,5 +42,8 @@ const ConfirmToken = db.define<ConfirmTokenInstance>(
     tableName: "confirm_token",
   }
 );
+
+User.hasMany(ConfirmToken, { foreignKey: "userId" });
+ConfirmToken.belongsTo(User, { foreignKey: "id" });
 
 export { ConfirmTokenAttributes, ConfirmTokenInstance, ConfirmToken };
