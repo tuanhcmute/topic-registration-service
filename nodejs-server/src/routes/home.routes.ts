@@ -14,13 +14,13 @@ export default class HomeRoutes implements Routes {
 
   public initializeRoutes(): void {
     this.router.get(
-      `${this.path}/employee`,
-      authFilter("EMPLOYEE"),
+      `${this.path}/student`,
+      authFilter("student"),
       this.homeConTroller.showEmployeePage
     );
     this.router.get(
-      `${this.path}/admin`,
-      authFilter("ADMIN"),
+      `${this.path}/teacher`,
+      authFilter("teacher"),
       this.homeConTroller.showAdminPage
     );
   }

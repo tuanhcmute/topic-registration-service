@@ -6,13 +6,6 @@ export default class UserController {
   private userService: UserService = new UserService();
 
   public getUsers = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const users: UserInstance[] = await this.userService.getAllUsers();
-
-      res.status(200).json(users);
-    } catch (err) {
-      console.log(err);
-      res.status(500).json({ msg: "Internal Server Error" });
-    }
+    res.status(200).json({ msg: "get all users" });
   };
 }

@@ -1,14 +1,15 @@
 import { DataTypes, Model } from "sequelize";
 import db from "../configs/db.config";
-import { Account } from "./account.model";
 
 interface UserAttributes {
   id?: number;
-  firstName: string;
-  lastName: string;
-  gender?: string | null;
-  dob?: Date | null;
+  username: string;
+  password?: string;
   email?: string | null;
+  role: string;
+  oauthProvider?: string | null;
+  googleId?: string | null;
+  enable: boolean;
 }
 
 interface UserInstance extends Model<UserAttributes>, UserAttributes {}
@@ -22,34 +23,40 @@ const User = db.define<UserInstance>(
       autoIncrement: true,
       field: "id",
     },
-    firstName: {
+    username: {
       type: DataTypes.STRING,
-      field: "first_name",
+      field: "username",
     },
-    lastName: {
+    password: {
       type: DataTypes.STRING,
-      field: "last_name",
-    },
-    gender: {
-      type: DataTypes.STRING,
-      field: "gender",
-    },
-    dob: {
-      type: DataTypes.DATE,
-      field: "date_of_birth",
+      field: "password",
     },
     email: {
       type: DataTypes.STRING,
       field: "email",
     },
+    oauthProvider: {
+      type: DataTypes.STRING,
+      field: "oauth_provider",
+      allowNull: true,
+    },
+    googleId: {
+      type: DataTypes.STRING,
+      field: "oauth_id",
+    },
+    role: {
+      type: DataTypes.STRING,
+      field: "role",
+    },
+    enable: {
+      type: DataTypes.BOOLEAN,
+      field: "enable",
+    },
   },
   {
     timestamps: false,
-    tableName: "users",
+    tableName: "Users",
   }
 );
-
-User.hasOne(Account, { foreignKey: "userId" });
-Account.hasOne(User, { foreignKey: "id" });
 
 export { User, UserAttributes, UserInstance };

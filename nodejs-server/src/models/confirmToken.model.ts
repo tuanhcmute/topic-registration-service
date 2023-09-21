@@ -1,11 +1,10 @@
 import db from "../configs/db.config";
 import { DataTypes, Model } from "sequelize";
-import { Account } from "./account.model";
 interface ConfirmTokenAttributes {
   id?: number;
   token: string;
   expiredTime: Date;
-  accountId?: number;
+  userId: number;
 }
 
 interface ConfirmTokenInstance
@@ -31,10 +30,10 @@ const ConfirmToken = db.define<ConfirmTokenInstance>(
       allowNull: false,
       field: "expired_time",
     },
-    accountId: {
+    userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      field: "account_id",
+      field: "user_id",
     },
   },
   {
@@ -42,8 +41,5 @@ const ConfirmToken = db.define<ConfirmTokenInstance>(
     tableName: "confirm_token",
   }
 );
-
-Account.hasMany(ConfirmToken, { foreignKey: "id" });
-ConfirmToken.belongsTo(Account, { foreignKey: "accountId" });
 
 export { ConfirmTokenAttributes, ConfirmTokenInstance, ConfirmToken };

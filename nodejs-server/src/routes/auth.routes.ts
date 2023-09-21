@@ -1,6 +1,7 @@
+import passport from "passport";
 import AuthController from "../controllers/auth.controller";
 import Routes from "../interfaces/routes.interface";
-import { Router } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 
 export default class AuthRoutes implements Routes {
   public path = "/auth";
@@ -21,6 +22,18 @@ export default class AuthRoutes implements Routes {
     this.router.post(
       `${this.path}/confirm-account`,
       this.authController.confirmAccount
+    );
+    this.router.get(
+      `${this.path}/google`,
+      passport.authenticate("google", { scope: ["profile"] })
+    );
+    this.router.get(
+      `${this.path}/google/redirect`,
+      passport.authenticate("google"),
+      (req: Request, res: Response) => {
+        // Successful authentication, redirect home.
+        res.send("Login with google success");
+      }
     );
   };
 }
