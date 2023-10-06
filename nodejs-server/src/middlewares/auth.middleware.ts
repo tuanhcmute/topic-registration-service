@@ -4,7 +4,6 @@ export const authFilter =
   (role: string) => async (req: Request, res: Response, next: NextFunction) => {
     try {
       let token = req.headers.authorization;
-      console.log(token);
       if (!token) {
         return res
           .status(401)

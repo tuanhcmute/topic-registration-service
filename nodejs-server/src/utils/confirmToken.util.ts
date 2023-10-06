@@ -18,14 +18,14 @@ export const generateConfirmToken = () => {
 };
 
 export const getConfirmToken = async (
-  accountId: number,
+  userId: number,
   token: string
 ): Promise<ConfirmTokenInstance> => {
   try {
     const confirmToken: ConfirmTokenInstance | null =
       await ConfirmToken.findOne({
         where: {
-          accountId: accountId,
+          userId: userId,
           token: token,
           expiredTime: {
             [Op.gt]: new Date(), // Check if expiredTime is greater than the current date

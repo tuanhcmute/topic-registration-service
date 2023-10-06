@@ -5,6 +5,10 @@ import dotenv from "dotenv";
 import apiRoutes from "./routes";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/error.middleware";
+import morgan from "morgan";
+import cookieSession from "cookie-session";
+import { keys } from "./configs/keys";
+
 dotenv.config();
 
 const app: Application = express();
@@ -12,12 +16,23 @@ const app: Application = express();
 // middlewares
 app.use(express.json());
 app.use(cookieParser());
+app.use(morgan("tiny"));
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.setHeader("Access-Controll-Allow-Origin", "*");
   res.setHeader("Access-Controll-Allow-Methods", "GET, POST, PUT, DELETE");
   res.setHeader("Access-Controll-Allow-Headers", "Content-Type, Authorization");
   next();
 });
+app.use(
+  cookieSession({
+    maxAge: 10 * 60 * 1000,
+    keys: [keys.session.cookieKey],
+  })
+);
+
+// initialize passport
+// app.use(passportSetup.initialize());
+// app.use(passportSetup.session());
 
 // routes
 apiRoutes.forEach((route) => {
