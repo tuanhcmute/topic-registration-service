@@ -1,16 +1,25 @@
 import { createBrowserRouter } from "react-router-dom";
-import App from "../App";
-import { ErrorPage, LoginPage } from "../pages";
+import { LoginPage, OAuth2RedirectHandler } from "../pages/login";
+import { HomePage } from "../pages/home";
+import { PageNotFound } from "../pages/error";
+import { PrivatePage } from "../utils/common";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
-    errorElement: <ErrorPage />,
+    element: <PrivatePage component={HomePage} />,
   },
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/oauth2/redirect",
+    element: <OAuth2RedirectHandler />,
+  },
+  {
+    path: "/404",
+    element: <PageNotFound />,
   },
 ]);
 
