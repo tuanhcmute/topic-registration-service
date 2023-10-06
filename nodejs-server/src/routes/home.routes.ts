@@ -1,7 +1,6 @@
 import { Router } from "express";
 import Routes from "../interfaces/routes.interface";
 import HomeController from "../controllers/home.controller";
-import { authFilter } from "../middlewares/auth.middleware";
 
 export default class HomeRoutes implements Routes {
   public path = "/home";

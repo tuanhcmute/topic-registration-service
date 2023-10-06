@@ -8,6 +8,7 @@ import { errorHandler } from "./middlewares/error.middleware";
 import morgan from "morgan";
 import cookieSession from "cookie-session";
 import { keys } from "./configs/keys";
+import { passportSetup } from "./configs/passport.config";
 
 dotenv.config();
 
@@ -30,9 +31,9 @@ app.use(
   })
 );
 
-// initialize passport
-// app.use(passportSetup.initialize());
-// app.use(passportSetup.session());
+//initialize passport
+app.use(passportSetup.initialize());
+app.use(passportSetup.session());
 
 // routes
 apiRoutes.forEach((route) => {

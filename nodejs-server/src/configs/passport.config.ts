@@ -1,45 +1,57 @@
-// import passport from "passport";
-// import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-// import { keys } from "./keys";
-// import { User } from "../models/user.model";
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { keys } from "./keys";
+import { User } from "../models/user.model";
+import constants from "./constants";
+import { v4 as uuidv4 } from "uuid";
 
-// passport.serializeUser((user: any, done) => {
-//   done(null, user.id);
-// });
+passport.serializeUser((user: any, done) => {
+  done(null, user.id);
+});
 
-// passport.deserializeUser((id: string, done) => {
-//   User.findByPk(id).then((user) => {
-//     done(null, user?.id);
-//   });
-// });
+passport.deserializeUser((id: string, done) => {
+  User.findByPk(id)
+    .then((user) => {
+      done(null, user); // Return the entire user object
+    })
+    .catch((err) => {
+      done(err, null); // Handle errors if any
+    });
+});
 
-// export const passportSetup = passport.use(
-//   new GoogleStrategy(
-//     {
-//       clientID: keys.google.clientId,
-//       clientSecret: keys.google.clientSecret,
-//       callbackURL: keys.google.callbackURL,
-//     },
-//     (accessToken, refreshToken, profile, done) => {
-//       User.findOne({
-//         where: {
-//           googleId: profile.id,
-//         },
-//       }).then((currentUser) => {
-//         if (currentUser) {
-//           done(null, currentUser);
-//         } else {
-//           User.create({
-//             username: profile.displayName,
-//             googleId: profile.id,
-//             role: "student",
-//             enable: true,
-//           }).then((user) => {
-//             console.log("account created " + user.googleId);
-//             done(null, user);
-//           });
-//         }
-//       });
-//     }
-//   )
-// );
+export const passportSetup = passport.use(
+  new GoogleStrategy(
+    {
+      clientID: keys.google.clientId,
+      clientSecret: keys.google.clientSecret,
+      callbackURL: keys.google.callbackURL,
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const [user, created] = await User.findOrCreate({
+          where: { providerId: profile.id },
+          defaults: {
+            id: uuidv4(),
+            email: profile._json.email || "",
+            providerId: profile.id,
+            role: constants.role.STUDENT,
+            imageUrl: profile._json.picture || "",
+            fullname: profile.displayName,
+            code: "templateCode",
+            password: "templatePassword",
+          },
+        });
+
+        if (created) {
+          console.log("New account created for " + user.providerId);
+        } else {
+          console.log("Existing user logged in: " + user.providerId);
+        }
+
+        done(null, user);
+      } catch (err) {
+        console.error("Error finding or creating user:", err);
+      }
+    }
+  )
+);

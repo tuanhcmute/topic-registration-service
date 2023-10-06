@@ -5,6 +5,12 @@ const constants = {
     PUT: "PUT",
     DELETE: "DELETE",
   },
+  role: {
+    STUDENT: "STUDENT",
+    HEAD: "HEAD",
+    LECTURE: "LECTURE",
+    ADMIN: "ADMIN",
+  },
 };
 
 export default constants;

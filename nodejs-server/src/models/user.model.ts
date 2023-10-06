@@ -6,14 +6,14 @@ interface UserAttributes {
   code: string;
   role: string;
   email: string;
-  image_url: string;
-  full_name: string;
-  phone_number: string;
-  provider_id: string;
-  password: string;
-  provider: string;
-  biography: string;
-  schoolYear: Date;
+  imageUrl?: string;
+  fullname: string;
+  phoneNumber?: string;
+  providerId?: string;
+  password?: string;
+  provider?: string;
+  biography?: string;
+  schoolYear?: Date;
   createdBy?: string;
   createdDate?: Date;
   updatedDate?: Date;
@@ -44,19 +44,19 @@ const User = db.define<UserInstance>(
       type: DataTypes.STRING,
       field: "email",
     },
-    image_url: {
+    imageUrl: {
       type: DataTypes.STRING,
       field: "image_url",
     },
-    full_name: {
+    fullname: {
       type: DataTypes.STRING,
       field: "full_name",
     },
-    phone_number: {
+    phoneNumber: {
       type: DataTypes.STRING,
       field: "phone_number",
     },
-    provider_id: {
+    providerId: {
       type: DataTypes.STRING,
       field: "provider_id",
     },
