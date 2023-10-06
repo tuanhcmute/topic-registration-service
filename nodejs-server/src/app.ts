@@ -6,7 +6,6 @@ import apiRoutes from "./routes";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/error.middleware";
 import morgan from "morgan";
-import { passportSetup } from "./configs/passport.config";
 import cookieSession from "cookie-session";
 import { keys } from "./configs/keys";
 
@@ -32,8 +31,8 @@ app.use(
 );
 
 // initialize passport
-app.use(passportSetup.initialize());
-app.use(passportSetup.session());
+// app.use(passportSetup.initialize());
+// app.use(passportSetup.session());
 
 // routes
 apiRoutes.forEach((route) => {

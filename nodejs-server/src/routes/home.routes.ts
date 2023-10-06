@@ -15,13 +15,8 @@ export default class HomeRoutes implements Routes {
   public initializeRoutes(): void {
     this.router.get(
       `${this.path}/student`,
-      authFilter("student"),
       this.homeConTroller.showEmployeePage
     );
-    this.router.get(
-      `${this.path}/teacher`,
-      authFilter("teacher"),
-      this.homeConTroller.showAdminPage
-    );
+    this.router.get(`${this.path}/teacher`, this.homeConTroller.showAdminPage);
   }
 }
