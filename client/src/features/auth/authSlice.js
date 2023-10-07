@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { ACCESS_TOKEN } from "../../utils/constants";
 
 const initialState = {
-  authenticated: false,
+  authenticated: true,
 };
 
 export const authSlice = createSlice({

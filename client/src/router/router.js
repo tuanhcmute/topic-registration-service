@@ -18,6 +18,14 @@ const router = createBrowserRouter([
     element: <OAuth2RedirectHandler />,
   },
   {
+    path: "/topic",
+    element: <PrivatePage component={HomePage} />,
+  },
+  {
+    path: "/lecture",
+    element: <PrivatePage component={HomePage} />,
+  },
+  {
     path: "/404",
     element: <PageNotFound />,
   },
