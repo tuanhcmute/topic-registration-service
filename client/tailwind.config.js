@@ -19,6 +19,7 @@ module.exports = {
       backgroundImage: {
         "header-logo": "url('./assets/images/logo-header.svg')",
         "footer-logo": "url('./assets/images/UTE-logo.svg')",
+        banner: "url('./assets/images/banner.svg')",
       },
       backgroundColor: {
         transparent: "transparent",

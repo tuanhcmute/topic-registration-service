@@ -2,7 +2,9 @@ function AppFooter() {
   return (
     <footer id='app-footer' className='font-Roboto py-5 bg-alabaster'>
       <div className='xl:w-[1140px] lg:w-[960px] md:w-full md:px-5 px-3 h-full mx-auto my-0 flex gap-5 md:flex-row flex-col items-center'>
+        {/* Footer logo */}
         <div className='bg-footer-logo bg-center bg-contain bg-no-repeat w-1/6 min-h-[100px] min-w-[100px]'></div>
+        {/* Footer info */}
         <div className='flex flex-col gap-1 w-full'>
           <h1 className='font-bold md:text-base text-primary text-sm'>
             THÔNG TIN LIÊN HỆ

@@ -1,5 +1,5 @@
 import React from "react";
-import PropsType from "prop-types";
+import PropTypes from "prop-types";
 
 import AppHeader from "./AppHeader";
 import AppFooter from "./AppFooter";
@@ -10,7 +10,7 @@ function App({ children }) {
       <AppHeader />
       <main
         id='app-main'
-        className='h-[1000px] xl:mt-24 lg:mt-20 md:mt-16 mt-14 bg-whiteSmoke'
+        className='xl:mt-24 lg:mt-20 md:mt-16 mt-14 bg-whiteSmoke'
       >
         {children}
       </main>
@@ -21,6 +21,6 @@ function App({ children }) {
 
 export default App;
 
-App.propsType = {
-  children: PropsType.node.isRequired,
+App.propTypes = {
+  children: PropTypes.node.isRequired,
 };

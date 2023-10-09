@@ -1,12 +1,19 @@
 import { Tooltip } from "react-tooltip";
 import PropTypes from "prop-types";
 
-function Dropdown({ items }) {
+function Dropdown(props) {
+  const { className, children, anchorSelect } = props;
+
   return (
-    <Tooltip disableStyleInjection={true}>
-      {items.map((item) => (
-        <div></div>
-      ))}
+    <Tooltip
+      disableStyleInjection={true}
+      anchorSelect={anchorSelect}
+      place='top'
+      clickable
+      className={className}
+      classNameArrow='hidden'
+    >
+      {children}
     </Tooltip>
   );
 }
@@ -14,5 +21,7 @@ function Dropdown({ items }) {
 export default Dropdown;
 
 Dropdown.propTypes = {
-  items: PropTypes.array.isRequired,
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+  anchorSelect: PropTypes.string.isRequired,
 };

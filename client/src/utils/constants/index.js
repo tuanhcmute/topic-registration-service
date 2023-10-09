@@ -12,3 +12,4 @@ export const GOOGLE_AUTH_URL =
   OAUTH2_REDIRECT_URI;
 
 export { default as headers } from "./headers";
+export { default as paths } from "./paths";

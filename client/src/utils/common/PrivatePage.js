@@ -11,6 +11,7 @@ function PrivatePage({ component: Component, ...rest }) {
   useEffect(() => {
     if (!authenticated) navigate("/login");
   }, [authenticated, navigate]);
+
   return (
     authenticated && (
       <App>
