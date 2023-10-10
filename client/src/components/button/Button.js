@@ -1,8 +1,14 @@
-import PropsType from "prop-types";
+import PropTypes from "prop-types";
 
 function Button(props) {
+  const { className } = props;
   return (
-    <button className='py-1 px-2 hover:bg-primary hover:text-white transition-all ease-in-out'>
+    <button
+      className={
+        className ||
+        "py-1 px-2 hover:bg-primary hover:text-white transition-all ease-in-out"
+      }
+    >
       {props.children}
     </button>
   );
@@ -10,6 +16,7 @@ function Button(props) {
 
 export default Button;
 
-Button.propsType = {
-  children: PropsType.node.isRequired,
+Button.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
 };

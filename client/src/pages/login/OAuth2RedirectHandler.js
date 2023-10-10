@@ -1,27 +1,26 @@
-import { useNavigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { loggedIn } from "../../features/auth/authSlice";
+import { loggedIn, fetchUserInfo } from "../../features/auth/authSlice";
+import { ACCESS_TOKEN, paths } from "../../utils/constants";
 
-function OAuth2RedirectHandler(props) {
-  const navigate = useNavigate();
+// The task of this function is to get access token from URL and redirect to home page
+// This function isn't completed
+function OAuth2RedirectHandler() {
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const token = getUrlParameter(ACCESS_TOKEN);
+
   function getUrlParameter(name) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    const regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
-
-    const results = regex.exec(props.location.search);
-    return results === null
-      ? ""
-      : decodeURIComponent(results[1].replace(/\+/g, " "));
+    const result = searchParams.get(name);
+    return result;
   }
-
-  const token = getUrlParameter("token");
 
   if (token) {
     dispatch(loggedIn(token));
-    return navigate("/");
+    dispatch(fetchUserInfo());
+    return <Navigate to={paths.HOME} replace />;
   }
-  return navigate("/login");
+  return <Navigate to={paths.LOGIN} />;
 }
 
 export default OAuth2RedirectHandler;
