@@ -1,13 +1,12 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { Banner } from "../../components/banner";
 
 function HomePage() {
   return (
     <React.Fragment>
       {/* Banner */}
-      <div className='xl:h-[300px] lg:h-72 md:h-64 h-60 bg-banner bg-no-repeat bg-center bg-cover flex items-center justify-center text-primary font-Roboto text-3xl font-bold shadow-sm'>
-        TRANG CHỦ
-      </div>
+      <Banner title='TRANG CHỦ' />
       {/* End banner */}
       {/* Navigation */}
       <div className='xl:w-[1140px] lg:w-[960px] md:w-full md:p-5 p-3 mx-auto my-0 flex flex-wrap justify-start gap-5'>

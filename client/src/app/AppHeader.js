@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { AiOutlineUser } from "react-icons/ai";
 import { BiLogOut } from "react-icons/bi";
 import { FaBars } from "react-icons/fa";
@@ -8,7 +8,7 @@ import { NavLink } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import { Dropdown } from "../components/dropdown";
-import { fetchUserProfile } from "../features/profile/profileSlice";
+import { logout } from "../features/auth/authSlice";
 import { paths } from "../utils/constants";
 
 const dropdownItems = [
@@ -27,19 +27,17 @@ const dropdownItems = [
 ];
 
 function AppHeader() {
+  const dispatch = useDispatch();
   const overlayRef = useRef();
   const navigationRef = useRef();
-  const currenProfile = useSelector((state) => state.profile.info);
-  const dispatch = useDispatch();
+  const currentUser = useSelector((state) => state.auth.currentUser);
 
   function toggleOverlay() {
-    console.log("toogle overlay");
     overlayRef.current.classList.toggle("hidden");
     toggleNavigation();
   }
 
   function toggleNavigation() {
-    console.log("Toggle navigation");
     navigationRef.current.classList.toggle("-translate-x-full");
   }
 
@@ -47,9 +45,10 @@ function AppHeader() {
     toggleOverlay();
   }
 
-  useEffect(() => {
-    dispatch(fetchUserProfile());
-  }, [dispatch]);
+  function handleLogout(e) {
+    e.preventDefault();
+    dispatch(logout());
+  }
 
   return (
     <header
@@ -89,7 +88,7 @@ function AppHeader() {
             data-tooltip-variant='light'
           >
             <AiOutlineUser className='w-4 h-4' />
-            <span className='font-bold'>{currenProfile.fullName}</span>
+            <span className='font-bold'>{currentUser.fullName}</span>
           </div>
           {/* End profile */}
           {/* Dropdown will be displayed when hovering on Profile */}
@@ -102,6 +101,9 @@ function AppHeader() {
                     className='flex items-center gap-1 w-full p-[10px] cursor-pointer text-black hover:text-primary transition-all ease-in-out'
                     key={item.id}
                     to={item.to}
+                    onClick={
+                      item.to === paths.LOGOUT ? (e) => handleLogout(e) : null
+                    }
                   >
                     <Icon className='text-lg' />
                     <span>{item.text}</span>

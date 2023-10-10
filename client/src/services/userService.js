@@ -1,7 +1,7 @@
 import { v4 as uuid } from "uuid";
 
 const userService = {
-  fetchUserProfile: () =>
+  fetchUserInfo: () =>
     Promise.resolve({
       id: uuid(),
       fullName: "Nguyen Tran Thi Van",

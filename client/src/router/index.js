@@ -9,6 +9,21 @@ const HomePage = React.lazy(() =>
     return { default: module.HomePage };
   })
 );
+const ProfilePage = React.lazy(() =>
+  import("../pages/profile").then((module) => {
+    return { default: module.ProfilePage };
+  })
+);
+const LecturePage = React.lazy(() =>
+  import("../pages/lecture").then((module) => {
+    return { default: module.LecturePage };
+  })
+);
+const TopicPage = React.lazy(() =>
+  import("../pages/topic").then((module) => {
+    return { default: module.TopicPage };
+  })
+);
 const LoginPage = React.lazy(() =>
   import("../pages/login").then((module) => {
     return { default: module.LoginPage };
@@ -22,8 +37,20 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
+    path: "/profile",
+    element: <PrivatePage component={ProfilePage} />,
+  },
+  {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/lecture",
+    element: <PrivatePage component={LecturePage} />,
+  },
+  {
+    path: "/topic",
+    element: <PrivatePage component={TopicPage} />,
   },
   {
     path: "/oauth2/redirect",
