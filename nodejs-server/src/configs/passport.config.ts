@@ -32,13 +32,10 @@ export const passportSetup = passport.use(
           where: { providerId: profile.id },
           defaults: {
             id: uuidv4(),
-            email: profile._json.email || "",
             providerId: profile.id,
-            role: constants.role.STUDENT,
+            email: profile.emails ? profile.emails[0].value : "",
             imageUrl: profile._json.picture || "",
             fullname: profile.displayName,
-            code: "templateCode",
-            password: "templatePassword",
           },
         });
 

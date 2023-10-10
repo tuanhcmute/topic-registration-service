@@ -5,7 +5,7 @@ import AuthController from "../controllers/auth.controller";
 import { UserInstance } from "models/user.model";
 
 export default class AuthRoutes implements Routes {
-  public path = "/auth";
+  public path = "oauth2";
   public router = Router();
   private authController = new AuthController();
 
@@ -14,11 +14,11 @@ export default class AuthRoutes implements Routes {
   }
   public initializeRoutes(): void {
     this.router.get(
-      `${this.path}/google`,
+      `/${this.path}/google`,
       passport.authenticate("google", { scope: ["profile"] })
     );
     this.router.get(
-      `${this.path}/google/redirect`,
+      `/login/${this.path}/code/google`,
       passport.authenticate("google"),
       this.authController.handleGoogleLogin
     );

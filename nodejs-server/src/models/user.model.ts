@@ -3,11 +3,11 @@ import db from "../configs/db.config";
 
 interface UserAttributes {
   id: string;
-  code: string;
-  role: string;
-  email: string;
+  code?: string;
+  role?: string;
+  email?: string;
   imageUrl?: string;
-  fullname: string;
+  fullname?: string;
   phoneNumber?: string;
   providerId?: string;
   password?: string;

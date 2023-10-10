@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { UserInstance } from "../models/user.model";
+import { User, UserInstance } from "../models/user.model";
 import { createJwtToken } from "../utils/jwt.util";
+import constants from "../configs/constants";
 
 export default class AuthController {
   public handleGoogleLogin = async (
@@ -10,7 +11,13 @@ export default class AuthController {
   ) => {
     try {
       const user = req.user as UserInstance;
-      const token = createJwtToken(user.id, user.role);
+      // find user role by id
+      const foundUser = await User.findByPk(user.id);
+      const token = createJwtToken(
+        user.id,
+        foundUser?.role || constants.role.STUDENT
+      );
+      console.log(token);
       res.redirect(`http://localhost:3000/api/v1/home/student?token=${token}`);
     } catch (err) {
       next(err);
