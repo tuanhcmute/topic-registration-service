@@ -4,9 +4,9 @@ dotenv.config();
 
 export const keys = {
   google: {
-    clientId: process.env.CLIENT_ID || "clientID",
-    clientSecret: process.env.CLIENT_SECRET || "clientSecret",
-    callbackURL: process.env.REDIRECT_URI,
+    clientId: process.env.CLIENT_ID || "clientId",
+    clientSecret: process.env.CLIENT_SECRET || "secret",
+    callbackURL: process.env.REDIRECT_URI || "uri",
   },
   session: {
     cookieKey: "ajsgfjsdjfhsdjfksdkfjksd",
@@ -20,11 +20,5 @@ export const keys = {
     },
     test: {},
     production: {},
-  },
-  mail: {
-    host: process.env.MAIL_HOST || "sandbox.smtp.mailtrap.io",
-    port: process.env.MAIL_PORT || 465,
-    username: process.env.MAIL_USERNAME || "username",
-    password: process.env.MAIL_PASSWORD || "password",
   },
 };

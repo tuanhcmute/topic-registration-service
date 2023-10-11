@@ -9,7 +9,7 @@ import morgan from "morgan";
 import cookieSession from "cookie-session";
 import { keys } from "./configs/keys";
 import { passportSetup } from "./configs/passport.config";
-import { corsMiddleware } from "./middlewares/cors.midleware";
+import { corsMiddleware } from "./middlewares/cors.middleware";
 
 dotenv.config();
 
