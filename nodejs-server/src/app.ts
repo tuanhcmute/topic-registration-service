@@ -9,6 +9,7 @@ import morgan from "morgan";
 import cookieSession from "cookie-session";
 import { keys } from "./configs/keys";
 import { passportSetup } from "./configs/passport.config";
+import { corsMiddleware } from "./middlewares/cors.middleware";
 
 dotenv.config();
 
@@ -18,12 +19,7 @@ const app: Application = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("tiny"));
-app.use((req: Request, res: Response, next: NextFunction) => {
-  res.setHeader("Access-Controll-Allow-Origin", "*");
-  res.setHeader("Access-Controll-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.setHeader("Access-Controll-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
+app.use(corsMiddleware);
 app.use(
   cookieSession({
     maxAge: 10 * 60 * 1000,

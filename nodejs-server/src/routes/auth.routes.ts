@@ -2,7 +2,6 @@ import Routes from "../interfaces/routes.interface";
 import { Router } from "express";
 import passport from "passport";
 import AuthController from "../controllers/auth.controller";
-import { UserInstance } from "models/user.model";
 
 export default class AuthRoutes implements Routes {
   public path = "oauth2";
