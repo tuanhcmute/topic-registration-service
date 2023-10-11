@@ -3,7 +3,7 @@ import Routes from "../interfaces/routes.interface";
 import UserController from "../controllers/user.controller";
 
 export default class UserRoutes implements Routes {
-  public path = "/users";
+  public path = "/user";
   public router = Router();
   private userController: UserController = new UserController();
 
@@ -12,6 +12,6 @@ export default class UserRoutes implements Routes {
   }
 
   public initializeRoutes(): void {
-    this.router.get(`${this.path}/`);
+    this.router.get(`${this.path}/profile`, this.userController.getProfile);
   }
 }

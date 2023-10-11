@@ -2,7 +2,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { keys } from "./keys";
 import { User } from "../models/user.model";
-import constants from "./constants";
+import constants from "../constants/constants";
 import { v4 as uuidv4 } from "uuid";
 
 passport.serializeUser((user: any, done) => {

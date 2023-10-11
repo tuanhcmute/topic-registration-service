@@ -1,5 +1,6 @@
-import db from "configs/db.config";
+import db from "../configs/db.config";
 import { DataTypes, Model } from "sequelize";
+import { User } from "./user.model";
 
 interface SpecializationAttributes {
   id: string;
@@ -38,5 +39,8 @@ const Specialization = db.define<SpecializationInstance>(
     tableName: "Specialization",
   }
 );
+
+Specialization.hasMany(User, { foreignKey: "specializationId" });
+User.belongsTo(Specialization, { foreignKey: "id", as: "specialization" });
 
 export { SpecializationInstance, SpecializationAttributes, Specialization };

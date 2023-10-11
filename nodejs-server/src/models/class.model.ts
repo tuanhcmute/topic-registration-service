@@ -1,5 +1,6 @@
-import db from "configs/db.config";
+import db from "../configs/db.config";
 import { DataTypes, Model } from "sequelize";
+import { User } from "./user.model";
 
 interface ClassAttributes {
   id: string;
@@ -46,5 +47,8 @@ const Class = db.define<ClassInstance>(
     tableName: "Class",
   }
 );
+
+Class.hasMany(User, { foreignKey: "classId" });
+User.belongsTo(Class, { foreignKey: "id", as: "class" });
 
 export { ClassInstance, ClassAttributes, Class };

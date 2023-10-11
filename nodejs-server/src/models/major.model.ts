@@ -1,5 +1,6 @@
-import db from "configs/db.config";
+import db from "../configs/db.config";
 import { DataTypes, Model } from "sequelize";
+import { User } from "./user.model";
 
 interface MajorAttributes {
   id: string;
@@ -46,5 +47,8 @@ const Major = db.define<MajorInstance>(
     tableName: "Major",
   }
 );
+
+Major.hasMany(User, { foreignKey: "majorId" });
+User.belongsTo(Major, { foreignKey: "id", as: "major" });
 
 export { MajorInstance, MajorAttributes, Major };

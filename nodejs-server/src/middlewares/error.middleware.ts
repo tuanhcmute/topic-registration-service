@@ -1,4 +1,5 @@
 import { NextFunction, Response, Request } from "express";
+import { ResponseModel } from "../interfaces/responseModel";
 
 export const errorHandler = (
   err: Error,
@@ -6,6 +7,10 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log(err.message);
-  res.status(500).json({ message: "Internal Server Error" });
+  const errorResponse: ResponseModel<{}> = {
+    message: "Internal server error",
+    statusCode: 500,
+  };
+  res.status(500).json(errorResponse);
+  next();
 };

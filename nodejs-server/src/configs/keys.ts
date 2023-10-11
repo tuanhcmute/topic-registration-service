@@ -14,8 +14,8 @@ export const keys = {
   db: {
     development: {
       dbName: process.env.DB_NAME || "authentication_demo",
-      dbUser: process.env.DB_USER || "springstudent",
-      dbPassword: process.env.DB_PASSWORD || "springstudent",
+      dbUser: process.env.DB_USER || "thanhduy",
+      dbPassword: process.env.DB_PASSWORD || "root",
       dbHost: process.env.DB_HOST || "localhost",
     },
     test: {},

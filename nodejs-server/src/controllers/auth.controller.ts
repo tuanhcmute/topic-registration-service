@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { User, UserInstance } from "../models/user.model";
 import { createJwtToken } from "../utils/jwt.util";
-import constants from "../configs/constants";
+import constants from "../constants/constants";
 
 export default class AuthController {
   public handleGoogleLogin = async (
