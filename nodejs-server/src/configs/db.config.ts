@@ -8,6 +8,7 @@ const { dbName, dbUser, dbPassword, dbHost } = keys.db.development;
 const db = new Sequelize(dbName, dbUser, dbPassword, {
   host: dbHost,
   dialect: "mysql",
+  logging: false,
 });
 
 export default db;

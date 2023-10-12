@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { User, UserInstance } from "../models/user.model";
 import { createJwtToken } from "../utils/jwt.util";
 import Role from "../constants/role.enum";
+import passport from "passport";
 
 export default class AuthController {
   public handleGoogleLogin = async (
@@ -17,7 +18,25 @@ export default class AuthController {
         user.id,
         foundUser?.role || String(Role.STUDENT)
       );
-      res.redirect(`http://localhost:3000/api/v1/home/student?token=${token}`);
+      const redirectUrl = req.query.state;
+      res.redirect(`${redirectUrl}?token=${token}`);
+    } catch (err) {
+      console.log(err);
+      next(err);
+    }
+  };
+
+  public getGoogleLogin = (req: Request, res: Response, next: NextFunction) => {
+    try {
+      let redirectUrl = req.query.redirectUrl;
+      if (!redirectUrl) {
+        redirectUrl = "http://localhost:3000";
+      }
+      // Pass the redirectUrl as a query parameter to the Google authentication
+      passport.authenticate("google", {
+        scope: ["profile"],
+        state: String(redirectUrl), // Pass the redirectUrl as state
+      })(req, res, next);
     } catch (err) {
       next(err);
     }

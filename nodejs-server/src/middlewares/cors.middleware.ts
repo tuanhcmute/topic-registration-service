@@ -16,8 +16,7 @@ export const corsMiddleware = (
   res.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, "*");
   res.setHeader(
     ACCESS_CONTROL_ALLOW_METHODS,
-    `${HttpMethod.GET}, ${HttpMethod.POST}, 
-    ${HttpMethod.PUT}, ${HttpMethod.DELETE}`
+    `${HttpMethod.GET}, ${HttpMethod.POST}, ${HttpMethod.PUT}, ${HttpMethod.DELETE}`
   );
   res.setHeader(
     ACCESS_CONTROL_ALLOW_HEADERS,
