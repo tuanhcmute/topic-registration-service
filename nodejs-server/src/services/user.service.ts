@@ -1,25 +1,22 @@
-import { Account } from "../models/account.model";
-import { User, UserInstance } from "../models/user.model";
+import ErrorMessages from "exceptions/ErrorMessages";
+import { User, UserInstance } from "models/user.model";
+import UserNotFoundException from "exceptions/UserNotFoundException";
+import { error } from "console";
 
-export default class UserService {
-  public getAllUsers = async (): Promise<UserInstance[]> => {
+class UserService {
+  public finUserById = async (userId: string): Promise<UserInstance> => {
     try {
-      const users: UserInstance[] = await User.findAll({ include: Account });
-
-      return users;
+      const foundUser = await User.findByPk(userId);
+      if (!foundUser)
+        throw new UserNotFoundException(
+          ErrorMessages.USER_NOT_FOUND + "with userId: " + userId
+        );
+      return foundUser;
     } catch (err) {
-      throw new Error("Can't get all users");
-    }
-  };
-
-  public getUserById = async (userId: number): Promise<UserInstance | null> => {
-    try {
-      // Use the findByPk method to find a user by their ID
-      const user = await User.findByPk(userId);
-      return user; // Returns the user if found, or null if not found
-    } catch (error) {
-      console.error("Error fetching user by ID:", error);
-      throw error;
+      console.log(error);
+      throw err;
     }
   };
 }
+
+export default UserService;

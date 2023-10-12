@@ -12,6 +12,6 @@ export default class UserRoutes implements Routes {
   }
 
   public initializeRoutes(): void {
-    this.router.get(`${this.path}/`, this.userController.getUsers);
+    this.router.get(`${this.path}/`);
   }
 }

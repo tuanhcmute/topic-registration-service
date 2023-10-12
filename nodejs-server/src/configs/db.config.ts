@@ -1,17 +1,13 @@
-import { Dialect, Sequelize } from "sequelize";
+import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
-
+import { keys } from "./keys";
 dotenv.config();
 
-const dbName: string = process.env.DB_NAME || "test";
-const dbUser: string = process.env.DB_USER || "postgres";
-const dbPasswd: string = process.env.DB_PASSWORD || "";
-const dbHost: string = process.env.DB_HOST || "localhost";
+const { dbName, dbUser, dbPassword, dbHost } = keys.db.development;
 
-const db = new Sequelize(dbName, dbUser, dbPasswd, {
+const db = new Sequelize(dbName, dbUser, dbPassword, {
   host: dbHost,
-  dialect: "postgres",
-  timezone: "UTC",
+  dialect: "mysql",
 });
 
 export default db;

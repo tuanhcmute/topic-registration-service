@@ -1,7 +1,6 @@
 import { Router } from "express";
 import Routes from "../interfaces/routes.interface";
 import HomeController from "../controllers/home.controller";
-import { authFilter } from "../middlewares/auth.middleware";
 
 export default class HomeRoutes implements Routes {
   public path = "/home";
@@ -14,14 +13,9 @@ export default class HomeRoutes implements Routes {
 
   public initializeRoutes(): void {
     this.router.get(
-      `${this.path}/employee`,
-      authFilter("EMPLOYEE"),
+      `${this.path}/student`,
       this.homeConTroller.showEmployeePage
     );
-    this.router.get(
-      `${this.path}/admin`,
-      authFilter("ADMIN"),
-      this.homeConTroller.showAdminPage
-    );
+    this.router.get(`${this.path}/teacher`, this.homeConTroller.showAdminPage);
   }
 }
