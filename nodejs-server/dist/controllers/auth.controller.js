@@ -12,66 +12,42 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const auth_service_1 = __importDefault(require("../services/auth.service"));
-const bcypt_util_1 = require("../utils/bcypt.util");
+const _models_1 = require("@models");
+const jwt_util_1 = require("@utils/jwt.util");
+const constants_1 = require("@configs/constants");
+const passport_1 = __importDefault(require("passport"));
 class AuthController {
     constructor() {
-        this.authService = new auth_service_1.default();
-        // RERGISTER A NEW ACCOUNT CONTROLLER
-        this.register = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.handleGoogleLogin = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const userInfo = req.body;
-                // Check if the username is already exists
-                const isUsernameTaken = yield this.authService.checkDuplicatedUserName(userInfo.username);
-                if (isUsernameTaken || !userInfo.username) {
-                    throw new Error("The Username already exists");
-                }
-                // Password validation
-                const isValidPassword = this.authService.checkPasswordPolicies(req.body.password);
-                if (!isValidPassword) {
-                    throw new Error("Invalid password. Password must meet policy requirements.");
-                }
-                // Hash the password
-                const hashedPassword = yield (0, bcypt_util_1.hashPassword)(req.body.password);
-                // Save account
-                const account = yield this.authService.saveAccount(Object.assign(Object.assign({}, req.body), { password: hashedPassword }));
-                return res.status(201).json({ account });
+                const user = req.user;
+                // find user role by id
+                const foundUser = yield _models_1.User.findByPk(user.id);
+                const token = (0, jwt_util_1.createJwtToken)(user.id, (foundUser === null || foundUser === void 0 ? void 0 : foundUser.role) || String(constants_1.Role.STUDENT));
+                const redirectUrl = req.query.state;
+                res.redirect(`${redirectUrl}?token=${token}`);
             }
             catch (err) {
-                console.error(err);
-                if (err instanceof Error) {
-                    // 'err' is now treated as an 'Error' type
-                    res.status(400).json({ error: err.message || "Unexpected error" });
-                }
-                else {
-                    // Handle other error cases here if needed
-                    res.status(500).json({ error: "Internal server error" });
-                }
+                console.log(err);
+                next(err);
             }
         });
-        // LOGIN TO THE SYSTEM
-        this.login = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.getGoogleLogin = (req, res, next) => {
             try {
-                // get information from the request
-                const loginInfo = req.body;
-                // authenticate the user
-                const account = yield this.authService.loggedIn(loginInfo.username, loginInfo.password);
-                return res
-                    .status(200)
-                    .json({ message: "Login successful", account: account });
+                let redirectUrl = req.query.redirectUrl;
+                if (!redirectUrl) {
+                    redirectUrl = "http://localhost:3000";
+                }
+                // Pass the redirectUrl as a query parameter to the Google authentication
+                passport_1.default.authenticate("google", {
+                    scope: ["profile"],
+                    state: String(redirectUrl), // Pass the redirectUrl as state
+                })(req, res, next);
             }
             catch (err) {
-                if (err instanceof Error) {
-                    return res
-                        .status(400)
-                        .json({ message: err.message || "Unexpected error" });
-                }
-                else {
-                    return res.status(500).json({ message: "External server error" });
-                }
+                next(err);
             }
-        });
-        this.forgotPassword = (req, res, next) => { };
+        };
     }
 }
 exports.default = AuthController;

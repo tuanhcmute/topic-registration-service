@@ -9,17 +9,59 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const account_model_1 = require("../models/account.model");
-const user_model_1 = require("../models/user.model");
+const _models_1 = require("@models");
+const _exceptions_1 = require("@exceptions");
 class UserService {
     constructor() {
-        this.getAllUsers = () => __awaiter(this, void 0, void 0, function* () {
+        this.finUserById = (userId) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const users = yield user_model_1.User.findAll({ include: account_model_1.Account });
-                return users;
+                const foundUser = yield _models_1.User.findByPk(userId);
+                if (!foundUser)
+                    throw new _exceptions_1.UserNotFoundException(_exceptions_1.ErrorMessages.USER_NOT_FOUND + "with userId: " + userId);
+                return foundUser;
             }
             catch (err) {
-                throw new Error("Can't get all users");
+                console.log(err);
+                throw err;
+            }
+        });
+        this.getProfileUserData = (userId) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const foundUser = yield _models_1.User.findByPk(userId, {
+                    include: [
+                        {
+                            model: _models_1.Major,
+                            as: "major",
+                            attributes: ["code", "name"],
+                        },
+                        {
+                            model: _models_1.Specialization,
+                            as: "specialization",
+                            attributes: ["code", "name"],
+                        },
+                        {
+                            model: _models_1.Class,
+                            as: "class",
+                            attributes: ["code", "name"],
+                        },
+                    ],
+                    attributes: [
+                        "code",
+                        "role",
+                        "email",
+                        "imageUrl",
+                        "fullname",
+                        "phoneNumber",
+                        "biography",
+                        "schoolYear",
+                    ],
+                });
+                if (!foundUser)
+                    throw new _exceptions_1.UserNotFoundException(_exceptions_1.ErrorMessages.USER_NOT_FOUND + "with userId: " + userId);
+                return foundUser;
+            }
+            catch (err) {
+                throw err;
             }
         });
     }

@@ -8,22 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const user_service_1 = __importDefault(require("../services/user.service"));
+const _services_1 = require("@services");
+const constants_1 = require("@configs/constants");
 class UserController {
     constructor() {
-        this.userService = new user_service_1.default();
-        this.getUsers = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.userService = new _services_1.UserService();
+        this.getProfile = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const users = yield this.userService.getAllUsers();
-                res.status(200).json(users);
+                const user = yield this.userService.getProfileUserData("1");
+                const userProfile = {
+                    message: "Get user profile successfully.",
+                    statusCode: constants_1.StatusCode.OK,
+                    data: user,
+                };
+                res.status(200).json(userProfile);
             }
-            catch (err) {
-                console.log(err);
-                res.status(500).json({ msg: "Internal Server Error" });
+            catch (error) {
+                next(error);
             }
         });
     }

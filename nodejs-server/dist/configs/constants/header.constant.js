@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AUTHORIZATION = exports.CONTENT_TYPE = exports.ACCESS_CONTROL_ALLOW_HEADERS = exports.ACCESS_CONTROL_ALLOW_METHODS = exports.ACCESS_CONTROL_ALLOW_ORIGIN = void 0;
+const ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
+exports.ACCESS_CONTROL_ALLOW_ORIGIN = ACCESS_CONTROL_ALLOW_ORIGIN;
+const ACCESS_CONTROL_ALLOW_METHODS = "Access-Control-Allow-Methods";
+exports.ACCESS_CONTROL_ALLOW_METHODS = ACCESS_CONTROL_ALLOW_METHODS;
+const ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
+exports.ACCESS_CONTROL_ALLOW_HEADERS = ACCESS_CONTROL_ALLOW_HEADERS;
+const CONTENT_TYPE = "Content-Type";
+exports.CONTENT_TYPE = CONTENT_TYPE;
+const AUTHORIZATION = "Authorization";
+exports.AUTHORIZATION = AUTHORIZATION;
