@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cookieSession from "cookie-session";
 import apiRoutes from "./routes";
-import { errorHandler, corsMiddleware } from "@middlewares";
+import { errorHandler, corsMiddleware, authorizeUser } from "@middlewares";
 import { keys, db, passportSetup } from "@configs";
 
 dotenv.config();
@@ -23,6 +23,7 @@ app.use(
     keys: [keys.session.cookieKey],
   })
 );
+app.use(authorizeUser);
 
 //initialize passport
 app.use(passportSetup.initialize());

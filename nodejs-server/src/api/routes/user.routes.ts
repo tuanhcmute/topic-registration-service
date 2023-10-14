@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { IRoutes } from "@interfaces";
 import { UserController } from "@controllers";
+import { authorizeUser } from "@middlewares";
 
 export default class UserRoutes implements IRoutes {
   public path = "/user";
