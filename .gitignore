@@ -60,3 +60,4 @@ build/
 node_modules
 *.pem
 .env
+/nodejs-server/dist
