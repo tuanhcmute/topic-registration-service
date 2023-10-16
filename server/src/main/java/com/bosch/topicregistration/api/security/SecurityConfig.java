@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
@@ -28,10 +29,10 @@ public class SecurityConfig {
     @Value("${app.security.permit-all.ant-pattern}")
     private String[] antPatterns;
 
-    @Bean
-    public CustomAuthenticationEntryPoint customAuthenticationEntryPoint() {
-        return new CustomAuthenticationEntryPoint();
-    }
+    // @Bean
+    // public CustomAuthenticationEntryPoint customAuthenticationEntryPoint() {
+    //     return new CustomAuthenticationEntryPoint();
+    // }
 
     @Bean
     public CustomAccessDeniedHandler customAccessDeniedHandler() {
@@ -49,7 +50,7 @@ public class SecurityConfig {
         http.oauth2Login().userInfoEndpoint().userService(customOAuth2UserService);
         http.oauth2Login().successHandler(oAuth2AuthenticationSuccessHandler);
         http.oauth2Login().failureHandler(oAuth2AuthenticationFailureHandler);
-        http.exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint());
+        http.exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
         http.exceptionHandling().accessDeniedHandler(customAccessDeniedHandler());
         http.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
