@@ -8,7 +8,7 @@ function Dropdown(props) {
     <Tooltip
       disableStyleInjection={true}
       anchorSelect={anchorSelect}
-      place='top'
+      place='bottom'
       clickable
       className={className}
       classNameArrow='hidden'

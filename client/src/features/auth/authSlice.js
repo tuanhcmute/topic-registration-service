@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { userService } from "../../services";
-import { loadState, saveState } from "../../utils/common/localStorage";
 import { ACCESS_TOKEN } from "../../utils/constants";
 
 const initialState = {
@@ -20,7 +19,7 @@ export const fetchUserInfo = createAsyncThunk(
 
 export const authSlice = createSlice({
   name: "auth",
-  initialState: loadState("auth") || initialState,
+  initialState: initialState,
   reducers: {
     loggedIn: (state, action) => {
       state = {
@@ -28,7 +27,6 @@ export const authSlice = createSlice({
         authenticated: true,
         [ACCESS_TOKEN]: action.payload,
       };
-      saveState("auth", state);
       return state;
     },
     logout: (state) => {
@@ -39,7 +37,6 @@ export const authSlice = createSlice({
         currentUser: {},
         errorMessage: "",
       };
-      saveState("auth", state);
       return state;
     },
   },
@@ -50,18 +47,15 @@ export const authSlice = createSlice({
         ...action.payload,
       };
       state.errorMessage = "";
-      saveState("auth", state);
       return state;
     });
     builder.addCase(fetchUserInfo.pending, (state, action) => {
       state.currentUser = {};
       state.errorMessage = "";
-      saveState("auth", state);
       return state;
     });
     builder.addCase(fetchUserInfo.rejected, (state, action) => {
       state.errorMessage = action.error.message;
-      saveState("auth", state);
       return state;
     });
   },

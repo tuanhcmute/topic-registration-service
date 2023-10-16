@@ -1,25 +1,26 @@
-import React, { Suspense } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { Provider } from "react-redux";
 import { ErrorBoundary } from "react-error-boundary";
+import { PersistGate } from "redux-persist/integration/react";
 
 import reportWebVitals from "./reportWebVitals";
 import router from "./router";
-import { store } from "./store";
+import { persistor, store } from "./store";
 import "./index.css";
-import { Loading } from "./components/loading";
+import "react-toastify/dist/ReactToastify.css";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <ErrorBoundary FallbackComponent={ErrorBoundary}>
-      <Suspense fallback={<Loading />}>
-        <Provider store={store}>
-          <RouterProvider router={router} />
-        </Provider>
-      </Suspense>
-    </ErrorBoundary>
+  <ErrorBoundary FallbackComponent={ErrorBoundary}>
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <RouterProvider router={router} />
+      </PersistGate>
+    </Provider>
+  </ErrorBoundary>
   </React.StrictMode>
 );
 

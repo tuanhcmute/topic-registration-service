@@ -1,6 +1,9 @@
 function AppFooter() {
   return (
-    <footer id='app-footer' className='font-Roboto py-5 bg-alabaster'>
+    <footer
+      id='app-footer'
+      className='font-Roboto py-5 bg-alabaster dark:bg-slate'
+    >
       <div className='xl:w-[1140px] lg:w-[960px] md:w-full md:px-5 px-3 h-full mx-auto my-0 flex gap-5 md:flex-row flex-col items-center'>
         {/* Footer logo */}
         <div className='bg-footer-logo bg-center bg-contain bg-no-repeat w-1/6 min-h-[100px] min-w-[100px]'></div>

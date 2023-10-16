@@ -7,7 +7,7 @@ function Banner(props) {
     <div
       className={
         className ||
-        "xl:h-[300px] lg:h-72 md:h-64 h-60 bg-banner bg-no-repeat bg-center bg-cover flex items-center justify-center text-primary font-Roboto text-3xl font-bold shadow-sm"
+        "xl:h-[300px] lg:h-72 md:h-64 h-60 bg-banner bg-no-repeat bg-center bg-cover flex items-center justify-center text-primary font-Roboto text-3xl font-bold shadow-sm dark:text-whiteSmoke"
       }
     >
       {title}
