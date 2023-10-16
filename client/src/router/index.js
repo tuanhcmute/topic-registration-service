@@ -1,60 +1,39 @@
 import React from "react";
 import { createBrowserRouter } from "react-router-dom";
+import { App as AppLayout } from "../app";
 import { ErrorPage } from "../pages/error";
 import { OAuth2RedirectHandler } from "../pages/login";
-import { PrivatePage } from "../utils/common";
-
-const HomePage = React.lazy(() =>
-  import("../pages/home").then((module) => {
-    return { default: module.HomePage };
-  })
-);
-const ProfilePage = React.lazy(() =>
-  import("../pages/profile").then((module) => {
-    return { default: module.ProfilePage };
-  })
-);
-const LecturePage = React.lazy(() =>
-  import("../pages/lecture").then((module) => {
-    return { default: module.LecturePage };
-  })
-);
-const TopicPage = React.lazy(() =>
-  import("../pages/topic").then((module) => {
-    return { default: module.TopicPage };
-  })
-);
-const LoginPage = React.lazy(() =>
-  import("../pages/login").then((module) => {
-    return { default: module.LoginPage };
-  })
-);
+import ProtectedRoutes from "./ProtectedRoutes";
+import { HomePage as HomeRoute } from "../pages/home";
+import { ProfilePage as ProfileRoute } from "../pages/profile";
+import { TopicPage as TopicRoute } from "../pages/topic";
+import { LecturePage as LectureRoute } from "../pages/lecture";
+import { LoginPage as LoginRoute } from "../pages/login";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <PrivatePage component={HomePage} />,
+    element: <AppLayout />,
     errorElement: <ErrorPage />,
+    children: [
+      {
+        element: <ProtectedRoutes />,
+        children: [
+          {
+            path: "",
+            element: <HomeRoute />,
+          },
+          { path: "topic", element: <TopicRoute /> },
+          { path: "lecture", element: <LectureRoute /> },
+          { path: "profile", element: <ProfileRoute /> },
+        ],
+      },
+    ],
   },
-  {
-    path: "/profile",
-    element: <PrivatePage component={ProfilePage} />,
-  },
+  { path: "oauth2/redirect", element: <OAuth2RedirectHandler /> },
   {
     path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    path: "/lecture",
-    element: <PrivatePage component={LecturePage} />,
-  },
-  {
-    path: "/topic",
-    element: <PrivatePage component={TopicPage} />,
-  },
-  {
-    path: "/oauth2/redirect",
-    element: <OAuth2RedirectHandler />,
+    element: <LoginRoute />,
   },
 ]);
 

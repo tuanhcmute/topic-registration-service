@@ -1,4 +1,6 @@
+const PORT = process.env.PORT || "3001";
+
 module.exports = {
-  redirectUri: "http://localhost:3000/oauth2/redirect",
+  redirectUri: `http://localhost:${PORT}/oauth2/redirect`,
   apiBaseUrl: "http://localhost:8080",
 };
