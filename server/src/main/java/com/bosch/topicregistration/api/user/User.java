@@ -1,15 +1,16 @@
 package com.bosch.topicregistration.api.user;
 
-import com.bosch.topicregistration.api.class_model.ClassModel;
-import com.bosch.topicregistration.api.major.Major;
 import com.bosch.topicregistration.api.security.oauth2.OAuth2Provider;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,6 +19,7 @@ import java.sql.Date;
 @Builder
 @Entity
 @Table(name = "user_tbl")
+@EntityListeners(AuditingEntityListener.class)
 public class User implements Serializable {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -28,25 +30,20 @@ public class User implements Serializable {
     @Column(name = "ntid_column", nullable = false, unique = true, updatable = false)
     private String ntid;
 
-    // @Column(name = "code_column", nullable = false, unique = true, updatable = false)
-    // private String code;
-
-    @Column(name = "role_column", nullable = false, updatable = true)
+    @Column(name = "role_column", nullable = false)
     private String role;
 
     @Column(name = "email_column", nullable = false, unique = true, updatable = false)
     private String email;
 
-    @Column(name = "image_url_column", nullable = true)
+    @Column(name = "image_url_column")
     private String imageUrl;
 
     @Column(name = "name_column", nullable = false)
     private String name;
 
-    @JsonIgnore
-    @Builder.Default
     @Column(name = "password_column")
-    private String password = null;
+    private String password;
 
     @Column(name = "phone_number_column", nullable = false, unique = true, columnDefinition = "VARCHAR(10)")
     private String phoneNumber;
@@ -62,26 +59,32 @@ public class User implements Serializable {
     @Builder.Default
     private Boolean emailVerified = false;
 
-    @Column(name = "biography_column", nullable = true)
+    @Column(name = "biography_column")
     private String biography;
 
     @Column(name = "created_by_column", nullable = false)
-    private String created_by;
+    private String createdBy;
 
+    @CreatedDate
     @Column(name = "created_date_column", nullable = false)
-    private Date createdDate;
+    private LocalDateTime createdDate;
 
-    @Column(name = "update_date_column", nullable = true)
-    private Date updateDate;
+    @LastModifiedDate
+    @Column(name = "updated_date_column")
+    private LocalDateTime updatedDate;
 
-    @Column(name = "school_year_column", nullable = true)
-    private Date schoolYear;
-
-    @ManyToOne
-    @JoinColumn(name = "classId", nullable = true)
-    private ClassModel classModel;
+    @Column(name = "school_year_column")
+    private String schoolYear;
 
     @ManyToOne
-    @JoinColumn(name = "majorId", nullable = true)
+    @JoinColumn
+    private Clazz clazz;
+
+    @ManyToOne
+    @JoinColumn
     private Major major;
+
+    @OneToMany(mappedBy = "user")
+    private Set<UserRole> userRoles;
+
 }

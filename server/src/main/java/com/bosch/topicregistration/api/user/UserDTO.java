@@ -1,8 +1,6 @@
 package com.bosch.topicregistration.api.user;
-import java.util.Date;
 
-import com.bosch.topicregistration.api.major.MajorDto;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,12 +10,15 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class UserDTO {
     private String imageUrl;
     private String fullName;
-    private String code;
-    private String rolde;
-    private MajorDto major;
-    private Date school_year;
+    private String ntid;
+    private String role;
+    private String schoolYear;
     private String biography;
+    private String phoneNumber;
+    private String email;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private MajorDTO major;
 }
