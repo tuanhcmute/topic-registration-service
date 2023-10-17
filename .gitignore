@@ -1,10 +1,10 @@
 
+### Java server
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-
 ### STS ###
 .apt_generated
 .classpath
@@ -13,13 +13,11 @@ target/
 .settings
 .springBeans
 .sts4-cache
-
 ### IntelliJ IDEA ###
 .idea
 *.iws
 *.iml
 *.ipr
-
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -29,34 +27,36 @@ target/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-
 ### VS Code ###
 .vscode/
 
-# node_modules
+# Client ReacJS
 /client/node_modules
-
 # dependencies
 /client/.pnp
 /client.pnp.js
-
 # testing
 /client/coverage
-
 # production
 /client/build
-
 # misc
 /client/.DS_Store
 /client/.env.local
 /client/.env.development.local
 /client/.env.test.local
 /client/.env.production.local
-
 /client/npm-debug.log*
 /client/yarn-debug.log*
 /client/yarn-error.log*
 
+<<<<<<< HEAD
+# nodejs server
+/nodejs-server/node_modules
+/nodejs-server/dist
+*.pem
+=======
 node_modules
 *.pem
 .env
+/nodejs-server/dist
+>>>>>>> 7ae903cad05c9e465efa856e3b9ce56c2f891610

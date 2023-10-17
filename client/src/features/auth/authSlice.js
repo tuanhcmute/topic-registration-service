@@ -1,28 +1,63 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { userService } from "../../services";
 import { ACCESS_TOKEN } from "../../utils/constants";
 
 const initialState = {
   authenticated: false,
+  currentUser: {},
+  [ACCESS_TOKEN]: "",
+  errorMessage: "",
 };
+
+export const fetchUserInfo = createAsyncThunk(
+  "auth/fetchUserInfo",
+  async (thunkAPI) => {
+    const response = await userService.fetchUserInfo();
+    return response;
+  }
+);
 
 export const authSlice = createSlice({
   name: "auth",
-  initialState,
+  initialState: initialState,
   reducers: {
     loggedIn: (state, action) => {
-      localStorage.setItem(ACCESS_TOKEN, action.payload);
-      return {
+      state = {
         ...state,
         authenticated: true,
+        [ACCESS_TOKEN]: action.payload,
       };
+      return state;
     },
     logout: (state) => {
-      localStorage.removeItem(ACCESS_TOKEN);
-      return {
+      state = {
         ...state,
         authenticated: false,
+        [ACCESS_TOKEN]: "",
+        currentUser: {},
+        errorMessage: "",
       };
+      return state;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchUserInfo.fulfilled, (state, action) => {
+      state.currentUser = {
+        ...state.currentUser,
+        ...action.payload,
+      };
+      state.errorMessage = "";
+      return state;
+    });
+    builder.addCase(fetchUserInfo.pending, (state, action) => {
+      state.currentUser = {};
+      state.errorMessage = "";
+      return state;
+    });
+    builder.addCase(fetchUserInfo.rejected, (state, action) => {
+      state.errorMessage = action.error.message;
+      return state;
+    });
   },
 });
 
