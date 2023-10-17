@@ -1,20 +1,23 @@
 server:
-  port: 90000
+  port: 8080
   servlet:
     context-path: /api/v1
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_SCHEMA}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    url:
+    username:
+    password:
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: ${CLIENT_ID}
-            client-secret: ${CLIENT_SECRET}
+            client-id:
+            client-secret:
+            scope:
+              - email
+              - profile
   jpa:
     hibernate:
       ddl-auto: update
@@ -24,7 +27,13 @@ spring:
         format_sql: true
 app:
   jwt:
-    secret-key: ${SECRET_KEY}
+    secretKey:
   security:
-    permit-all:
-      ant-pattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status
+    permitAll:
+      antPattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status
+    cors:
+      allowedOrigin: '*'
+      allowedMethods: '*'
+      allowedHeaders: '*'
+      allowedCredentials: false
+      corsConfiguration: '/**'

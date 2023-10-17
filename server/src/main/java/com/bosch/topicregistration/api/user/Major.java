@@ -1,24 +1,12 @@
-package com.bosch.topicregistration.api.major;
+package com.bosch.topicregistration.api.user;
 
-import java.sql.Date;
-import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import com.bosch.topicregistration.api.user.User;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import javax.persistence.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -27,7 +15,7 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(name = "major_tbl")
-public class Major {
+public class Major implements Serializable {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
@@ -40,18 +28,18 @@ public class Major {
     @Column(name = "name_column", nullable = false, unique = true, updatable = false)
     private String name;
 
-    @Column(name = "description_column", nullable = false)
+    @Column(name = "description_column")
     private String description;
 
     @Column(name = "created_by_column", nullable = false)
-    private String created_by;
+    private String createdBy;
 
     @Column(name = "created_date_column", nullable = false)
-    private Date createdDate;
+    private LocalDateTime createdDate;
 
-    @Column(name = "update_date_column", nullable = true)
-    private Date updateDate;
+    @Column(name = "updated_date_column")
+    private LocalDateTime updatedDate;
 
     @OneToMany(mappedBy = "major")
-    private List<User> users;
+    private Set<User> users;
 }

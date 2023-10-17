@@ -42,17 +42,21 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if (StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
-        log.info("Process OAuth2 User: {}", oAuth2UserInfo.getEmail());
-        Optional<User> userOptional = userRepository.findByEmail(oAuth2UserInfo.getEmail());
+        String email = oAuth2UserInfo.getEmail();
+        log.info("Process OAuth2 User: {}", email);
+        Optional<User> userOptional = userRepository.findByEmail(email);
         User user;
         if (userOptional.isPresent()) {
             user = userOptional.get();
-            if (!user.getProvider().equals(OAuth2Provider.valueOf(userRequest.getClientRegistration().getRegistrationId()))) {
+            if (!user.getProvider().equals(OAuth2Provider.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase()))) {
                 throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
                         user.getProvider() + " account. Please use your " + user.getProvider() +
                         " account to login.");
             }
             log.info("User {} exist", user.getEmail());
+            if (StringUtils.isEmpty(user.getImageUrl())) {
+                updateUserInfo(oAuth2UserInfo, user);
+            }
         } else {
             user = registerNewUser(userRequest, oAuth2UserInfo);
         }
@@ -64,13 +68,20 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .name(oAuth2UserInfo.getName())
                 .email(oAuth2UserInfo.getEmail())
                 .imageUrl(oAuth2UserInfo.getImageUrl())
-                .provider(OAuth2Provider.valueOf(userRequest.getClientRegistration().getRegistrationId()))
+                .provider(OAuth2Provider.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase()))
                 .providerId(oAuth2UserInfo.getId())
                 .ntid(UUID.randomUUID().toString())
                 .phoneNumber(UUID.randomUUID().toString().substring(0, 9))
+                .createdBy(UUID.randomUUID().toString().substring(0, 9))
                 .build();
         userRepository.save(user);
         log.info("Register new user: {}", user.getEmail());
         return user;
+    }
+
+    private void updateUserInfo(OAuth2UserInfo oAuth2UserInfo, User userInDB) {
+        userInDB.setImageUrl(oAuth2UserInfo.getImageUrl());
+        userInDB.setProviderId(oAuth2UserInfo.getId());
+        userRepository.save(userInDB);
     }
 }

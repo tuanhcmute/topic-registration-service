@@ -1,17 +1,23 @@
 package com.bosch.topicregistration.api.user;
 
-import com.bosch.topicregistration.api.major.MajorDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 
-public class UserMapper {
-    public static UserDto toUserDto(User user, MajorDto majorDto) {
-        UserDto userDto = new UserDto();
-        userDto.setImageUrl(user.getImageUrl());
-        userDto.setFullName(user.getName());
-        userDto.setRolde(user.getRole());
-        userDto.setMajor(majorDto);
+import java.util.Set;
 
-        userDto.setSchool_year(user.getSchoolYear());
-        userDto.setBiography(user.getBiography());
-        return userDto;
+@Mapper(componentModel = "spring")
+public interface UserMapper {
+
+    @Mappings({
+            @Mapping(target = "createdDate", source = "user.createdDate", dateFormat = "dd-MM-yyyy HH:mm:ss"),
+            @Mapping(target = "updatedDate", source = "user.updatedDate", dateFormat = "dd-MM-yyyy HH:mm:ss")
+    })
+    UserDTO toDTO(User user);
+
+    Set<String> map(Set<UserRole> userRoles);
+
+    default String map(UserRole userRole) {
+        return userRole.getRole().getCode().toString();
     }
 }

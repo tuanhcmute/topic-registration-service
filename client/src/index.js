@@ -8,19 +8,22 @@ import { PersistGate } from "redux-persist/integration/react";
 import reportWebVitals from "./reportWebVitals";
 import router from "./router";
 import { persistor, store } from "./store";
+import { injectStore } from "./services/axiosClient";
+
 import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
+injectStore(store);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-  <ErrorBoundary FallbackComponent={ErrorBoundary}>
-    <Provider store={store}>
-      <PersistGate persistor={persistor}>
-        <RouterProvider router={router} />
-      </PersistGate>
-    </Provider>
-  </ErrorBoundary>
+    <ErrorBoundary FallbackComponent={ErrorBoundary}>
+      <Provider store={store}>
+        <PersistGate persistor={persistor}>
+          <RouterProvider router={router} />
+        </PersistGate>
+      </Provider>
+    </ErrorBoundary>
   </React.StrictMode>
 );
 

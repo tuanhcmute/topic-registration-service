@@ -49,14 +49,7 @@ build/
 /client/yarn-debug.log*
 /client/yarn-error.log*
 
-<<<<<<< HEAD
 # nodejs server
 /nodejs-server/node_modules
 /nodejs-server/dist
 *.pem
-=======
-node_modules
-*.pem
-.env
-/nodejs-server/dist
->>>>>>> 7ae903cad05c9e465efa856e3b9ce56c2f891610

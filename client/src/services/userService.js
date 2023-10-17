@@ -1,12 +1,12 @@
-import { v4 as uuid } from "uuid";
+import axiosClient from "./axiosClient";
 
+const baseUrl = "/user";
 const userService = {
-  fetchUserInfo: () =>
-    Promise.resolve({
-      id: uuid(),
-      fullName: "Nguyen Tran Thi Van",
-      role: "LECTURE",
-    }),
+  fetchUserInfo: () => {
+    console.log(axiosClient);
+    const requestUrl = `${baseUrl}/profile`;
+    return axiosClient.get(requestUrl);
+  },
 };
 
 export default userService;
