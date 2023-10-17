@@ -1,20 +1,23 @@
 server:
-  port: 90000
+  port: 8080
   servlet:
     context-path: /api/v1
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_SCHEMA}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    url: jdbc:mysql://localhost:3306/test?createDatabaseIfNotExist=true
+    username: root
+    password: root
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: ${CLIENT_ID}
-            client-secret: ${CLIENT_SECRET}
+            client-id: 191541386637-kctjg1nopsvtj3l814h52htasavdji33.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
+              - profile
   jpa:
     hibernate:
       ddl-auto: update
@@ -24,7 +27,7 @@ spring:
         format_sql: true
 app:
   jwt:
-    secret-key: ${SECRET_KEY}
+    secret-key: 54e1ac0d-820a-453b-aef5-2840f4b004dd
   security:
     permit-all:
       ant-pattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status

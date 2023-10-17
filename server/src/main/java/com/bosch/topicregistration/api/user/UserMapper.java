@@ -7,7 +7,8 @@ public class UserMapper {
         UserDto userDto = new UserDto();
         userDto.setImageUrl(user.getImageUrl());
         userDto.setFullName(user.getName());
-        userDto.setRolde(user.getRole());
+        userDto.setRole(user.getRole());
+        userDto.setNtid(user.getNtid());
         userDto.setMajor(majorDto);
 
         userDto.setSchool_year(user.getSchoolYear());

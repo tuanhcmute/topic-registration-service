@@ -15,8 +15,8 @@ import lombok.Setter;
 public class UserDto {
     private String imageUrl;
     private String fullName;
-    private String code;
-    private String rolde;
+    private String ntid;
+    private String role;
     private MajorDto major;
     private Date school_year;
     private String biography;

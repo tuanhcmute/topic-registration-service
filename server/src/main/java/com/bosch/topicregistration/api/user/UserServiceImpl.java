@@ -30,6 +30,7 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             reponse.setMessage("Major is empty");
             reponse.setStatus(500);
+            reponse.setData(email);
         }
         return reponse;
     }
