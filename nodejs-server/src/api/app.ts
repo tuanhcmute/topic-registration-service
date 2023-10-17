@@ -5,7 +5,12 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cookieSession from "cookie-session";
 import apiRoutes from "./routes";
-import { errorHandler, corsMiddleware, authorizeUser } from "@middlewares";
+import {
+  errorHandler,
+  corsMiddleware,
+  authorizeUser,
+  logMiddleware,
+} from "@middlewares";
 import { keys, db, passportSetup } from "@configs";
 
 dotenv.config();
@@ -15,7 +20,7 @@ const app: Application = express();
 // middlewares
 app.use(express.json());
 app.use(cookieParser());
-app.use(morgan("tiny"));
+// app.use(morgan("tiny"));
 app.use(corsMiddleware);
 app.use(
   cookieSession({
@@ -23,7 +28,8 @@ app.use(
     keys: [keys.session.cookieKey],
   })
 );
-app.use(authorizeUser);
+// app.use(authorizeUser);
+app.use(logMiddleware);
 
 //initialize passport
 app.use(passportSetup.initialize());

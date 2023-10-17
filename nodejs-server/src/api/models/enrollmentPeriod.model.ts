@@ -1,5 +1,6 @@
 import db from "@configs/db.config";
 import { DataTypes, Model } from "sequelize";
+import { Topic } from "./topic.model";
 
 interface EnrollmentPeriodAttributes {
   id: string;
@@ -83,6 +84,15 @@ const EnrollmentPeriod = db.define<EnrollmentPeriodInstance>(
     tableName: "EnrollmentPeriod",
   }
 );
+
+EnrollmentPeriod.hasMany(Topic, {
+  as: "EnrollmentPeriod",
+  foreignKey: "periodId",
+});
+Topic.belongsTo(EnrollmentPeriod, {
+  foreignKey: "code",
+  as: "enrollmentPeriod",
+});
 
 export {
   EnrollmentPeriodAttributes,

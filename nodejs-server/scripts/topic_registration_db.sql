@@ -117,6 +117,10 @@ CREATE TABLE `EnrollmentPeriod`(
     CONSTRAINT fk_enrollmentPeriod_semester FOREIGN KEY (semester_id) REFERENCES Semester(id)
 );
 
+INSERT INTO EnrollmentPeriod (id, code, name, description, start_date, end_date, active, type, period, semester_id, created_by)
+VALUES
+('1', 'EP202301', 'Spring 2023 Enrollment', 'Enrollment period for Spring 2023 semester', '2023-01-01 00:00:00', '2023-01-31 23:59:59', 'Active', 'TLCN', 'lecture', null, 'John Doe'),
+('2', 'EP202302', 'Fall 2023 Enrollment', 'Enrollment period for Fall 2023 semester', '2023-07-01 00:00:00', '2023-07-31 23:59:59', 'Active', 'KLTN', 'student', null, 'Jane Smith');
 
 CREATE TABLE Topic(
 	id VARCHAR(100) PRIMARY KEY,
@@ -133,13 +137,18 @@ CREATE TABLE Topic(
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     semester_id VARCHAR(100),
-    specialization VARCHAR(100),
+    specialization_id VARCHAR(100),
     lecture_id VARCHAR(100),
+    enrollment_period_id VARCHAR(100),
     
 	CONSTRAINT fk_topic_semester FOREIGN KEY (semester_id) REFERENCES Semester(id),
-    CONSTRAINT fk_topic_specialization FOREIGN KEY (specialization) REFERENCES Specialization(id),
-    CONSTRAINT fk_topic_lecture FOREIGN KEY (lecture_id) REFERENCES `User`(id)
+    CONSTRAINT fk_topic_specialization FOREIGN KEY (specialization_id) REFERENCES Specialization(id),
+    CONSTRAINT fk_topic_lecture FOREIGN KEY (lecture_id) REFERENCES `User`(id),
+    CONSTRAINT fk_topic_enrollmentPeriod FOREIGN KEY (enrollment_period_id) REFERENCES EnrollmentPeriod(code)
 );
+
+
+
 
 CREATE TABLE `Enrollment`(
 	id VARCHAR(100) PRIMARY KEY,
@@ -192,7 +201,14 @@ VALUES
   ('2', '20110757', 'STUDENT', 'user2@example.com', '', 'User Two', '+987654321', 'provider2', 'hashed_password2', 'GITHUB', 'Biography 2', 3, 'admin2', '3', '4', '5');
   
 
-
+-- Insert data into the Topic table with specialization_id set to null and lecture_id set to '1'
+INSERT INTO Topic (id, code, name, type, goal, expectation, requirement, status, max_slot, rest_slot, created_by, semester_id, specialization_id, lecture_id, enrollment_period_id)
+VALUES
+('1', 'T1', 'Topic 1', 'TLCN', 'Learn about a specific topic', 'High expectations for this topic', 'No special requirements', 'Active', 30, 30, 'John Doe', null, null, '1', 'EP202301'),
+('2', 'T2', 'Topic 2', 'TLCN', 'Explore another topic', 'Expect to cover key concepts', 'Prerequisite: Topic 1', 'Active', 25, 25, 'Jane Smith', null, null, '1', 'EP202301'),
+('3', 'T3', 'Topic 3', 'KLTN', 'In-depth research', 'High research expectations', 'Prerequisite: Topic 2', 'Active', 20, 20, 'Alice Johnson', null, null, '1', 'EP202302'),
+('4', 'T4', 'Topic 4', 'KLTN', 'Advanced topics', 'Expect advanced discussions', 'No special requirements', 'Active', 35, 35, 'Bob Brown', null, null, '1', 'EP202302'),
+('5', 'T5', 'Topic 5', 'TLCN', 'Hands-on experience', 'Expect practical sessions', 'Prerequisite: Topic 3', 'Active', 40, 40, 'Eve Wilson', null, null, '1', 'EP202301');
 
 
 

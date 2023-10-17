@@ -1,5 +1,6 @@
 import db from "../configs/db.config";
 import { DataTypes, Model } from "sequelize";
+import { User } from "./user.model";
 
 interface TopicAttributes {
   id: string;
@@ -18,6 +19,7 @@ interface TopicAttributes {
   semesterId?: string;
   specializationId?: string;
   lecturerId?: string;
+  periodId?: string;
 }
 
 interface TopicInstance extends Model<TopicAttributes>, TopicAttributes {}
@@ -89,6 +91,10 @@ const Topic = db.define<TopicInstance>(
     specializationId: {
       type: DataTypes.STRING,
       field: "specialization",
+    },
+    periodId: {
+      type: DataTypes.STRING,
+      field: "enrollment_period_id",
     },
   },
   {
