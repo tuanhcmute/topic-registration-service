@@ -7,7 +7,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -22,10 +25,8 @@ public class UserPrincipal implements UserDetails, OAuth2User {
     private Map<String, Object> attributes;
 
     public static UserPrincipal create(User user) {
-//        List<GrantedAuthority> authorities = Collections.
-//                singletonList(new SimpleGrantedAuthority("ROLE_USER"));
-       List<GrantedAuthority>  authorities = new ArrayList<>();
-       user.getUserRoles().forEach(userRole -> authorities.add(new SimpleGrantedAuthority(userRole.getRole().getCode().toString())));
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        user.getUserRoles().forEach(userRole -> authorities.add(new SimpleGrantedAuthority(userRole.getRole().getCode().toString())));
         return UserPrincipal.builder()
                 .id(user.getId())
                 .email(user.getEmail())

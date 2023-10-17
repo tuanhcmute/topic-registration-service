@@ -14,7 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "class_tbl")
+@Table(name = "clazz_tbl")
 public class Clazz implements Serializable {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -25,7 +25,7 @@ public class Clazz implements Serializable {
     @Column(name = "code_column", nullable = false, unique = true, updatable = false)
     private String code;
 
-    @Column(name = "description_column", nullable = false)
+    @Column(name = "description_column")
     private String description;
 
     @Column(name = "created_by_column", nullable = false)
@@ -34,7 +34,7 @@ public class Clazz implements Serializable {
     @Column(name = "created_date_column", nullable = false)
     private LocalDateTime createdDate;
 
-    @Column(name = "updated_date_column")
+    @Column(name = "updated_date_column", nullable = false)
     private LocalDateTime updatedDate;
 
     @OneToMany(mappedBy = "clazz")

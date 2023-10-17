@@ -28,7 +28,7 @@ public class Major implements Serializable {
     @Column(name = "name_column", nullable = false, unique = true, updatable = false)
     private String name;
 
-    @Column(name = "description_column", nullable = false)
+    @Column(name = "description_column")
     private String description;
 
     @Column(name = "created_by_column", nullable = false)

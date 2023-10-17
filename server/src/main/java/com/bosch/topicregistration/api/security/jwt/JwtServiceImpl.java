@@ -12,7 +12,7 @@ import java.util.Date;
 @Slf4j
 public class JwtServiceImpl implements JwtService {
 
-    @Value("${app.jwt.secret-key}")
+    @Value("${app.jwt.secretKey}")
     private String secretKey;
 
     @Override

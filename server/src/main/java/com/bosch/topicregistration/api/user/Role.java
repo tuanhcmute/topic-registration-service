@@ -2,7 +2,6 @@ package com.bosch.topicregistration.api.user;
 
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -36,15 +35,15 @@ public class Role implements Serializable {
     private String description;
 
     @CreatedDate
-    @Column(name = "created_date_column")
+    @Column(name = "created_date_column", nullable = false)
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @Column(name = "updated_date_column")
+    @Column(name = "updated_date_column", nullable = false)
     private LocalDateTime updatedDate;
 
-    @CreatedBy
-    @Column(name = "created_by_column")
+    //    @CreatedBy
+    @Column(name = "created_by_column", nullable = false)
     private String createdBy;
 
     @OneToMany(mappedBy = "role")

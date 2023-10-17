@@ -2,12 +2,12 @@ package com.bosch.topicregistration.api.user;
 
 import lombok.*;
 
-@Setter
 @Getter
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class MajorDTO {
+public class ClazzDTO {
     private String code;
-    private String name;
+    private String description;
 }

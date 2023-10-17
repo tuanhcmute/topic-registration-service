@@ -17,22 +17,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfiguration {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
     private final AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
-    @Value("${app.security.permit-all.ant-pattern}")
+    @Value("${app.security.permitAll.antPattern}")
     private String[] antPatterns;
-
-    // @Bean
-    // public CustomAuthenticationEntryPoint customAuthenticationEntryPoint() {
-    //     return new CustomAuthenticationEntryPoint();
-    // }
 
     @Bean
     public CustomAccessDeniedHandler customAccessDeniedHandler() {

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { HiOutlineUserGroup } from "react-icons/hi";
-import { MdOutlineArrowDropDown } from "react-icons/md";
 import { CiLogout } from "react-icons/ci";
 import { FaBars } from "react-icons/fa";
 import { PiUserCircleGearLight } from "react-icons/pi";
@@ -103,12 +102,17 @@ function AppHeader() {
           </div>
           {/* Profile */}
           <div
-            className='flex items-center text-primary cursor-pointer px-2 py-3 dark:text-whiteSmoke'
+            className='flex items-center text-primary cursor-pointer px-2 py-3 dark:text-whiteSmoke gap-1'
             id='info'
             data-tooltip-variant='light'
           >
-            <span className='font-bold'>{currentUser.fullName}</span>
-            <MdOutlineArrowDropDown className='w-5 h-5' />
+            <img
+              className='object-cover w-6 h-6 rounded-full'
+              src={currentUser.imageUrl}
+              alt=''
+            />
+            <span className='font-bold'>{currentUser.name}</span>
+            {/* <MdOutlineArrowDropDown className='w-5 h-5' /> */}
           </div>
           {/* End profile */}
           {/* Dropdown will be displayed when hovering on Profile */}

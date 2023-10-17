@@ -30,10 +30,7 @@ public class User implements Serializable {
     @Column(name = "ntid_column", nullable = false, unique = true, updatable = false)
     private String ntid;
 
-    @Column(name = "role_column", nullable = false)
-    private String role;
-
-    @Column(name = "email_column", nullable = false, unique = true, updatable = false)
+    @Column(name = "email_column", nullable = false, unique = true)
     private String email;
 
     @Column(name = "image_url_column")
@@ -42,13 +39,13 @@ public class User implements Serializable {
     @Column(name = "name_column", nullable = false)
     private String name;
 
-    @Column(name = "password_column")
+    @Column(name = "password_column", nullable = false)
     private String password;
 
     @Column(name = "phone_number_column", nullable = false, unique = true, columnDefinition = "VARCHAR(10)")
     private String phoneNumber;
 
-    @Column(name = "provider_id_column", nullable = false)
+    @Column(name = "provider_id_column")
     private String providerId;
 
     @Enumerated(EnumType.STRING)
@@ -56,8 +53,7 @@ public class User implements Serializable {
     private OAuth2Provider provider;
 
     @Column(name = "email_verified_column", nullable = false)
-    @Builder.Default
-    private Boolean emailVerified = false;
+    private Boolean emailVerified;
 
     @Column(name = "biography_column")
     private String biography;
@@ -70,7 +66,7 @@ public class User implements Serializable {
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @Column(name = "updated_date_column")
+    @Column(name = "updated_date_column", nullable = false)
     private LocalDateTime updatedDate;
 
     @Column(name = "school_year_column")
@@ -84,7 +80,7 @@ public class User implements Serializable {
     @JoinColumn
     private Major major;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<UserRole> userRoles;
 
 }

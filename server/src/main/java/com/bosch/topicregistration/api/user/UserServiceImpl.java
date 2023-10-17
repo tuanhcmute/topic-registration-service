@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
 
     public UserResponse<UserDTO> getUserProfile() {
         Optional<UserPrincipal> userPrincipalOptional = auditorAware.getCurrentAuditor();
-        if(!userPrincipalOptional.isPresent())
+        if (!userPrincipalOptional.isPresent())
             return UserResponse.<UserDTO>builder()
                     .message("Email could not be found")
                     .statusCode(HttpStatus.BAD_REQUEST.value())
