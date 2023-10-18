@@ -52,15 +52,17 @@ const Enrollment = db.define<EnrollmentInstance>(
 
 // Define the many-to-many relationship between User and Topic through Enrollment
 User.belongsToMany(Topic, {
-  through: Enrollment,
+  through: { model: Enrollment },
   foreignKey: "studentId", // The foreign key in the Enrollment table that links to User
   otherKey: "topicId", // The foreign key in the Enrollment table that links to Topic
+  as: "students",
 });
 
 Topic.belongsToMany(User, {
-  through: Enrollment,
+  through: { model: Enrollment },
   foreignKey: "topicId", // The foreign key in the Enrollment table that links to Topic
   otherKey: "studentId", // The foreign key in the Enrollment table that links to User
+  as: "students",
 });
 
 // // Optionally, you can add additional metadata to the association

@@ -49,6 +49,6 @@ const Class = db.define<ClassInstance>(
 );
 
 Class.hasMany(User, { foreignKey: "classId" });
-User.belongsTo(Class, { foreignKey: "id", as: "class" });
+User.belongsTo(Class, { foreignKey: "id", as: "clazz" });
 
 export { ClassInstance, ClassAttributes, Class };

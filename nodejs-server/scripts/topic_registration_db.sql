@@ -198,8 +198,9 @@ CREATE TABLE Division(
 INSERT INTO `User` (id, code, role, email, image_url, full_name, phone_number, provider_id, `password`, provider, biography, school_year, created_by, class_id, major_id, specialization_id)
 VALUES
   ('1', '20110756', 'STUDENT', 'user1@example.com', '', 'User One', '+123456789', 'provider1', 'hashed_password1', 'GOOGLE', 'Biography 1', 2, 'admin1', '1', '2', '3'),
-  ('2', '20110757', 'STUDENT', 'user2@example.com', '', 'User Two', '+987654321', 'provider2', 'hashed_password2', 'GITHUB', 'Biography 2', 3, 'admin2', '3', '4', '5');
-  
+  ('2', '20110757', 'STUDENT', 'user2@example.com', '', 'User Two', '+987654321', 'provider2', 'hashed_password2', 'GITHUB', 'Biography 2', 3, 'admin2', '3', '4', '5'),
+   ('3', '20110758', 'ADMIN', 'user3@example.com', '', 'User Three', '+555555555', 'provider3', 'hashed_password3', 'GOOGLE', 'Biography 3', 4, 'admin3', null, '4', '3'),
+  ('4', '20110759', 'STUDENT', 'user4@example.com', '', 'User Four', '+666666666', 'provider4', 'hashed_password4', 'GITHUB', 'Biography 4', 1, 'admin4', '3', '2', '2');
 
 -- Insert data into the Topic table with specialization_id set to null and lecture_id set to '1'
 INSERT INTO Topic (id, code, name, type, goal, expectation, requirement, status, max_slot, rest_slot, created_by, semester_id, specialization_id, lecture_id, enrollment_period_id)
@@ -210,7 +211,18 @@ VALUES
 ('4', 'T4', 'Topic 4', 'KLTN', 'Advanced topics', 'Expect advanced discussions', 'No special requirements', 'Active', 35, 35, 'Bob Brown', null, null, '1', 'EP202302'),
 ('5', 'T5', 'Topic 5', 'TLCN', 'Hands-on experience', 'Expect practical sessions', 'Prerequisite: Topic 3', 'Active', 40, 40, 'Eve Wilson', null, null, '1', 'EP202301');
 
+INSERT INTO Enrollment (id, topic_id, student_id, created_by)
+VALUES
+  ('1', '1', '1', 'Admin1'),
+  ('2', '2', '2', 'Admin2'),
+  ('3', '3', '3', 'Admin3'),
+  ('4', '4', '4', 'Admin4');
+  
 
+  
+  update Topic set lecture_id='cdb08cf6-7cdd-49e3-a5c1-5fb51fe353c5';
+  
+  select * from User;
 
 
 

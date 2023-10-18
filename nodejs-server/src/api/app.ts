@@ -28,7 +28,7 @@ app.use(
     keys: [keys.session.cookieKey],
   })
 );
-// app.use(authorizeUser);
+app.use(authorizeUser);
 app.use(logMiddleware);
 
 //initialize passport

@@ -32,7 +32,7 @@ class UserService {
           },
           {
             model: Class,
-            as: "class",
+            as: "clazz",
             attributes: ["code", "name"],
           },
         ],

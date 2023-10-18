@@ -2,6 +2,7 @@ import { NextFunction, Request, Response, query } from "express";
 import { TopicInstance } from "@models";
 import { TopicService } from "@services";
 import { error } from "console";
+import { TeacherTopicOut } from "@interfaces/topic.interface";
 
 export default class TopicController {
   private topicService: TopicService = new TopicService();
@@ -12,11 +13,13 @@ export default class TopicController {
     next: NextFunction
   ): Promise<void> => {
     try {
+      const userId = res.locals.userId;
       const type = req.query.type as string;
       const periodId = req.query["enrollment-period"] as string;
-      const topics: TopicInstance[] = await this.topicService.getAllTopics(
+      const topics: TeacherTopicOut[] = await this.topicService.getAllTopics(
         type,
-        periodId
+        periodId,
+        userId
       );
       res.status(200).json(topics);
     } catch (err) {
