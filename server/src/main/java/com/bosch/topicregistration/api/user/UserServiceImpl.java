@@ -47,4 +47,18 @@ public class UserServiceImpl implements UserService {
                 .data(data)
                 .build();
     }
+
+    @Override
+    public UserResponse<UserDTO> updateBiographyInUserProfile(String biography) {
+        Optional<UserPrincipal> userPrincipalOptional = auditorAware.getCurrentAuditor();
+        UserPrincipal userPrincipal = userPrincipalOptional.get();
+        String email = userPrincipal.getUsername();
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        userOptional.get().setBiography(biography);
+        userRepository.save(userOptional.get());
+       return UserResponse.<UserDTO>builder()
+                .message("User's biography has been updated successfully")
+                .statusCode(HttpStatus.OK.value())
+                .build();
+    }
 }

@@ -4,30 +4,30 @@ server:
     context-path: /api/v1
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url:
-    username:
-    password:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: password
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id:
-            client-secret:
+            client-id: client-id
+            client-secret: client-secret
             scope:
               - email
               - profile
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
         format_sql: true
 app:
   jwt:
-    secretKey:
+    secretKey: 54e1ac0d-820a-453b-aef5-2840f4b004dd
   security:
     permitAll:
       antPattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status
