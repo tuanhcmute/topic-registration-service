@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> userOptional = userRepository.findByEmail(email);
         userOptional.get().setBiography(biography);
         userRepository.save(userOptional.get());
-       return UserResponse.<UserDTO>builder()
+        return UserResponse.<UserDTO>builder()
                 .message("User's biography has been updated successfully")
                 .statusCode(HttpStatus.OK.value())
                 .build();
