@@ -1,5 +1,6 @@
 package com.bosch.topicregistration.api.user;
 
+import com.bosch.topicregistration.api.response.Response;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,8 +20,8 @@ public class UserController {
 
     @GetMapping("/profile")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_HEAD')")
-    public UserResponse<UserDTO> getUserProfile() {
+    @PreAuthorize("hasAuthority('ROLE_ANONYMOUS') or hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_HEAD')")
+    public Response<UserDTO> getUserProfile() {
         return userService.getUserProfile();
     }
 }

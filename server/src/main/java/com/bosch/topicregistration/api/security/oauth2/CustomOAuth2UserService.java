@@ -2,8 +2,7 @@ package com.bosch.topicregistration.api.security.oauth2;
 
 import com.bosch.topicregistration.api.exception.OAuth2AuthenticationProcessingException;
 import com.bosch.topicregistration.api.security.jwt.UserPrincipal;
-import com.bosch.topicregistration.api.user.User;
-import com.bosch.topicregistration.api.user.UserRepository;
+import com.bosch.topicregistration.api.user.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +22,11 @@ import java.util.UUID;
 @Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final UserRoleRepository userRoleRepository;
+
+    private static final String POSTFIX_STUDENT_EMAIL = "@student.hcmute.edu.vn";
+    private static final String POSTFIX_LECTURE_EMAIL = "@hcmute.edu.vn";
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -64,17 +68,37 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User registerNewUser(OAuth2UserRequest userRequest, OAuth2UserInfo oAuth2UserInfo) {
+        Boolean emailVerified = (Boolean) oAuth2UserInfo.getAttributes().get("email_verified");
+
         User user = User.builder()
                 .name(oAuth2UserInfo.getName())
                 .email(oAuth2UserInfo.getEmail())
                 .imageUrl(oAuth2UserInfo.getImageUrl())
                 .provider(OAuth2Provider.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase()))
                 .providerId(oAuth2UserInfo.getId())
-                .ntid(UUID.randomUUID().toString())
-                .phoneNumber(UUID.randomUUID().toString().substring(0, 9))
-                .createdBy(UUID.randomUUID().toString().substring(0, 9))
+                .createdBy(UUID.randomUUID().toString())
+                .emailVerified(emailVerified)
                 .build();
-        userRepository.save(user);
+//        Set user role
+        UserRole userRole = UserRole.builder().user(user).build();
+        Optional<Role> roleOptional;
+        String ntid = oAuth2UserInfo.getId();
+        if(oAuth2UserInfo.getEmail().contains(POSTFIX_STUDENT_EMAIL)) {
+            roleOptional = roleRepository.findByCode(RoleCode.ROLE_STUDENT);
+            // ntid: 20110345
+            ntid = oAuth2UserInfo.getEmail().substring(0, 9);
+        } else if (oAuth2UserInfo.getEmail().contains(POSTFIX_LECTURE_EMAIL)) {
+            roleOptional = roleRepository.findByCode(RoleCode.ROLE_LECTURE);
+            ntid = oAuth2UserInfo.getId().substring(0, 4);
+        } else {
+            roleOptional = roleRepository.findByCode(RoleCode.ROLE_ANONYMOUS);
+        }
+        roleOptional.ifPresent(userRole::setRole);
+        user.setNtid(ntid);
+        user.setPassword(user.getNtid());
+        user.getUserRoles().add(userRole);
+        userRoleRepository.save(userRole);
+        log.info("User role saved: {}", userRole.getId());
         log.info("Register new user: {}", user.getEmail());
         return user;
     }

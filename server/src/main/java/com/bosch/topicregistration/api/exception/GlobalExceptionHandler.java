@@ -1,5 +1,6 @@
 package com.bosch.topicregistration.api.exception;
 
+import com.bosch.topicregistration.api.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -14,19 +15,19 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({AuthenticationException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ExceptionResponse handleAuthenticationException(Exception ex) {
+    public Response<Void> handleAuthenticationException(Exception ex) {
         log.info(ex.getMessage());
-        return ExceptionResponse.builder()
+        return Response.<Void>builder()
                 .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .message(ex.getMessage())
                 .build();
     }
 
     @ExceptionHandler({BadRequestException.class})
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ExceptionResponse handleBadRequestException(Exception ex) {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Response<Void> handleBadRequestException(Exception ex) {
         log.info(ex.getMessage());
-        return ExceptionResponse.builder()
+        return Response.<Void>builder()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .message(ex.getMessage())
                 .build();
@@ -34,10 +35,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({AccessDeniedException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ExceptionResponse handleAccessDeniedException(Exception ex) {
+    public Response<Void> handleAccessDeniedException(Exception ex) {
         log.info(ex.getMessage());
-        return ExceptionResponse.builder()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
+        return Response.<Void>builder()
+                .statusCode(HttpStatus.FORBIDDEN.value())
                 .message(ex.getMessage())
                 .build();
     }

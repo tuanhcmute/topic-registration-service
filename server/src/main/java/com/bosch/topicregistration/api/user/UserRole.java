@@ -22,7 +22,7 @@ public class UserRole implements Serializable {
     @Column(name = "id_column", updatable = false)
     private String id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn
     private User user;
 

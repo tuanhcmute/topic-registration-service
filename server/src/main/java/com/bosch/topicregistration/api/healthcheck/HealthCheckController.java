@@ -1,5 +1,6 @@
 package com.bosch.topicregistration.api.healthcheck;
 
+import com.bosch.topicregistration.api.response.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +23,8 @@ public class HealthCheckController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(hidden = true)
-    public HealthCheckResponse getHealthCheckStatus() {
-        HealthCheckResponse response = HealthCheckResponse.builder()
+    public Response<Void> getHealthCheckStatus() {
+        Response<Void> response = Response.<Void>builder()
                 .message("Application is running on port " + port)
                 .statusCode(HttpStatus.OK.value())
                 .build();
