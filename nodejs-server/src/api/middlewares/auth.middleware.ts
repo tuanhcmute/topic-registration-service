@@ -15,21 +15,20 @@ export const authFilterRestrictAccess =
             new ResponseModelBuilder<null>()
               .withStatusCode(StatusCode.UNAUTHORIZED)
               .withMessage(ErrorMessages.UNAUTHORIZED)
-              .withData(null)
               .build()
           );
       }
 
-      const decoded = await verifyToken(token);
-
-      if (!decoded) {
+      let decoded;
+      try {
+        decoded = await verifyToken(token);
+      } catch (err: any) {
         return res
           .status(401)
           .json(
             new ResponseModelBuilder()
-              .withMessage(ErrorMessages.INVALID_TOKEN)
               .withStatusCode(StatusCode.UNAUTHORIZED)
-              .withData(null)
+              .withMessage(err.message)
               .build()
           );
       }
@@ -82,10 +81,9 @@ export const authorizeUser = async (
       return res
         .status(401)
         .json(
-          new ResponseModelBuilder<null>()
+          new ResponseModelBuilder()
             .withStatusCode(StatusCode.UNAUTHORIZED)
             .withMessage(ErrorMessages.UNAUTHORIZED)
-            .withData(null)
             .build()
         );
     } else {
@@ -93,16 +91,16 @@ export const authorizeUser = async (
         token = token.slice("bearer".length).trim();
       }
 
-      const decoded = await verifyToken(token);
-
-      if (!decoded) {
+      let decoded;
+      try {
+        decoded = await verifyToken(token);
+      } catch (err: any) {
         return res
           .status(401)
           .json(
-            new ResponseModelBuilder<null>()
+            new ResponseModelBuilder()
               .withStatusCode(StatusCode.UNAUTHORIZED)
-              .withMessage(ErrorMessages.UNAUTHORIZED)
-              .withData(null)
+              .withMessage(err.message)
               .build()
           );
       }
@@ -112,7 +110,6 @@ export const authorizeUser = async (
     }
     next();
   } catch (err) {
-    console.log(err);
     // Handle errors here
     next(err);
   }

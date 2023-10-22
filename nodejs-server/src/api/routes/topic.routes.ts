@@ -2,6 +2,8 @@ import { Router } from "express";
 import { IRoutes } from "@interfaces";
 import { TopicController } from "@controllers";
 import { User } from "@models";
+import { authFilterRestrictAccess } from "@middlewares";
+import { Role } from "@configs/constants";
 
 export default class TopicRoutes implements IRoutes {
   public path = "/topic";
@@ -13,7 +15,11 @@ export default class TopicRoutes implements IRoutes {
   }
 
   private initializeRoutes() {
-    this.router.get(`${this.path}/`, this.topicController.getAllTopics);
+    this.router.get(
+      `${this.path}/`,
+      authFilterRestrictAccess("ADMIN"),
+      this.topicController.getAllTopics
+    );
     // this.router.get("/topics/:id", this.topicController.getTopicById);
     // this.router.post("/topics", this.topicController.createTopic);
     // this.router.put("/topics/:id", this.topicController.updateTopic);
