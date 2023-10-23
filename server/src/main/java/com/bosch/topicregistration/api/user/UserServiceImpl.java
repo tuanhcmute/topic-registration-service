@@ -45,10 +45,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Response<UserDTO> updateBiographyInUserProfile(String biography) {
         if(!biography.isEmpty()) {
-            Optional<UserPrincipal> userPrincipalOptional = auditorAware.getCurrentAuditor();
-            UserPrincipal userPrincipal = userPrincipalOptional.get();
-            String email = userPrincipal.getUsername();
-            Optional<User> userOptional = userRepository.findByEmail(email);
+            Optional<User> userOptional = userCommon.getCurrentUserByCurrentAuditor();
             userOptional.get().setBiography(biography);
             userRepository.save(userOptional.get());
             return Response.<UserDTO>builder()
