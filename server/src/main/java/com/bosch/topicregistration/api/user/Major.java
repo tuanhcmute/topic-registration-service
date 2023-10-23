@@ -1,11 +1,13 @@
 package com.bosch.topicregistration.api.user;
 
+import com.bosch.topicregistration.api.enrollment.topic.Topic;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -41,5 +43,10 @@ public class Major implements Serializable {
     private LocalDateTime updatedDate;
 
     @OneToMany(mappedBy = "major")
-    private Set<User> users;
+    @Builder.Default
+    private Set<User> users = new HashSet<>();
+
+    @OneToMany(mappedBy = "major")
+    @Builder.Default
+    private Set<Topic> topics = new HashSet<>();
 }

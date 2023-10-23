@@ -1,5 +1,6 @@
 package com.bosch.topicregistration.api.user;
 
+import com.bosch.topicregistration.api.enrollment.topic.Topic;
 import com.bosch.topicregistration.api.security.oauth2.OAuth2Provider;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -42,7 +44,7 @@ public class User implements Serializable {
     @Column(name = "password_column", nullable = false)
     private String password;
 
-    @Column(name = "phone_number_column", nullable = false, unique = true, columnDefinition = "VARCHAR(10)")
+    @Column(name = "phone_number_column", unique = true, columnDefinition = "VARCHAR(10)")
     private String phoneNumber;
 
     @Column(name = "provider_id_column")
@@ -81,6 +83,11 @@ public class User implements Serializable {
     private Major major;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private Set<UserRole> userRoles;
+    @Builder.Default
+    private Set<UserRole> userRoles = new HashSet<>();
+
+    @OneToMany(mappedBy = "lecture")
+    @Builder.Default
+    private Set<Topic> topics = new HashSet<>();
 
 }

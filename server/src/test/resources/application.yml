@@ -27,7 +27,13 @@ spring:
         format_sql: true
 app:
   jwt:
-    secret-key: secret-key
+    secretKey: 54e1ac0d-820a-453b-aef5-2840f4b004dd
   security:
-    permit-all:
-      ant-pattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status
+    permitAll:
+      antPattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status
+    cors:
+      allowedOrigin: '*'
+      allowedMethods: '*'
+      allowedHeaders: '*'
+      allowedCredentials: false
+      corsConfiguration: '/**'
