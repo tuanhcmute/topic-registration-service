@@ -7,6 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,10 +38,10 @@ public class Semester {
     private String name;
 
     @Column(name = "start_date_column", nullable = false, unique = true)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date_column", nullable = false, unique = true)
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     @Column(name = "created_by_column")
     private String createdBy;
@@ -53,7 +54,7 @@ public class Semester {
     @Column(name = "updated_date_column", nullable = false)
     private LocalDateTime updatedDate;
 
-    @OneToMany(mappedBy = "semester")
+    @OneToMany(mappedBy = "semester", fetch = FetchType.EAGER)
     @Builder.Default
     private Set<EnrollmentPeriod> enrollmentPeriods = new HashSet<>();
 

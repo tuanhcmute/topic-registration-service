@@ -21,12 +21,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+    private static final String POSTFIX_STUDENT_EMAIL = "@student.hcmute.edu.vn";
+    private static final String POSTFIX_LECTURE_EMAIL = "@hcmute.edu.vn";
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
-
-    private static final String POSTFIX_STUDENT_EMAIL = "@student.hcmute.edu.vn";
-    private static final String POSTFIX_LECTURE_EMAIL = "@hcmute.edu.vn";
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -83,7 +82,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         UserRole userRole = UserRole.builder().user(user).build();
         Optional<Role> roleOptional;
         String ntid = oAuth2UserInfo.getId();
-        if(oAuth2UserInfo.getEmail().contains(POSTFIX_STUDENT_EMAIL)) {
+        if (oAuth2UserInfo.getEmail().contains(POSTFIX_STUDENT_EMAIL)) {
             roleOptional = roleRepository.findByCode(RoleCode.ROLE_STUDENT);
             // ntid: 20110345
             ntid = oAuth2UserInfo.getEmail().substring(0, 9);
