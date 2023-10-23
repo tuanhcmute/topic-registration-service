@@ -4,4 +4,5 @@ import com.bosch.topicregistration.api.response.Response;
 
 public interface UserService {
     Response<UserDTO> getUserProfile();
+    Response<UserDTO> updateBiographyInUserProfile(String biography);
 }

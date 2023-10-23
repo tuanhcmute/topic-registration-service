@@ -5,16 +5,16 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url:
-    username:
-    password:
+    url: 
+    username: 
+    password: 
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id:
-            client-secret:
+            client-id: 
+            client-secret: 
             scope:
               - email
               - profile
@@ -27,7 +27,7 @@ spring:
         format_sql: true
 app:
   jwt:
-    secretKey:
+    secretKey: 
   security:
     permitAll:
       antPattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status
