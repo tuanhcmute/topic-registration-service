@@ -22,6 +22,7 @@ public class UserServiceImpl implements UserService {
     private final UserCommon userCommon;
     private final UserRepository userRepository;
 
+    @Override
     @LoggerAround
     public Response<UserDTO> getUserProfile() {
         Optional<User> userOptional = userCommon.getCurrentUserByCurrentAuditor();
