@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha -r ts-node/register src/tests/**/*.ts",
     "start": "ts-node -r tsconfig-paths/register src/api/app.ts",
-    "dev": "nodemon --exec  'ts-node -r tsconfig-paths/register --transpile-only' src/api/app.ts",
+    "dev": "nodemon",
     "build": "tsc && tsc-alias -p ."
   },
   "author": "thanhduy",
@@ -54,6 +54,7 @@
     "chai": "^4.3.8",
     "mocha": "^10.2.0",
     "nodemon": "^3.0.1",
+    "openssl": "^2.0.0",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0"
   }
