@@ -35,7 +35,7 @@ public class UserController {
 
     @PutMapping(path = "/profile", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     @ResponseStatus(HttpStatus.OK)
-    // @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_HEAD')")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_HEAD')")
     public UserResponse<UserDTO> updateBiographyInUserProfile( @RequestParam MultiValueMap<String,String> paramMap) {
         try {
             String biography = paramMap.get("biography").get(0);
