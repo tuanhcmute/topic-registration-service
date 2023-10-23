@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bosch.topicregistration.api.exception.BadRequestException;
+import com.bosch.topicregistration.api.logging.LoggerAround;
 import com.bosch.topicregistration.api.response.Response;
 
 @Slf4j
@@ -29,14 +30,16 @@ public class UserController {
 
     @GetMapping("/profile")
     @ResponseStatus(HttpStatus.OK)
-    // @PreAuthorize("hasAuthority('ROLE_ANONYMOUS') or hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_HEAD')")
+    @PreAuthorize("hasAuthority('ROLE_ANONYMOUS') or hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_HEAD')")
+    @LoggerAround
     public Response<UserDTO> getUserProfile() {
         return userService.getUserProfile();
     }
 
     @PutMapping(path = "/profile", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     @ResponseStatus(HttpStatus.OK)
-    // @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_HEAD')")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_HEAD')")
+    @LoggerAround
     public Response<UserDTO> updateBiographyInUserProfile( @RequestParam MultiValueMap<String,String> paramMap) {
         try {
             String biography = paramMap.get("biography").get(0);
