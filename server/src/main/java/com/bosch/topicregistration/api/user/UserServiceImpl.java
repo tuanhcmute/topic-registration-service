@@ -1,8 +1,11 @@
 package com.bosch.topicregistration.api.user;
 
+import com.bosch.topicregistration.api.response.Response;
 import com.bosch.topicregistration.api.security.jwt.UserPrincipal;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,24 +18,15 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final AuditorAware<UserPrincipal> auditorAware;
+    private final UserCommon userCommon;
+    private final UserRepository userRepository;
+    private final AuditorAware auditorAware;
 
-    public UserResponse<UserDTO> getUserProfile() {
-        Optional<UserPrincipal> userPrincipalOptional = auditorAware.getCurrentAuditor();
-        if (!userPrincipalOptional.isPresent())
-            return UserResponse.<UserDTO>builder()
-                    .message("Email could not be found")
-                    .statusCode(HttpStatus.BAD_REQUEST.value())
-                    .build();
-
-        UserPrincipal userPrincipal = userPrincipalOptional.get();
-        String email = userPrincipal.getUsername();
-        log.info("Get profile of email: {}", email);
-        Optional<User> userOptional = userRepository.findByEmail(email);
+    public Response<UserDTO> getUserProfile() {
+        Optional<User> userOptional = userCommon.getCurrentUserByCurrentAuditor();
         if (!userOptional.isPresent())
-            return UserResponse.<UserDTO>builder()
+            return Response.<UserDTO>builder()
                     .message("User could not be found")
                     .statusCode(HttpStatus.BAD_REQUEST.value())
                     .build();
@@ -41,7 +35,7 @@ public class UserServiceImpl implements UserService {
         log.info("userId: {}", user.getId());
         Map<String, UserDTO> data = new HashMap<>();
         data.put("profile", userMapper.toDTO(user));
-        return UserResponse.<UserDTO>builder()
+        return Response.<UserDTO>builder()
                 .message("User's profile has been successfully retrieved")
                 .statusCode(HttpStatus.OK.value())
                 .data(data)
@@ -49,16 +43,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse<UserDTO> updateBiographyInUserProfile(String biography) {
-        Optional<UserPrincipal> userPrincipalOptional = auditorAware.getCurrentAuditor();
-        UserPrincipal userPrincipal = userPrincipalOptional.get();
-        String email = userPrincipal.getUsername();
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        userOptional.get().setBiography(biography);
-        userRepository.save(userOptional.get());
-        return UserResponse.<UserDTO>builder()
-                .message("User's biography has been updated successfully")
-                .statusCode(HttpStatus.OK.value())
-                .build();
+    public Response<UserDTO> updateBiographyInUserProfile(String biography) {
+        if(!biography.isEmpty()) {
+            Optional<UserPrincipal> userPrincipalOptional = auditorAware.getCurrentAuditor();
+            UserPrincipal userPrincipal = userPrincipalOptional.get();
+            String email = userPrincipal.getUsername();
+            Optional<User> userOptional = userRepository.findByEmail(email);
+            userOptional.get().setBiography(biography);
+            userRepository.save(userOptional.get());
+            return Response.<UserDTO>builder()
+                    .message("User's biography has been updated successfully")
+                    .statusCode(HttpStatus.OK.value())
+                    .build();
+        } else {
+            return Response.<UserDTO>builder()
+                    .message("User's biography has been updated failed - Value is empty")
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .build();
+        }
     }
 }

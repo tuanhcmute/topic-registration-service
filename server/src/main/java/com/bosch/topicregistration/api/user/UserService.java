@@ -1,6 +1,8 @@
 package com.bosch.topicregistration.api.user;
 
+import com.bosch.topicregistration.api.response.Response;
+
 public interface UserService {
-    UserResponse<UserDTO> getUserProfile();
-    UserResponse<UserDTO> updateBiographyInUserProfile(String biography);
+    Response<UserDTO> getUserProfile();
+    Response<UserDTO> updateBiographyInUserProfile(String biography);
 }
