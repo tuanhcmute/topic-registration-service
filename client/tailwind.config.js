@@ -18,6 +18,8 @@ module.exports = {
       green: "#008000",
       orange: "#FFA500",
       slate: "#0f172a",
+      "black-pearl": "#171c24",
+      sambuca: "#222b36",
     },
     extend: {
       fontFamily: {

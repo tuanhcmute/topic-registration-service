@@ -18,7 +18,7 @@ const dropdownItems = [
     id: uuidv4(),
     text: "Thông tin cá nhân",
     icon: PiUserCircleGearLight,
-    to: paths.PROFILE,
+    to: "/lecture/profile",
   },
   {
     id: uuidv4(),
@@ -28,7 +28,7 @@ const dropdownItems = [
   },
 ];
 
-function AppHeader() {
+function AppLectureHeader() {
   const dispatch = useDispatch();
   const overlayRef = useRef();
   const navigationRef = useRef();
@@ -39,15 +39,12 @@ function AppHeader() {
     overlayRef.current.classList.toggle("hidden");
     toggleNavigation();
   }
-
   function toggleNavigation() {
     navigationRef.current.classList.toggle("-translate-x-full");
   }
-
   function clickBarsIcon() {
     toggleOverlay();
   }
-
   function clickLogout(e) {
     e.preventDefault();
     dispatch(logout());
@@ -68,7 +65,7 @@ function AppHeader() {
         {/* Logo UTE */}
         <NavLink
           replace
-          to={paths.HOME}
+          to='/lecture/home'
           className='xl:w-[200px] lg:w-44 md:w-40 w-36 object-cover cursor-pointer bg-header-logo bg-contain bg-no-repeat h-full bg-center'
         ></NavLink>
         {/* End logo UTE */}
@@ -79,14 +76,14 @@ function AppHeader() {
         >
           <div className='flex md:items-center md:flex-row md:border-none font-bold text-primary flex-col items-start border-b'>
             <Link
-              to={"/topic"}
+              to='/lecture/topic'
               className='hover:bg-primary hover:text-white transition-all ease-in-out flex items-center gap-1 w-full min-w-fit text-start md:p-2 px-2 py-3 dark:text-white'
             >
               <FiBook className='w-4 h-4 md:hidden' />
               <span>Đề tài của tôi</span>
             </Link>
             <Link
-              to={"/lecture"}
+              to='/lecture/view'
               className='hover:bg-primary hover:text-white transition-all ease-in-out flex items-center gap-1 w-full min-w-fit text-start md:p-2 px-2 py-3 dark:text-white'
             >
               <HiOutlineUserGroup className='w-4 h-4 md:hidden' />
@@ -112,7 +109,6 @@ function AppHeader() {
               alt=''
             />
             <span className='font-bold'>{currentUser.name}</span>
-            {/* <MdOutlineArrowDropDown className='w-5 h-5' /> */}
           </div>
           {/* End profile */}
           {/* Dropdown will be displayed when hovering on Profile */}
@@ -156,4 +152,4 @@ function AppHeader() {
   );
 }
 
-export default AppHeader;
+export default AppLectureHeader;

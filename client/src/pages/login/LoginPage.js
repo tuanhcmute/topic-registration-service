@@ -10,7 +10,6 @@ function LoginPage() {
 
   useLayoutEffect(() => {
     authenticated && navigate(-1);
-    return () => console.log("Cleanup function is executed");
   }, [authenticated, navigate]);
 
   return (

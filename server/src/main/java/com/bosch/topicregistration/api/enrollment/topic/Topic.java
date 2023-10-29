@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "topic_tbl")
+@EntityListeners(AuditingEntityListener.class)
 public class Topic implements Serializable {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -44,6 +46,12 @@ public class Topic implements Serializable {
     @Enumerated(value = EnumType.STRING)
     @Column(name = "status_column", nullable = false)
     private TopicStatus status;
+
+    @Column(name = "max_slot_column", nullable = false)
+    private Integer maxSlot;
+
+    @Column(name = "available_slot_column", nullable = false)
+    private Integer availableSlot;
 
     @Column(name = "created_by_column")
     private String createdBy;

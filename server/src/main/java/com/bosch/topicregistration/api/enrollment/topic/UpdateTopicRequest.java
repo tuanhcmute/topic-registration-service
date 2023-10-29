@@ -2,26 +2,20 @@ package com.bosch.topicregistration.api.enrollment.topic;
 
 import lombok.*;
 
-@Getter
-@Setter
+import java.util.HashSet;
+import java.util.Set;
+
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
-public class TopicDTO {
+public class UpdateTopicRequest {
     private String id;
-
-    private String name;
-
-    private TopicType type;
-
+    private String topicName;
     private String goal;
-
     private String requirement;
-
-    private TopicStatus status;
-
     private Integer maxSlot;
-
-    private Integer availableSlot;
-
+    @Builder.Default
+    private Set<String> students = new HashSet<>();
 }
