@@ -1,7 +1,7 @@
 import { Navigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loggedIn, fetchUserInfo } from "../../features/auth/authSlice";
-import { ACCESS_TOKEN, paths } from "../../utils/constants";
+import { ACCESS_TOKEN, paths, roles } from "../../utils/constants";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 
@@ -11,10 +11,10 @@ function OAuth2RedirectHandler() {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const authenticated = useSelector((state) => state.auth.authenticated);
+  const currentUser = useSelector((state) => state.auth.currentUser);
 
   // Display message after login successful
   useEffect(() => {
-    console.log("OAuth2RedirectHandler re-render");
     if (authenticated) {
       toast.success("Đăng nhập thành công!", {
         position: "top-right",
@@ -28,7 +28,6 @@ function OAuth2RedirectHandler() {
       });
     }
   }, [authenticated]);
-
   useEffect(() => {
     function getUrlParameter(name) {
       return searchParams.get(name);
@@ -39,14 +38,12 @@ function OAuth2RedirectHandler() {
       dispatch(fetchUserInfo());
     }
   }, [dispatch, searchParams]);
+  console.log(currentUser);
 
-  console.log("OAuth2RedirectHandler will mount");
-
-  return authenticated ? (
-    <Navigate to={paths.HOME} replace />
-  ) : (
-    <Navigate to={paths.LOGIN} />
-  );
+  if (!authenticated) return <Navigate to={paths.LOGIN} replace />;
+  // if (currentUser?.userRoles.includes(roles.ROLE_STUDENT))
+  //   return <Navigate to='/student/home' replace />;
+  return <Navigate to='/lecture/home' replace />;
 }
 
 export default OAuth2RedirectHandler;

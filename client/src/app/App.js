@@ -1,17 +1,18 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { ToastContainer } from "react-toastify";
 import { Outlet } from "react-router-dom";
 
-import AppHeader from "./AppHeader";
 import AppFooter from "./AppFooter";
 
-function App() {
+function App(props) {
+  const { header: Header } = props;
   return (
     <React.Fragment>
-      <AppHeader />
+      <Header />
       <main
         id='app-main'
-        className='xl:mt-24 lg:mt-20 md:mt-16 mt-14 bg-whiteSmoke dark:bg-slate'
+        className='xl:mt-24 lg:mt-20 md:mt-16 mt-14 bg-whiteSmoke dark:bg-black-pearl'
       >
         <Outlet />
       </main>
@@ -22,3 +23,7 @@ function App() {
 }
 
 export default App;
+
+App.propTypes = {
+  header: PropTypes.func.isRequired,
+};

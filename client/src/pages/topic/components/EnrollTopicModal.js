@@ -1,36 +1,63 @@
+import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import Select from "react-select";
-import { Modal, Button, TextInput, Label, Textarea } from "flowbite-react";
+import { Modal, Button, TextInput, Label } from "flowbite-react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
+import * as toipcType from "../../../utils/constants/topicType";
 
 const validationSchema = Yup.object().shape({
+  type: Yup.string().required(),
+  majorCode: Yup.string().required(),
+  ntid: Yup.string().required(),
   topicName: Yup.string().required("Tên đề tài là bắt buộc"),
   goal: Yup.string().required("Yêu cầu đề tài là bắt buộc"),
-  expectation: Yup.string().required("Mục tiêu đề tài là bắt buộc"),
   requirement: Yup.string().required("Kiến thức cần có là bắt buộc"),
+  maxSlot: Yup.number()
+    .min(1, "Số lượng SVTH phải lớn hơn 0")
+    .max(2, "Số lượng SVTH không quá 2")
+    .required("Số lượng SVTH là bắt buộc"),
+  students: Yup.array(),
 });
 
 const options = [
-  { value: "chocolate", label: "Chocolate" },
-  { value: "strawberry", label: "Strawberry" },
-  { value: "vanilla", label: "Vanilla" },
+  { value: "20110756", label: "Pham Nguyen Nhut Truong" },
+  { value: "20110623", label: "Bui Thanh Duy" },
+  { value: "20110205", label: "Vu Hoang Anh" },
+  { value: "20110202", label: "Tran Chi My" },
 ];
 
 function EnrollTopicModal(props) {
-  const { openModal, setOpenModal } = props;
+  const { openModal, setOpenModal, handleNewTopic } = props;
+  const currentUser = useSelector((state) => state.auth?.currentUser);
   const formik = useFormik({
     initialValues: {
+      type: toipcType.TLCN,
+      majorCode: currentUser?.major?.code,
+      ntid: currentUser?.ntid,
+      maxSlot: 2,
       topicName: "",
       goal: "",
-      expectation: "",
       requirement: "",
+      students: [],
     },
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+      handleNewTopic(values);
     },
     validationSchema,
   });
+
+  function changeSelect(selectedOption) {
+    console.log(selectedOption);
+    const studentCodes = selectedOption?.map((item) => item.value);
+    formik.values = {
+      ...formik.values,
+      students: studentCodes?.slice(0, formik.values.maxSlot) || [],
+    };
+  }
 
   return (
     <Modal
@@ -47,7 +74,7 @@ function EnrollTopicModal(props) {
         <div className='space-y-4'>
           {/* EnrollmentPeriod */}
           <TextInput
-            placeholder='name@flowbite.com'
+            placeholder='Đợt đề xuất'
             required
             type='text'
             value='Đợt đề xuất tiểu luận chuyên ngành học kỳ I/2023 (ĐK và duyệt: 01/10 - 20/10/2023)'
@@ -57,12 +84,17 @@ function EnrollTopicModal(props) {
           <div className='grid grid-cols-2 gap-3'>
             {/* Lecture name field */}
             <div className='mb-2 block font-Roboto'>
-              <Label value='Giảng viên hướng dẫn (*)' className='mb-2 block' />
+              <Label
+                value='Giảng viên hướng dẫn (*)'
+                className='mb-2 block'
+                htmlFor='lectureName'
+              />
               <TextInput
+                id='lectureName'
                 placeholder='Nhập giảng viên hưỡng dẫn'
                 required
                 type='text'
-                value='Nguyen Tran Thi Van'
+                value={currentUser?.name}
                 disabled
               />
             </div>
@@ -75,10 +107,11 @@ function EnrollTopicModal(props) {
                 className='mb-2 block'
               />
               <TextInput
+                id='major'
                 placeholder='Nhập chuyên ngành'
                 required
                 type='text'
-                value='Công nghệ thông tin'
+                value={currentUser?.major?.name}
                 disabled
               />
             </div>
@@ -91,6 +124,7 @@ function EnrollTopicModal(props) {
                 className='mb-2 block'
               />
               <TextInput
+                id='head'
                 placeholder='Nhập trưởng bộ môn'
                 required
                 type='text'
@@ -99,6 +133,25 @@ function EnrollTopicModal(props) {
               />
             </div>
             {/* End head field */}
+            {/* Max slot field*/}
+            <div className='mb-2 block font-Roboto'>
+              <Label
+                htmlFor='maxSlot'
+                value='Số lượng SVTH (*)'
+                className='mb-2 block'
+              />
+              <TextInput
+                id='maxSlot'
+                color={formik.errors.maxSlot ? "failure" : "gray"}
+                helperText={formik.errors.maxSlot}
+                placeholder='Nhập số lượng sinh viên...'
+                required
+                type='number'
+                onChange={formik.handleChange}
+                value={formik.values.maxSlot}
+              />
+            </div>
+            {/* End max slot field */}
           </div>
           {/* Topic field */}
           <div className='mb-2 block font-Roboto'>
@@ -106,12 +159,12 @@ function EnrollTopicModal(props) {
               htmlFor='topicName'
               value='Tên đề tài (*)'
               className='mb-2 block'
-              color={formik.errors.topicName ? "failure" : "gray"}
+              color={formik.errors.topicName && "failure"}
             />
             <TextInput
-              color={formik.errors.topicName ? "failure" : "gray"}
+              color={formik.errors.topicName && "failure"}
               helperText={formik.errors.topicName}
-              placeholder='Tên đề tài...'
+              placeholder='Nhập tên đề tài...'
               required
               type='text'
               id='topicName'
@@ -123,77 +176,48 @@ function EnrollTopicModal(props) {
           {/* Goal field */}
           <div className='mb-2 block font-Roboto'>
             <Label
-              color={formik.errors.goal ? "failure" : "gray"}
+              color={formik.errors.goal && "failure"}
               htmlFor='goal'
               value='Yêu cầu đề tài (*)'
               className='mb-2 block'
             />
-            <Textarea
-              id='goal'
-              color={formik.errors.goal ? "failure" : "gray"}
-              value={formik.values.goal}
-              onChange={formik.handleChange}
-              helperText={formik.errors.goal}
-              placeholder='Nhập yêu cầu đề tài....'
-              required
-              type='text'
-              rows={4}
+            <CKEditor
+              editor={ClassicEditor}
+              onChange={(event, editor) => {
+                const data = editor.getData();
+                console.log({ event, editor, data });
+                formik.values.goal = data;
+              }}
             />
           </div>
           {/* End goal field */}
-          {/* Expectation field */}
           <div className='mb-2 block font-Roboto'>
             <Label
-              color={formik.errors.expectation ? "failure" : "gray"}
-              htmlFor='expectation'
-              value='Mục tiêu đề tài (*)'
-              className='mb-2 block'
-            />
-            <Textarea
-              id='expectation'
-              color={formik.errors.expectation ? "failure" : "gray"}
-              value={formik.values.expectation}
-              onChange={formik.handleChange}
-              helperText={formik.errors.expectation}
-              placeholder='Nhập mục tiêu đề tài....'
-              required
-              type='text'
-              rows={4}
-            />
-          </div>
-          {/* End expectation field */}
-          <div className='mb-2 block font-Roboto'>
-            <Label
-              color={formik.errors.requirement ? "failure" : "gray"}
+              color={formik.errors.requirement && "failure"}
               htmlFor='requirement'
               value='Kiến thức cần có (*)'
               className='mb-2 block'
             />
-            <Textarea
-              id='requirement'
-              color={formik.errors.requirement ? "failure" : "gray"}
-              value={formik.values.requirement}
-              onChange={formik.handleChange}
-              helperText={formik.errors.requirement}
-              placeholder='Nhập kiến thức cần có....'
-              required
-              type='text'
-              rows={4}
+            <CKEditor
+              editor={ClassicEditor}
+              onChange={(event, editor) => {
+                const data = editor.getData();
+                formik.values.requirement = data;
+              }}
             />
           </div>
-          <div className='grid grid-cols-2 gap-3'>
+          <div className='grid grid-cols-1 gap-3'>
             <div className='mb-2 block font-Roboto'>
-              <Label
-                htmlFor='email1'
-                value='Sinh viên thực hiện 1'
-                className='mb-2 block'
+              <Label htmlFor='email1' value='SVTH' className='mb-2 block' />
+              <Select
+                placeholder='Lựa chọn SVTH'
+                options={options}
+                isSearchable={true}
+                isMulti={true}
+                onChange={(selectedOption) => changeSelect(selectedOption)}
               />
-              <Select options={options} isSearchable={true} />
             </div>
           </div>
-          <Button color='gray' className='p-0'>
-            Thêm SVTH
-          </Button>
         </div>
       </Modal.Body>
       <Modal.Footer>
@@ -205,17 +229,17 @@ function EnrollTopicModal(props) {
           >
             Hủy bỏ
           </Button>
-          <Button
-            className='p-0'
-            color='green'
-            onClick={() => {
-              console.log(formik.isSubmitting);
-            }}
-            // onClick={() => setOpenModal(undefined)}
-            type='submit'
-          >
-            Lưu lại
-          </Button>
+          <form onSubmit={formik.handleSubmit}>
+            <Button
+              onSubmit={formik.handleSubmit}
+              className='p-0'
+              color='green'
+              // onClick={() => setOpenModal(undefined)}
+              type='submit'
+            >
+              Lưu lại
+            </Button>
+          </form>
         </div>
       </Modal.Footer>
     </Modal>

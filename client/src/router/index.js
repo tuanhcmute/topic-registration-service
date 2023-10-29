@@ -9,22 +9,24 @@ import { ProfilePage as ProfileRoute } from "../pages/profile";
 import { TopicPage as TopicRoute } from "../pages/topic";
 import { LecturePage as LectureRoute } from "../pages/lecture";
 import { LoginPage as LoginRoute } from "../pages/login";
+import { roles } from "../utils/constants";
+import AppLectureHeader from "../app/AppLectureHeader";
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <AppLayout />,
+    path: "lecture",
+    element: <AppLayout header={AppLectureHeader} />,
     errorElement: <ErrorPage />,
     children: [
       {
-        element: <ProtectedRoutes />,
+        element: <ProtectedRoutes role={roles.ROLE_LECTURE} />,
         children: [
           {
-            path: "",
+            path: "home",
             element: <HomeRoute />,
           },
           { path: "topic", element: <TopicRoute /> },
-          { path: "lecture", element: <LectureRoute /> },
+          { path: "view", element: <LectureRoute /> },
           { path: "profile", element: <ProfileRoute /> },
         ],
       },
@@ -32,7 +34,7 @@ const router = createBrowserRouter([
   },
   { path: "oauth2/redirect", element: <OAuth2RedirectHandler /> },
   {
-    path: "/login",
+    path: "login",
     element: <LoginRoute />,
   },
 ]);
