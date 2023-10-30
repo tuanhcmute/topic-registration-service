@@ -38,7 +38,7 @@ public class EnrollmentPeriodImpl implements EnrollmentPeriodService {
             Map<String, EnrollmentPeriodDTO> data = new HashMap<>();
             data.put("enrollmentPeriod", enrollmentPeriodMapper.toDTO(enrollmentPeriod));
             return Response.<EnrollmentPeriodDTO>builder()
-                    .message("User's profile has been successfully retrieved")
+                    .message("Enrollment period has been successfully retrieved")
                     .statusCode(HttpStatus.OK.value())
                     .data(data)
                     .build();
