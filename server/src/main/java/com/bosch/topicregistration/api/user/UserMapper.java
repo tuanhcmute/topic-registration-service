@@ -8,7 +8,6 @@ import java.util.Set;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-
     @Mappings({
             @Mapping(target = "createdDate", source = "user.createdDate", dateFormat = "dd-MM-yyyy HH:mm:ss"),
             @Mapping(target = "updatedDate", source = "user.updatedDate", dateFormat = "dd-MM-yyyy HH:mm:ss")
