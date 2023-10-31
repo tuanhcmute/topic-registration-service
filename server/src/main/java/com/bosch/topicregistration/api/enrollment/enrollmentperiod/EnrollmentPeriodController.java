@@ -24,7 +24,7 @@ public class EnrollmentPeriodController {
 
     @GetMapping("/enrollment-period")
     @ResponseStatus(HttpStatus.OK)
-    // @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_ADMIN')")
     @LoggerAround
     public Response<EnrollmentPeriodDTO> getEnrollmentPeriod(@RequestParam("type") String type,
             @RequestParam("period") String period) {
