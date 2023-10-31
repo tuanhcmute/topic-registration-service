@@ -10,6 +10,7 @@ import {
 import { StatusCode } from "@configs/constants";
 import { ValidateFailException } from "@exceptions";
 import { validate } from "class-validator";
+import { classToPlain, plainToClass, plainToInstance } from "class-transformer";
 
 export default class UserController {
   private userService = new UserService();
@@ -48,12 +49,19 @@ export default class UserController {
   ) => {
     try {
       const userId = res.locals.userId;
-      const bio = req.body as UpdatedBio;
+      const bio = req.body;
+
+      const updatedBio = plainToInstance(UpdatedBio, bio);
 
       // Validate bio
-      const errors = await validate(bio);
+      const errors = await validate(updatedBio);
+      console.info(errors.length);
       if (errors.length > 0) {
-        throw new ValidateFailException(errors.toString());
+        const firstError = errors[0]; // Get the first validation error
+        const errorMessage = firstError.constraints
+          ? Object.values(firstError.constraints)[0]
+          : "No error message available";
+        throw new ValidateFailException(errorMessage);
       } else {
         console.info("Validation succeeded");
       }
