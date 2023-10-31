@@ -24,27 +24,37 @@ public class EnrollmentPeriodImpl implements EnrollmentPeriodService {
     @Override
     @LoggerAround
     public Response<EnrollmentPeriodDTO> getEnrollmentPeriod(String type, String period) {
-        String topicTypeItem = type.toUpperCase();
-        String enrollmentPeriodCodeItem = period.toUpperCase().concat("_ENROLLMENT_PERIOD");
+        // validate Topic type and Period not null
+        if (type.isEmpty())
+            throw new BadRequestException("Type parameter is empty");
+        if (period.isEmpty())
+            throw new BadRequestException("Period parameter is empty");
 
         // validate Topic type
-        boolean isMatchTopicType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), topicTypeItem));
-        if (!isMatchTopicType) throw new BadRequestException("Topic type is not valid");
+        boolean isMatchTopicType = Arrays.stream(TopicType.values())
+                .anyMatch(item -> StringUtils.equals(item.name(), type));
+        if (!isMatchTopicType)
+            throw new BadRequestException("Topic type is not valid");
 
         // Validate Enrollment Period Code
-        boolean isMatchEnrollmentPeriodCode = Arrays.stream(EnrollmentPeriodCode.values()).anyMatch(item -> StringUtils.equals(item.name(), enrollmentPeriodCodeItem));
-        if (!isMatchEnrollmentPeriodCode) throw new BadRequestException("Enrollment Period is not valid");
+        boolean isMatchEnrollmentPeriodCode = Arrays.stream(EnrollmentPeriodCode.values())
+                .anyMatch(item -> StringUtils.equals(item.name(), period));
+        if (!isMatchEnrollmentPeriodCode)
+            throw new BadRequestException("Enrollment Period is not valid");
 
         // Get parameters from ENUM
-        TopicType topicType = TopicType.valueOf(topicTypeItem);
-        EnrollmentPeriodCode enrollmentPeriodCode = EnrollmentPeriodCode.valueOf(enrollmentPeriodCodeItem);
-        SemesterStatus semesterStatus = SemesterStatus.valueOf("ACTIVATED");
+        TopicType topicType = TopicType.valueOf(type);
+        EnrollmentPeriodCode enrollmentPeriodCode = EnrollmentPeriodCode.valueOf(period);
+        SemesterStatus semesterStatus = SemesterStatus.ACTIVATED;
 
-        // Get Enrollment Period based on Topic type, Enrollment Period with Activated status
-        Optional<EnrollmentPeriod> enrollmentPeriodOptinal = enrollmentPeriodRepository.findByTypeAndCodeAndStatus(topicType, enrollmentPeriodCode, semesterStatus);
+        // Get Enrollment Period based on Topic type, Enrollment Period with Activated
+        // status
+        Optional<EnrollmentPeriod> enrollmentPeriodOptinal = enrollmentPeriodRepository
+                .findByTypeAndCodeAndStatus(topicType, enrollmentPeriodCode, semesterStatus);
 
         // Check null Item Optional before get value
-        if(!enrollmentPeriodOptinal.isPresent()) throw new BadRequestException("Enrollment Period could not be found");
+        if (!enrollmentPeriodOptinal.isPresent())
+            throw new BadRequestException("Enrollment Period could not be found");
         EnrollmentPeriod enrollmentPeriod = enrollmentPeriodOptinal.get();
 
         // Mapping data with structure
