@@ -1,8 +1,10 @@
 package com.bosch.topicregistration.api.enrollment.topic;
 
+import com.bosch.topicregistration.api.enrollment.TopicEnrollment;
 import com.bosch.topicregistration.api.enrollment.semester.Semester;
 import com.bosch.topicregistration.api.user.Major;
 import com.bosch.topicregistration.api.user.User;
+import com.bosch.topicregistration.api.user.UserRole;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
@@ -12,6 +14,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -75,4 +79,8 @@ public class Topic implements Serializable {
     @ManyToOne
     @JoinColumn
     private User lecture;
+
+    @OneToMany(mappedBy = "topic", fetch = FetchType.EAGER)
+    @Builder.Default
+    private Set<TopicEnrollment> topicEnrollments = new HashSet<>();
 }

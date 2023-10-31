@@ -4,6 +4,6 @@ public enum TopicStatus {
     APPROVED,
     REJECTED,
     UPDATED,
-    CREATED,
+    PENDING,
 
 }

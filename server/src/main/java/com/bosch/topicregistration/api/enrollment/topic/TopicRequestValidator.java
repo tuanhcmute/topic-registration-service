@@ -12,6 +12,7 @@ public interface TopicRequestValidator extends Function<NewTopicRequest, TopicVa
         return request ->
                 StringUtils.isEmpty(request.getMajorCode()) ? TopicValidatorResult.MAJOR_CODE_INVALID : TopicValidatorResult.VALID;
     }
+
     static TopicRequestValidator isTypeValid() {
         return request -> {
             boolean isValid = Arrays.stream(TopicType.values()).anyMatch(topicType -> topicType.name().equals(request.getType()));
@@ -41,22 +42,22 @@ public interface TopicRequestValidator extends Function<NewTopicRequest, TopicVa
 
     static TopicRequestValidator isAvailableSlotValid(Integer maxSlot) {
         return request -> {
-            if(Objects.isNull(request.getStudents())) return TopicValidatorResult.LIST_STUDENTS_INVALID;
-            if(maxSlot < request.getStudents().size()) {
+            if (Objects.isNull(request.getStudents())) return TopicValidatorResult.LIST_STUDENTS_INVALID;
+            if (maxSlot < request.getStudents().size()) {
                 return TopicValidatorResult.LIST_STUDENTS_INVALID;
             }
             return TopicValidatorResult.VALID;
         };
     }
 
-    default TopicRequestValidator and (TopicRequestValidator other) {
+    default TopicRequestValidator and(TopicRequestValidator other) {
         return topic -> {
             TopicValidatorResult result = this.apply(topic);
             return result.equals(TopicValidatorResult.VALID) ? other.apply(topic) : result;
         };
     }
 
-    default TopicRequestValidator or (TopicRequestValidator other) {
+    default TopicRequestValidator or(TopicRequestValidator other) {
         return topic -> {
             TopicValidatorResult result = this.apply(topic);
             return !result.equals(TopicValidatorResult.VALID) ? other.apply(topic) : result;

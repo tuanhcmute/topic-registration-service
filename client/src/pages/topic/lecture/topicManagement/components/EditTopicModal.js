@@ -1,12 +1,13 @@
 import PropTypes from "prop-types";
 import Select from "react-select";
-import { Modal, Button, TextInput, Label } from "flowbite-react";
+import { Modal, Button, TextInput, Label, Textarea } from "flowbite-react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { useSelector } from "react-redux";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { useEffect, useState } from "react";
+import { topicStatus } from "../../../../../utils/constants";
 
 const validationSchema = Yup.object().shape({
   id: Yup.string().required(),
@@ -19,15 +20,8 @@ const validationSchema = Yup.object().shape({
     .max(2, "Số lượng SVTH không quá 2"),
 });
 
-const options = [
-  { value: "20110756", label: "Pham Nguyen Nhut Truong" },
-  { value: "20110623", label: "Bui Thanh Duy" },
-  { value: "20110205", label: "Vu Hoang Anh" },
-  { value: "20110202", label: "Tran Chi My" },
-];
-
 function EditTopicModal(props) {
-  const { openModal, setOpenModal, data, handleUpdateTopic } = props;
+  const { openModal, setOpenModal, data, options, handleUpdateTopic } = props;
   const currentUser = useSelector((state) => state.auth?.currentUser);
   const [initialValues, setInitialValues] = useState({
     id: "",
@@ -140,6 +134,7 @@ function EditTopicModal(props) {
                 type='number'
                 onChange={formik.handleChange}
                 value={formik.values.maxSlot}
+                disabled={data?.status === "APPROVED"}
               />
             </div>
             {/* End max slot field */}
@@ -160,8 +155,8 @@ function EditTopicModal(props) {
               type='text'
               id='topicName'
               onChange={formik.handleChange}
-              // defaultValue={data?.name}
               value={formik.values.topicName}
+              disabled={data?.status === "APPROVED"}
             />
           </div>
           {/* End topic field */}
@@ -173,16 +168,23 @@ function EditTopicModal(props) {
               value='Yêu cầu đề tài (*)'
               className='mb-2 block'
             />
-            <CKEditor
-              onReady={(editor) => {
-                editor.setData(formik.values.goal);
-              }}
-              editor={ClassicEditor}
-              onChange={(event, editor) => {
-                const data = editor.getData();
-                formik.values.goal = data;
-              }}
-            />
+            {data?.status === "APPROVED" ? (
+              <div
+                dangerouslySetInnerHTML={{ __html: data?.goal }}
+                className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500'
+              ></div>
+            ) : (
+              <CKEditor
+                onReady={(editor) => {
+                  editor.setData(formik.values.goal);
+                }}
+                editor={ClassicEditor}
+                onChange={(event, editor) => {
+                  const data = editor.getData();
+                  formik.values.goal = data;
+                }}
+              />
+            )}
           </div>
           {/* End goal field */}
           <div className='mb-2 block font-Roboto'>
@@ -192,48 +194,66 @@ function EditTopicModal(props) {
               value='Kiến thức cần có (*)'
               className='mb-2 block'
             />
-            <CKEditor
-              onReady={(editor) => {
-                // You can store the "editor" and use when it is needed.
-                editor.setData(formik.values.requirement);
-              }}
-              editor={ClassicEditor}
-              onChange={(event, editor) => {
-                const data = editor.getData();
-                formik.values.requirement = data;
-              }}
-            />
+            {data?.status === "APPROVED" ? (
+              <div
+                dangerouslySetInnerHTML={{ __html: data?.requirement }}
+                className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500'
+              ></div>
+            ) : (
+              <CKEditor
+                onReady={(editor) => {
+                  // You can store the "editor" and use when it is needed.
+                  editor.setData(formik.values.requirement);
+                }}
+                editor={ClassicEditor}
+                onChange={(event, editor) => {
+                  const data = editor.getData();
+                  formik.values.requirement = data;
+                }}
+              />
+            )}
           </div>
           <div className='grid grid-cols-1 gap-3'>
             <div className='mb-2 block font-Roboto'>
               <Label value='SVTH' className='mb-2 block' />
-              <Select options={options} isSearchable isMulti />
+              <Select
+                isDisabled={data?.status === "APPROVED"}
+                options={options}
+                isSearchable
+                isMulti
+                defaultValue={data?.students.map((item) => ({
+                  label: item?.name,
+                  value: item?.ntid,
+                }))}
+              />
             </div>
           </div>
         </div>
       </Modal.Body>
-      <Modal.Footer>
-        <div className='w-full flex items-center justify-end gap-5'>
-          <Button
-            color='red'
-            onClick={() => setOpenModal(undefined)}
-            className='p-0'
-          >
-            Hủy bỏ
-          </Button>
-          <form onSubmit={formik.handleSubmit}>
+      {data?.status === "PENDING" && (
+        <Modal.Footer>
+          <div className='w-full flex items-center justify-end gap-5'>
             <Button
-              onSubmit={formik.handleSubmit}
+              color='red'
+              onClick={() => setOpenModal(undefined)}
               className='p-0'
-              color='green'
-              // onClick={() => setOpenModal(undefined)}
-              type='submit'
             >
-              Lưu lại
+              Hủy bỏ
             </Button>
-          </form>
-        </div>
-      </Modal.Footer>
+            <form onSubmit={formik.handleSubmit}>
+              <Button
+                onSubmit={formik.handleSubmit}
+                className='p-0'
+                color='green'
+                // onClick={() => setOpenModal(undefined)}
+                type='submit'
+              >
+                Lưu lại
+              </Button>
+            </form>
+          </div>
+        </Modal.Footer>
+      )}
     </Modal>
   );
 }
@@ -241,6 +261,7 @@ function EditTopicModal(props) {
 export default EditTopicModal;
 
 EditTopicModal.propTypes = {
+  options: PropTypes.array.isRequired,
   openModal: PropTypes.any,
   setOpenModal: PropTypes.func.isRequired,
   handleUpdateTopic: PropTypes.func.isRequired,

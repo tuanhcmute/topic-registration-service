@@ -7,7 +7,7 @@ import { useFormik } from "formik";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
-import * as toipcType from "../../../utils/constants/topicType";
+import * as toipcType from "../../../../../utils/constants/topicType";
 
 const validationSchema = Yup.object().shape({
   type: Yup.string().required(),
@@ -23,15 +23,8 @@ const validationSchema = Yup.object().shape({
   students: Yup.array(),
 });
 
-const options = [
-  { value: "20110756", label: "Pham Nguyen Nhut Truong" },
-  { value: "20110623", label: "Bui Thanh Duy" },
-  { value: "20110205", label: "Vu Hoang Anh" },
-  { value: "20110202", label: "Tran Chi My" },
-];
-
 function EnrollTopicModal(props) {
-  const { openModal, setOpenModal, handleNewTopic } = props;
+  const { openModal, setOpenModal, handleNewTopic, options } = props;
   const currentUser = useSelector((state) => state.auth?.currentUser);
   const formik = useFormik({
     initialValues: {
@@ -51,12 +44,8 @@ function EnrollTopicModal(props) {
   });
 
   function changeSelect(selectedOption) {
-    console.log(selectedOption);
     const studentCodes = selectedOption?.map((item) => item.value);
-    formik.values = {
-      ...formik.values,
-      students: studentCodes?.slice(0, formik.values.maxSlot) || [],
-    };
+    formik.setFieldValue("students", studentCodes);
   }
 
   return (

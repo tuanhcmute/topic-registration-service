@@ -1,6 +1,9 @@
 package com.bosch.topicregistration.api.enrollment.topic;
 
+import com.bosch.topicregistration.api.user.StudentDTO;
 import lombok.*;
+
+import java.util.Set;
 
 @Getter
 @Setter
@@ -23,5 +26,7 @@ public class TopicDTO {
     private Integer maxSlot;
 
     private Integer availableSlot;
+
+    private Set<StudentDTO> students;
 
 }

@@ -1,13 +1,33 @@
-import React from "react";
-import { PiNewspaperClippingLight } from "react-icons/pi";
-import { Modal, Button, TextInput, Label } from "flowbite-react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
+import { PiNewspaperClippingLight } from "react-icons/pi";
+import { Button, TextInput, Label } from "flowbite-react";
+
 import { Banner } from "../../components/banner";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { userService } from "../../services";
+import { toast } from "react-toastify";
+import { HttpStatusCode } from "axios";
 
 function ProfilePage() {
   const currentUser = useSelector((state) => state.auth.currentUser);
+  const [biography, setBiography] = useState(
+    (currentUser) => currentUser?.biography || ""
+  );
+  console.log(biography);
+
+  async function updateBiographyInUserProfile() {
+    console.log(biography);
+    const response = await userService.updateBiographyInUserProfile({
+      biography,
+    });
+    if (response?.data?.statusCode === HttpStatusCode.Ok) {
+      toast.success("Cập nhật tiểu sử thành công");
+    }
+    console.log(response);
+  }
+
   return (
     <React.Fragment>
       {/* Banner */}
@@ -89,17 +109,19 @@ function ProfilePage() {
               <CKEditor
                 onReady={(editor) => {
                   // You can store the "editor" and use when it is needed.
-                  editor.setData(currentUser?.biography || "");
+                  editor.setData(currentUser?.biography);
                 }}
                 editor={ClassicEditor}
                 onChange={(event, editor) => {
                   const data = editor.getData();
-                  console.log({ event, data });
+                  setBiography(data);
                 }}
               />
             </div>
           </div>
-          <Button color='gray'>Lưu thay đổi</Button>
+          <Button color='gray' onClick={updateBiographyInUserProfile}>
+            Lưu thay đổi
+          </Button>
         </div>
         {/* End right content */}
       </div>

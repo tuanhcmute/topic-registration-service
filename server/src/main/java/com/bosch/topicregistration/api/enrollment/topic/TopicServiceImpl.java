@@ -40,25 +40,26 @@ public class TopicServiceImpl implements TopicService {
     @LoggerAround
     @Override
     public Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriod(String type, Integer pageNumber, Integer pageSize, String sortBy) {
-        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy));
+//        Get topic type by type from client
+//         Validate type
+        boolean isMatch = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
+        if (!isMatch) throw new BadRequestException("Topic type is not valid");
+        TopicType topicType = TopicType.valueOf(type);
 
 //        Get current semester
         List<Semester> semesters = semesterRepository.findByStatus(SemesterStatus.ACTIVATED);
         if (semesters.size() == 0) throw new BadRequestException("Current semester is not activated");
         Semester currentSemester = semesters.get(0);
 
-//        Get topic type by type from client
-        // Validate type
-        boolean isMatch = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
-        if (!isMatch) throw new BadRequestException("Topic type is not valid");
-        TopicType topicType = TopicType.valueOf(type);
-
 //        Get current user
         Optional<User> userOptional = userCommon.getCurrentUserByCurrentAuditor();
         if (!userOptional.isPresent()) throw new BadRequestException("Lecture could not be found");
         User lecture = userOptional.get();
 
-        // Get topics
+//        Define paging
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
+
+//         Get topics
         Page<Topic> topicPage = topicRepository.findBySemesterAndTypeAndLecture(currentSemester, topicType, lecture, paging);
         List<TopicDTO> listTopicDTO = topicMapper.toListDTO(topicPage.getContent());
         Map<String, List<TopicDTO>> data = new HashMap<>();
@@ -81,29 +82,30 @@ public class TopicServiceImpl implements TopicService {
                 .and(isMaxSlotValid())
                 .and(isAvailableSlotValid(request.getMaxSlot()))
                 .apply(request);
-        if(!result.equals(TopicValidatorResult.VALID)) throw new BadRequestException(result.getMessage());
+        if (!result.equals(TopicValidatorResult.VALID)) throw new BadRequestException(result.getMessage());
 
 //        Get lecture
         Optional<User> userOptional = userCommon.getCurrentUserByCurrentAuditor();
-        if(!userOptional.isPresent()) throw new BadRequestException("Lecture could not be found");
+        if (!userOptional.isPresent()) throw new BadRequestException("Lecture could not be found");
         User lecture = userOptional.get();
-        if(!StringUtils.equals(lecture.getNtid(), request.getNtid())) throw new BadRequestException("Lecture code is not valid");
+        if (!StringUtils.equals(lecture.getNtid(), request.getNtid()))
+            throw new BadRequestException("Lecture code is not valid");
         log.info("Lecture: {}", lecture.getId());
 
 //        Get major
         Optional<Major> majorOptional = majorRepository.findByCode(request.getMajorCode());
-        if(!majorOptional.isPresent()) throw new BadRequestException("Major could not be found");
+        if (!majorOptional.isPresent()) throw new BadRequestException("Major could not be found");
         Major major = majorOptional.get();
         log.info("Major: {}", major.getId());
 
 //        Get available slot
-        if(request.getMaxSlot() < request.getStudents().size())
+        if (request.getMaxSlot() < request.getStudents().size())
             throw new BadRequestException("Max slot could not be less than size of student");
         Integer availableSlot = request.getMaxSlot() - request.getStudents().size();
         log.info("Available slot: {}", availableSlot);
 
 //         Get students
-        List<User> students = userRepository.findAllById(request.getStudents());
+        List<User> students = userRepository.findAllByNtids(request.getStudents());
         log.info("Size of students: {}", students.size());
 
 //        Get topicType
@@ -112,7 +114,7 @@ public class TopicServiceImpl implements TopicService {
 
 //        Get semester
         List<Semester> semesters = semesterRepository.findByStatus(SemesterStatus.ACTIVATED);
-        if(semesters.isEmpty()) throw new BadRequestException("Current semester could not be found");
+        if (semesters.isEmpty()) throw new BadRequestException("Current semester could not be found");
         Semester currentSemester = semesters.get(0);
 
         // Topic instance
@@ -124,7 +126,7 @@ public class TopicServiceImpl implements TopicService {
                 .major(major)
                 .type(topicType)
                 .lecture(lecture)
-                .status(TopicStatus.CREATED)
+                .status(TopicStatus.PENDING)
                 .semester(currentSemester)
                 .availableSlot(availableSlot)
                 .build();
@@ -132,7 +134,7 @@ public class TopicServiceImpl implements TopicService {
         log.info("Topic: {}", topic.getId());
 
 //        Store student enroll topic
-        if(!students.isEmpty()) {
+        if (!students.isEmpty()) {
             List<TopicEnrollment> topicEnrollments = students.stream().map(student -> TopicEnrollment.builder()
                     .student(student)
                     .topic(topic)
@@ -153,7 +155,7 @@ public class TopicServiceImpl implements TopicService {
 //        TODO: Handling
 //        Find topic by id
         Optional<Topic> topicOptional = topicRepository.findById(request.getId());
-        if(!topicOptional.isPresent()) throw new BadRequestException("Topic could not be found");
+        if (!topicOptional.isPresent()) throw new BadRequestException("Topic could not be found");
         Topic topic = topicOptional.get();
 
 //        Find list students enroll topic

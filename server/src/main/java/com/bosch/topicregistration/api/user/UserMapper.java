@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
+import java.util.List;
 import java.util.Set;
 
 @Mapper(componentModel = "spring")
@@ -20,4 +21,6 @@ public interface UserMapper {
     default String map(UserRole userRole) {
         return userRole.getRole().getCode().toString();
     }
+
+    List<UserDTO> toListDTO(List<User> users);
 }

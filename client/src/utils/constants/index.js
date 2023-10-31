@@ -1,6 +1,7 @@
 import keys from "../../config";
 import * as topicType from "./topicType";
 import * as roles from "./roles";
+import * as topicStatus from "./topicStatus";
 
 export const API_BASE_URL = keys.apiBaseUrl;
 
@@ -15,4 +16,4 @@ export const GOOGLE_AUTH_URL =
 
 export { default as headers } from "./headers";
 export { default as paths } from "./paths";
-export { topicType, roles };
+export { topicType, roles, topicStatus };
