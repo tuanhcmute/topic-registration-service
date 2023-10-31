@@ -21,25 +21,25 @@ public class TopicController {
 
     private final TopicService topicService;
 
-//        [GET] /api/v1/topic/lecture
+    // [GET] /api/v1/topic/lecture
     @GetMapping("/lecture")
     @PreAuthorize("hasAuthority('ROLE_LECTURE')")
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
     public Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriod(@RequestParam("type") String type,
-                                                                          @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
-                                                                          @RequestParam(defaultValue = "10", name = "pageSize") Integer pageSize,
-                                                                          @RequestParam(defaultValue = "id", name = "sortBy") String sortBy) {
+            @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+            @RequestParam(defaultValue = "10", name = "pageSize") Integer pageSize,
+            @RequestParam(defaultValue = "id", name = "sortBy") String sortBy) {
         return topicService.getAllTopicsInLectureEnrollmentPeriod(type, pageNumber, pageSize, sortBy);
     }
 
-//    [POST] /api/v1/topic/lecture
+    // [POST] /api/v1/topic/lecture
     @PostMapping("/lecture")
     @PreAuthorize("hasAuthority('ROLE_LECTURE')")
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
     public Response<Void> createNewTopicInLectureEnrollmentPeriod(@RequestBody NewTopicRequest request) {
-//        Validate request
+        // Validate request
         TopicValidatorResult result = isMajorCodeValid()
                 .and(isGoalValid())
                 .and(isTopicNameValid())
@@ -48,17 +48,18 @@ public class TopicController {
                 .and(isMaxSlotValid())
                 .and(isAvailableSlotValid(request.getMaxSlot()))
                 .apply(request);
-        if(!result.equals(TopicValidatorResult.VALID)) throw new BadRequestException(result.getMessage());
-//        Call service
+        if (!result.equals(TopicValidatorResult.VALID))
+            throw new BadRequestException(result.getMessage());
+        // Call service
         return topicService.createNewTopicInLectureEnrollmentPeriod(request);
     }
 
-//    [PUT] /api/v1/topic/lecture
+    // [PUT] /api/v1/topic/lecture
     @PutMapping("/lecture")
     @LoggerAround
-    public  Response<Void> updateTopicInLectureEnrollmentPeriod(@RequestBody UpdateTopicRequest request) {
-//        TODO: Validate
-//        TODO: Handling
+    public Response<Void> updateTopicInLectureEnrollmentPeriod(@RequestBody UpdateTopicRequest request) {
+        // TODO: Validate
+        // TODO: Handling
         return topicService.updateTopicInLectureEnrollmentPeriod(request);
     }
 }
