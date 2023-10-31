@@ -27,24 +27,27 @@ public class EnrollmentPeriodImpl implements EnrollmentPeriodService {
         String topicTypeItem = type.toUpperCase();
         String enrollmentPeriodCodeItem = period.toUpperCase().concat("_ENROLLMENT_PERIOD");
 
-        log.info(enrollmentPeriodCodeItem);
-
+        // validate Topic type
         boolean isMatchTopicType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), topicTypeItem));
         if (!isMatchTopicType) throw new BadRequestException("Topic type is not valid");
 
+        // Validate Enrollment Period Code
         boolean isMatchEnrollmentPeriodCode = Arrays.stream(EnrollmentPeriodCode.values()).anyMatch(item -> StringUtils.equals(item.name(), enrollmentPeriodCodeItem));
         if (!isMatchEnrollmentPeriodCode) throw new BadRequestException("Enrollment Period is not valid");
 
-
+        // Get parameters from ENUM
         TopicType topicType = TopicType.valueOf(topicTypeItem);
         EnrollmentPeriodCode enrollmentPeriodCode = EnrollmentPeriodCode.valueOf(enrollmentPeriodCodeItem);
         SemesterStatus semesterStatus = SemesterStatus.valueOf("ACTIVATED");
 
+        // Get Enrollment Period based on Topic type, Enrollment Period with Activated status
         Optional<EnrollmentPeriod> enrollmentPeriodOptinal = enrollmentPeriodRepository.findByTypeAndCodeAndStatus(topicType, enrollmentPeriodCode, semesterStatus);
-        if(!enrollmentPeriodOptinal.isPresent()) throw new BadRequestException("Enrollment Period could not be found");
 
+        // Check null Item Optional before get value
+        if(!enrollmentPeriodOptinal.isPresent()) throw new BadRequestException("Enrollment Period could not be found");
         EnrollmentPeriod enrollmentPeriod = enrollmentPeriodOptinal.get();
 
+        // Mapping data with structure
         Map<String, EnrollmentPeriodDTO> data = new HashMap<>();
         data.put("enrollmentPeriod", enrollmentPeriodMapper.toDTO(enrollmentPeriod));
         return Response.<EnrollmentPeriodDTO>builder()
