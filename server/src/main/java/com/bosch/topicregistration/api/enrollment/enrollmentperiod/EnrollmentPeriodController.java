@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
 import com.bosch.topicregistration.api.response.Response;
 
@@ -26,6 +27,8 @@ public class EnrollmentPeriodController {
     @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_ADMIN')")
     @LoggerAround
     public Response<EnrollmentPeriodDTO> getEnrollmentPeriod(@RequestParam("type") String type, @RequestParam("period") String period) {
+        if(type.isEmpty()) throw new BadRequestException("Type parameter is empty");
+        if(period.isEmpty()) throw new BadRequestException("Period parameter is empty");
         return enrollmentPeriodService.getEnrollmentPeriod(type, period);
     }
 }

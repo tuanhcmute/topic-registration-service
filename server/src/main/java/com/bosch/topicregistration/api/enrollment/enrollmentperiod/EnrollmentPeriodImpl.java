@@ -1,21 +1,18 @@
 package com.bosch.topicregistration.api.enrollment.enrollmentperiod;
 
-import java.util.HashMap;
-import java.util.Optional;
-
-import java.util.Map;
-import java.util.NoSuchElementException;
-
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.bosch.topicregistration.api.enrollment.semester.SemesterStatus;
 import com.bosch.topicregistration.api.enrollment.topic.TopicType;
+import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
 import com.bosch.topicregistration.api.response.Response;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -27,31 +24,33 @@ public class EnrollmentPeriodImpl implements EnrollmentPeriodService {
     @Override
     @LoggerAround
     public Response<EnrollmentPeriodDTO> getEnrollmentPeriod(String type, String period) {
-        try {
-            TopicType topicType = TopicType.valueOf(type.toUpperCase());
-            EnrollmentPeriodCode enrollmentPeriodCode = EnrollmentPeriodCode.valueOf(period.toUpperCase().concat("_ENROLLMENT_PERIOD"));
-            SemesterStatus semesterStatus = SemesterStatus.valueOf("ACTIVATED");
+        String topicTypeItem = type.toUpperCase();
+        String enrollmentPeriodCodeItem = period.toUpperCase().concat("_ENROLLMENT_PERIOD");
 
-            Optional<EnrollmentPeriod> enrollmentPeriodOptinal = enrollmentPeriodRepository.findByTypeAndCodeAndStatus(topicType, enrollmentPeriodCode, semesterStatus);
+        log.info(enrollmentPeriodCodeItem);
 
-            EnrollmentPeriod enrollmentPeriod = enrollmentPeriodOptinal.get();
-            Map<String, EnrollmentPeriodDTO> data = new HashMap<>();
-            data.put("enrollmentPeriod", enrollmentPeriodMapper.toDTO(enrollmentPeriod));
-            return Response.<EnrollmentPeriodDTO>builder()
-                    .message("Enrollment period has been successfully retrieved")
-                    .statusCode(HttpStatus.OK.value())
-                    .data(data)
-                    .build();
-        } catch (IllegalArgumentException e) {
-            return Response.<EnrollmentPeriodDTO>builder()
-                .message("Invalid parameter!")
-                .statusCode(HttpStatus.BAD_REQUEST.value())
+        boolean isMatchTopicType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), topicTypeItem));
+        if (!isMatchTopicType) throw new BadRequestException("Topic type is not valid");
+
+        boolean isMatchEnrollmentPeriodCode = Arrays.stream(EnrollmentPeriodCode.values()).anyMatch(item -> StringUtils.equals(item.name(), enrollmentPeriodCodeItem));
+        if (!isMatchEnrollmentPeriodCode) throw new BadRequestException("Enrollment Period is not valid");
+
+
+        TopicType topicType = TopicType.valueOf(topicTypeItem);
+        EnrollmentPeriodCode enrollmentPeriodCode = EnrollmentPeriodCode.valueOf(enrollmentPeriodCodeItem);
+        SemesterStatus semesterStatus = SemesterStatus.valueOf("ACTIVATED");
+
+        Optional<EnrollmentPeriod> enrollmentPeriodOptinal = enrollmentPeriodRepository.findByTypeAndCodeAndStatus(topicType, enrollmentPeriodCode, semesterStatus);
+        if(!enrollmentPeriodOptinal.isPresent()) throw new BadRequestException("Enrollment Period could not be found");
+
+        EnrollmentPeriod enrollmentPeriod = enrollmentPeriodOptinal.get();
+
+        Map<String, EnrollmentPeriodDTO> data = new HashMap<>();
+        data.put("enrollmentPeriod", enrollmentPeriodMapper.toDTO(enrollmentPeriod));
+        return Response.<EnrollmentPeriodDTO>builder()
+                .message("Enrollment period has been successfully retrieved")
+                .statusCode(HttpStatus.OK.value())
+                .data(data)
                 .build();
-        } catch (NoSuchElementException e) {
-            return Response.<EnrollmentPeriodDTO>builder()
-                .message("Data not found")
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .build();
-        }
     }
 }
