@@ -15,7 +15,7 @@ export const createJwtToken = (id: string, role: string) => {
   const privateKey = fs.readFileSync("private-key.pem", "utf8"); // Read the private key from a file
 
   const token = jwt.sign(
-    { exp: Math.floor(Date.now() / 1000) + 60 * 15, id: id, role: role },
+    { exp: Math.floor(Date.now() / 1000) + 60 * 60 * 2, id: id, role: role },
     privateKey,
     { algorithm: "RS256" } // Specify the signing algorithm (e.g., RS256 for RSA)
   );

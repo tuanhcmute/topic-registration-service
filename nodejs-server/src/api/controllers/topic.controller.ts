@@ -1,8 +1,13 @@
 import { NextFunction, Request, Response, query } from "express";
-import { TopicInstance } from "@models";
 import { TopicService } from "@services";
 import { error } from "console";
-import { TeacherTopicOut } from "@interfaces/topic.interface";
+import { TeacherTopicOut, createReqTopic } from "@interfaces/topic.interface";
+import { plainToClass, plainToInstance } from "class-transformer";
+import { validate } from "class-validator";
+import { StatusCode } from "@configs/constants";
+import { STATUS_CODES } from "http";
+import { StatusCodes } from "http-status-codes";
+import { ResponseModelBuilder } from "@interfaces";
 
 export default class TopicController {
   private topicService: TopicService = new TopicService();
@@ -28,17 +33,50 @@ export default class TopicController {
     }
   };
 
-  //   public async createTopic(req: Request, res: Response): Promise<void> {
-  //     const { name, description } = req.body;
-  //     const newTopic: Topic = new Topic({ name, description });
+  public createTopic = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const rawTopic = req.body;
+      console.log(rawTopic);
+      const newTopic = plainToInstance(createReqTopic, rawTopic);
+      console.info(newTopic);
 
-  //     try {
-  //       await newTopic.save();
-  //       res.status(201).json(newTopic);
-  //     } catch (err) {
-  //       res.status(400).json({ message: err.message });
-  //     }
-  //   }
+      const errors = await validate(newTopic);
+      if (errors.length > 0) {
+        const firstError = errors[0];
+
+        const errorMessage = firstError.constraints
+          ? Object.values(firstError.constraints)[0]
+          : "No error message available";
+
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json(
+            new ResponseModelBuilder()
+              .withMessage(errorMessage)
+              .withStatusCode(StatusCodes.BAD_REQUEST)
+              .build()
+          );
+      } else {
+        const userId = res.locals.userId;
+        await this.topicService.createTopic(newTopic, userId);
+        res
+          .status(StatusCodes.CREATED)
+          .json(
+            new ResponseModelBuilder()
+              .withMessage("Topic has been created successfully")
+              .withStatusCode(StatusCode.CREATED)
+              .build()
+          );
+      }
+    } catch (err) {
+      console.log(err);
+      next(err);
+    }
+  };
 
   //   public async getTopicById(req: Request, res: Response): Promise<void> {
   //     const { id } = req.params;

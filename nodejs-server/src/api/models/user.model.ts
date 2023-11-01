@@ -6,7 +6,7 @@ import { Class } from "./class.model";
 
 interface UserAttributes {
   id: string;
-  code?: string;
+  code: string;
   role?: string;
   email?: string;
   imageUrl?: string;
@@ -109,22 +109,5 @@ const User = db.define<UserInstance>(
     tableName: "User",
   }
 );
-
-// one to one relationship
-// Define the User model
-// User.hasOne(Major, {
-//   foreignKey: "majorId",
-// });
-
-// Define the Major model
-// Major.belongsTo(User, {
-//   foreignKey: "id",
-// });
-
-// User.hasOne(Specialization, { foreignKey: "specializationId" });
-// Specialization.belongsTo(User, { foreignKey: "id" });
-
-// User.hasOne(Class, { foreignKey: "classId" });
-// Class.belongsTo(User);
 
 export { User, UserAttributes, UserInstance };

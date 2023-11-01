@@ -1,10 +1,10 @@
 import db from "../configs/db.config";
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model, Sequelize } from "sequelize";
 import { User, UserInstance } from "./user.model";
 
 interface TopicAttributes {
-  id: string;
-  code: string;
+  id?: string;
+  ntid: string;
   name: string;
   type?: string;
   goal?: string;
@@ -30,11 +30,13 @@ const Topic = db.define<TopicInstance>(
   "topic",
   {
     id: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID, // Use UUIDV4 as the default value
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
       primaryKey: true,
       field: "id",
     },
-    code: {
+    ntid: {
       type: DataTypes.STRING,
       field: "code",
     },
@@ -104,5 +106,8 @@ const Topic = db.define<TopicInstance>(
     tableName: "Topic",
   }
 );
+
+User.hasMany(Topic, { foreignKey: "lecturerId" });
+Topic.belongsTo(User, { foreignKey: "code" });
 
 export { Topic, TopicAttributes, TopicInstance };
