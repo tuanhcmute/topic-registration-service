@@ -1,4 +1,4 @@
-package com.bosch.topicregistration.api.enrollment.semester;
+package com.bosch.topicregistration.api.semester;
 
 public enum SemesterType {
     FIRST_SEMESTER,

@@ -1,4 +1,5 @@
-package com.bosch.topicregistration.api.enrollment.topic;
+package com.bosch.topicregistration.api.topic;
+
 
 import lombok.*;
 
@@ -10,12 +11,14 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-public class UpdateTopicRequest {
-    private String id;
+public class NewTopicRequest {
+    private String type;
+    private String majorCode;
+    private String ntid;
+    private Integer maxSlot;
     private String topicName;
     private String goal;
     private String requirement;
-    private Integer maxSlot;
     @Builder.Default
     private Set<String> students = new HashSet<>();
 }

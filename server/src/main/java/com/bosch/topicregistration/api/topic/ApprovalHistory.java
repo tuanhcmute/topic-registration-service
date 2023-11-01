@@ -1,7 +1,5 @@
-package com.bosch.topicregistration.api.enrollment;
+package com.bosch.topicregistration.api.topic;
 
-import com.bosch.topicregistration.api.topic.Topic;
-import com.bosch.topicregistration.api.user.User;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
@@ -13,26 +11,25 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "topic_enrollment_tbl")
+@Table(name = "approval_history_tbl")
 @EntityListeners(AuditingEntityListener.class)
-public class TopicEnrollment {
+public class ApprovalHistory {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id_column", updatable = false)
     private String id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn
-    private User student;
+    @Column(name = "reason_column", updatable = false)
+    private String reason;
 
-    @ManyToOne
-    @JoinColumn
-    private Topic topic;
+    @Column(name = "status_column", updatable = false)
+    @Enumerated(EnumType.STRING)
+    private TopicStatus status;
 
     @Column(name = "created_by_column")
     private String createdBy;
@@ -44,4 +41,8 @@ public class TopicEnrollment {
     @LastModifiedDate
     @Column(name = "updated_date_column", nullable = false)
     private LocalDateTime updatedDate;
+
+    @ManyToOne
+    @JoinColumn
+    private Topic topic;
 }

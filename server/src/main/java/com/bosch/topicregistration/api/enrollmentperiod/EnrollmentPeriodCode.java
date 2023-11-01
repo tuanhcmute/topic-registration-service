@@ -1,4 +1,4 @@
-package com.bosch.topicregistration.api.enrollment.enrollmentperiod;
+package com.bosch.topicregistration.api.enrollmentperiod;
 
 public enum EnrollmentPeriodCode {
     LECTURE_ENROLLMENT_PERIOD,

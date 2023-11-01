@@ -1,10 +1,9 @@
-package com.bosch.topicregistration.api.enrollment.topic;
+package com.bosch.topicregistration.api.topic;
 
 import com.bosch.topicregistration.api.enrollment.TopicEnrollment;
-import com.bosch.topicregistration.api.enrollment.semester.Semester;
+import com.bosch.topicregistration.api.semester.Semester;
 import com.bosch.topicregistration.api.user.Major;
 import com.bosch.topicregistration.api.user.User;
-import com.bosch.topicregistration.api.user.UserRole;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
@@ -83,4 +82,8 @@ public class Topic implements Serializable {
     @OneToMany(mappedBy = "topic", fetch = FetchType.EAGER)
     @Builder.Default
     private Set<TopicEnrollment> topicEnrollments = new HashSet<>();
+
+    @OneToMany(mappedBy = "topic", fetch = FetchType.EAGER)
+    @Builder.Default
+    private Set<ApprovalHistory> approvalHistories = new HashSet<>();
 }

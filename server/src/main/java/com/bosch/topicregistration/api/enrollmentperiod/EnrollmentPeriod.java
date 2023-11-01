@@ -1,8 +1,8 @@
-package com.bosch.topicregistration.api.enrollment.enrollmentperiod;
+package com.bosch.topicregistration.api.enrollmentperiod;
 
-import com.bosch.topicregistration.api.enrollment.semester.Semester;
-import com.bosch.topicregistration.api.enrollment.semester.SemesterStatus;
-import com.bosch.topicregistration.api.enrollment.topic.TopicType;
+import com.bosch.topicregistration.api.semester.Semester;
+import com.bosch.topicregistration.api.semester.SemesterStatus;
+import com.bosch.topicregistration.api.topic.TopicType;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;

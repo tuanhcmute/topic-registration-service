@@ -1,4 +1,4 @@
-package com.bosch.topicregistration.api.enrollment.topic;
+package com.bosch.topicregistration.api.topic;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,10 +1,10 @@
-package com.bosch.topicregistration.api.enrollment.topic;
+package com.bosch.topicregistration.api.topic;
 
 import com.bosch.topicregistration.api.enrollment.TopicEnrollment;
 import com.bosch.topicregistration.api.enrollment.TopicEnrollmentRepository;
-import com.bosch.topicregistration.api.enrollment.semester.Semester;
-import com.bosch.topicregistration.api.enrollment.semester.SemesterRepository;
-import com.bosch.topicregistration.api.enrollment.semester.SemesterStatus;
+import com.bosch.topicregistration.api.semester.Semester;
+import com.bosch.topicregistration.api.semester.SemesterRepository;
+import com.bosch.topicregistration.api.semester.SemesterStatus;
 import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
 import com.bosch.topicregistration.api.response.Response;
@@ -22,8 +22,6 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bosch.topicregistration.api.enrollment.topic.TopicRequestValidator.*;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -36,11 +34,11 @@ public class TopicServiceImpl implements TopicService {
     private final MajorRepository majorRepository;
     private final UserRepository userRepository;
     private final TopicEnrollmentRepository topicEnrollmentRepository;
+    private final ApprovalHistoryRepository approvalHistoryRepository;
 
     @LoggerAround
     @Override
     public Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriod(String type, Integer pageNumber, Integer pageSize, String sortBy) {
-//        Get topic type by type from client
 //         Validate type
         boolean isMatch = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
         if (!isMatch) throw new BadRequestException("Topic type is not valid");
@@ -74,13 +72,13 @@ public class TopicServiceImpl implements TopicService {
     @Override
     public Response<Void> createNewTopicInLectureEnrollmentPeriod(NewTopicRequest request) {
 //        Validate request
-        TopicValidatorResult result = isMajorCodeValid()
-                .and(isGoalValid())
-                .and(isTopicNameValid())
-                .and(isRequirementValid())
-                .and(isTypeValid())
-                .and(isMaxSlotValid())
-                .and(isAvailableSlotValid(request.getMaxSlot()))
+        TopicValidatorResult result = TopicRequestValidator.isMajorCodeValid()
+                .and(TopicRequestValidator.isGoalValid())
+                .and(TopicRequestValidator.isTopicNameValid())
+                .and(TopicRequestValidator.isRequirementValid())
+                .and(TopicRequestValidator.isTypeValid())
+                .and(TopicRequestValidator.isMaxSlotValid())
+                .and(TopicRequestValidator.isAvailableSlotValid(request.getMaxSlot()))
                 .apply(request);
         if (!result.equals(TopicValidatorResult.VALID)) throw new BadRequestException(result.getMessage());
 
@@ -104,7 +102,7 @@ public class TopicServiceImpl implements TopicService {
         Integer availableSlot = request.getMaxSlot() - request.getStudents().size();
         log.info("Available slot: {}", availableSlot);
 
-//         Get students
+//         Get students enroll topic
         List<User> students = userRepository.findAllByNtids(request.getStudents());
         log.info("Size of students: {}", students.size());
 
@@ -118,7 +116,7 @@ public class TopicServiceImpl implements TopicService {
         Semester currentSemester = semesters.get(0);
 
         // Topic instance
-        Topic topic = com.bosch.topicregistration.api.enrollment.topic.Topic.builder()
+        Topic topic = Topic.builder()
                 .name(request.getTopicName())
                 .goal(request.getGoal())
                 .requirement(request.getRequirement())
@@ -152,7 +150,13 @@ public class TopicServiceImpl implements TopicService {
     @Override
     public Response<Void> updateTopicInLectureEnrollmentPeriod(UpdateTopicRequest request) {
 //        TODO: Validate
-//        TODO: Handling
+        TopicValidatorResult result = UpdateTopicRequestValidator.isTopicNameValid()
+                .and(UpdateTopicRequestValidator.isGoalValid())
+                .and(UpdateTopicRequestValidator.isRequirementValid())
+                .and(UpdateTopicRequestValidator.isMaxSlotValid())
+                .apply(request);
+        if(!result.equals(TopicValidatorResult.VALID)) throw new BadRequestException(result.getMessage());
+
 //        Find topic by id
         Optional<Topic> topicOptional = topicRepository.findById(request.getId());
         if (!topicOptional.isPresent()) throw new BadRequestException("Topic could not be found");
@@ -166,12 +170,46 @@ public class TopicServiceImpl implements TopicService {
         topic.setGoal(request.getGoal());
         topic.setRequirement(request.getRequirement());
         topic.setMaxSlot(request.getMaxSlot());
+        topic.setStatus(TopicStatus.UPDATED);
         topicRepository.save(topic);
-
 
 //        Return data
         return Response.<Void>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Topic has been updated successfully").build();
+    }
+
+    @Override
+    public Response<Void> approveTopicInLectureEnrollmentPeriod(ApprovalTopicRequest request) {
+//        TODO: Validate request
+//        Get topic status
+        boolean isMatch = Arrays.stream(TopicStatus.values()).anyMatch(topicStatus -> topicStatus.name().equals(request.getStatus()));
+        if(!isMatch) throw new BadRequestException("Topic status could not be found");
+        TopicStatus status = TopicStatus.valueOf(request.getStatus());
+
+//        Get topic
+        Optional<Topic> topicOptional = topicRepository.findById(request.getId());
+        if(!topicOptional.isPresent()) throw new BadRequestException("Topic could not be found");
+        Topic topic = topicOptional.get();
+
+//        Update topic when topic status doest not equal APPROVED
+        if(!topic.getStatus().equals(TopicStatus.APPROVED))  {
+//            Update topic status
+            topic.setStatus(status);
+            topicRepository.save(topic);
+            log.info("Topic status: {}", topic.getStatus().name());
+
+//        Store approval history
+            ApprovalHistory approvalHistory = ApprovalHistory.builder()
+                    .status(status)
+                    .reason(request.getReason())
+                    .build();
+            approvalHistoryRepository.save(approvalHistory);
+            log.info("Approval history: {}", approvalHistory.getId());
+        }
+        return Response.<Void>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Topic has been updated successfully")
+                .build();
     }
 }

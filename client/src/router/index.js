@@ -1,5 +1,6 @@
 import React from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
+
 import { App as AppLayout } from "../app";
 import { ErrorPage } from "../pages/error";
 import { OAuth2RedirectHandler } from "../pages/login";
@@ -9,12 +10,30 @@ import { ProfilePage as ProfileRoute } from "../pages/profile";
 import { LectureTopicPageWrapper as LectureTopicRoutes } from "../pages/topic";
 import { TopicManagementPage as TopicManagementRoute } from "../pages/topic/lecture/topicManagement";
 import { AppreciationManagementPage as AppreciationManagementPageRoute } from "../pages/topic/lecture/appreciationManagement";
+import { ApprovalTopicManagementPage as ApprovalTopicManagementPageRoute } from "../pages/topic/lecture/approvalTopicManagement";
 import { LecturePage as LectureRoute } from "../pages/lecture";
 import { LoginPage as LoginRoute } from "../pages/login";
-import { roles, topicType } from "../utils/constants";
+
+import { paths, roles, topicType } from "../utils/constants";
 import AppLectureHeader from "../app/AppLectureHeader";
+import { useSelector } from "react-redux";
+
+const RedirectRoute = () => {
+  const isAuthenticated = useSelector((state) => state.auth.authenticated);
+  const currentUser = useSelector((state) => state.auth.currentUser);
+  if (!isAuthenticated) return <Navigate to={paths.LOGIN} replace />;
+  const isStudent = currentUser?.userRoles?.some(
+    (item) => item === roles.ROLE_STUDENT
+  );
+  return isStudent ? (
+    <Navigate to='/student/home' replace />
+  ) : (
+    <Navigate to='/lecture/home' replace />
+  );
+};
 
 const router = createBrowserRouter([
+  { path: "", element: <RedirectRoute /> },
   {
     path: "lecture",
     element: <AppLayout header={AppLectureHeader} />,
@@ -38,6 +57,10 @@ const router = createBrowserRouter([
               {
                 path: `${topicType.TLCN.toLowerCase()}/appreciation`,
                 element: <AppreciationManagementPageRoute />,
+              },
+              {
+                path: `${topicType.TLCN.toLowerCase()}/approval`,
+                element: <ApprovalTopicManagementPageRoute />,
               },
             ],
           },

@@ -1,6 +1,6 @@
-package com.bosch.topicregistration.api.enrollment.enrollmentperiod;
+package com.bosch.topicregistration.api.enrollmentperiod;
 
-import com.bosch.topicregistration.api.enrollment.semester.Semester;
+import com.bosch.topicregistration.api.semester.Semester;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

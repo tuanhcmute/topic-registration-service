@@ -14,6 +14,10 @@ const topicService = {
     const requestUrl = `${baseUrl}/lecture`;
     return axiosClient.put(requestUrl, data);
   },
+  approveTopicInLectureEnrollmentPeriod: (data) => {
+    const requestUrl = `${baseUrl}/lecture/approval`;
+    return axiosClient.put(requestUrl, data);
+  },
 };
 
 export default topicService;

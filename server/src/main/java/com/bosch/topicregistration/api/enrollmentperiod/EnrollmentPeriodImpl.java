@@ -1,4 +1,4 @@
-package com.bosch.topicregistration.api.enrollment.enrollmentperiod;
+package com.bosch.topicregistration.api.enrollmentperiod;
 
 import org.springframework.stereotype.Service;
 

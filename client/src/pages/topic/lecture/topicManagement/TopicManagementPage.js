@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
 import { Button } from "flowbite-react";
 import Select from "react-select";
+import { useSelector } from "react-redux";
+import { HttpStatusCode } from "axios";
+import { toast } from "react-toastify";
+import { AiOutlineFilter } from "react-icons/ai";
 
 import EnrollTopicModal from "./components/EnrollTopicModal";
 import EditTopicModal from "./components/EditTopicModal";
 import { topicService, userService } from "../../../../services";
 import { topicStatus, topicType } from "../../../../utils/constants";
-import { useSelector } from "react-redux";
-import { HttpStatusCode } from "axios";
-import { toast } from "react-toastify";
+import { Dropdown } from "../../../../components/dropdown";
 
 const options = [
   {
@@ -25,6 +27,7 @@ function TopicManagementPage() {
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [topics, setTopics] = useState([]);
   const [studentOptions, setStudentOptions] = useState([]);
+  const [topicStatusFilter, setTopicStatusFilter] = useState("ALL");
   // Get current user from redux
   const currentUser = useSelector((state) => state.auth?.currentUser);
 
@@ -116,6 +119,38 @@ function TopicManagementPage() {
           />
         </div>
         {/* End select */}
+        {/* Topic status filter */}
+        <div className='px-3 py-1 w-fit' id='topicStatusFilter'>
+          <Button
+            color='gray'
+            className='rounded-md p-0 cursor-default flex items-center'
+          >
+            <AiOutlineFilter className='mr-1' />
+            <span>Lọc theo trạng thái</span>
+          </Button>
+        </div>
+        <Dropdown
+          place='right-right'
+          className='p-0 bg-whiteSmoke rounded border-gray-400 dark:bg-sambuca dark:opacity-100 opacity-100'
+          anchorSelect='#topicStatusFilter'
+        >
+          <div className='flex flex-col gap-2 p-3'>
+            {Object.keys(topicStatus).map((item) => {
+              return (
+                <div
+                  key={item}
+                  className='text-sm px-2 py-1 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer'
+                  onClick={() =>
+                    setTopicStatusFilter(topicStatus?.[item]?.value)
+                  }
+                >
+                  {topicStatus?.[item]?.label}
+                </div>
+              );
+            })}
+          </div>
+        </Dropdown>
+        {/* End topic status filter */}
         {/* Table */}
         <div className='p-3'>
           <div className='overflow-x-auto'>
@@ -136,52 +171,60 @@ function TopicManagementPage() {
                       </tr>
                     </thead>
                     <tbody className='text-gray-600 text-sm font-light'>
-                      {topics?.map((item, index) => {
-                        return (
-                          <tr
-                            className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'
-                            key={item.id}
-                          >
-                            <td className='p-3 text-center whitespace-nowrap border'>
-                              {index + 1}
-                            </td>
-                            <td className='p-3 text-left border border-collapse border-lightGrey w-[300px]'>
-                              <p className='font-normal'>{item.name}</p>
-                            </td>
-                            <td className='p-3 text-left border border-collapse border-lightGrey'>
-                              <div className=''>
-                                <span className='bg-orange-400 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
-                                  {currentUser?.ntid}
+                      {topics
+                        ?.filter((item) => {
+                          if (topicStatusFilter === "ALL") return true;
+                          return item?.status === topicStatusFilter;
+                        })
+                        ?.map((item, index) => {
+                          return (
+                            <tr
+                              className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'
+                              key={item.id}
+                            >
+                              <td className='p-3 text-center whitespace-nowrap border'>
+                                {index + 1}
+                              </td>
+                              <td className='p-3 text-left border border-collapse border-lightGrey w-[300px]'>
+                                <p className='font-normal'>{item.name}</p>
+                              </td>
+                              <td className='p-3 text-left border border-collapse border-lightGrey'>
+                                <div className=''>
+                                  <span className='bg-orange-400 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
+                                    {currentUser?.ntid}
+                                  </span>
+                                  <span className='block mt-2 font-normal'>
+                                    {currentUser?.name}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className='p-3 text-center border border-collapse border-lightGrey'>
+                                <span className='bg-orange-400 py-1 px-3 text-sm font-medium rounded dark:text-black-pearl'>
+                                  {
+                                    topicStatus?.[item?.status.toLowerCase()]
+                                      ?.label
+                                  }
                                 </span>
-                                <span className='block mt-2 font-normal'>
-                                  {currentUser?.name}
+                              </td>
+                              <td className='p-3 text-center border border-collapse border-lightGrey'>
+                                <span className='bg-orange-400 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
+                                  {item.maxSlot}
                                 </span>
-                              </div>
-                            </td>
-                            <td className='p-3 text-center border border-collapse border-lightGrey'>
-                              <span className='bg-orange-400 py-1 px-3 text-sm font-medium rounded dark:text-black-pearl'>
-                                {topicStatus?.[item?.status]}
-                              </span>
-                            </td>
-                            <td className='p-3 text-center border border-collapse border-lightGrey'>
-                              <span className='bg-orange-400 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
-                                {item.maxSlot}
-                              </span>
-                            </td>
-                            <td className='border border-collapse border-lightGrey'>
-                              <div className='flex justify-center'>
-                                <LiaEditSolid
-                                  className='w-6 h-6 cursor-pointer'
-                                  onClick={() => {
-                                    setSelectedTopic(item);
-                                    setOpenEditTopicMode("default");
-                                  }}
-                                />
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                              </td>
+                              <td className='border border-collapse border-lightGrey'>
+                                <div className='flex justify-center'>
+                                  <LiaEditSolid
+                                    className='w-6 h-6 cursor-pointer'
+                                    onClick={() => {
+                                      setSelectedTopic(item);
+                                      setOpenEditTopicMode("default");
+                                    }}
+                                  />
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </table>
                 </div>

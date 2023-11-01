@@ -1,7 +1,7 @@
 import keys from "../../config";
 import * as topicType from "./topicType";
 import * as roles from "./roles";
-import * as topicStatus from "./topicStatus";
+import topicStatus from "./topicStatus";
 
 export const API_BASE_URL = keys.apiBaseUrl;
 

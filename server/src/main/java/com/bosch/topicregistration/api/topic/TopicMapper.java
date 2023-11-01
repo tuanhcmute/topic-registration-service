@@ -1,8 +1,9 @@
-package com.bosch.topicregistration.api.enrollment.topic;
+package com.bosch.topicregistration.api.topic;
 
 import com.bosch.topicregistration.api.enrollment.TopicEnrollment;
+import com.bosch.topicregistration.api.user.LectureDTO;
 import com.bosch.topicregistration.api.user.StudentDTO;
-import com.bosch.topicregistration.api.user.UserRole;
+import com.bosch.topicregistration.api.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -23,6 +24,13 @@ public interface TopicMapper {
         return StudentDTO.builder()
                 .ntid(topicEnrollment.getStudent().getNtid())
                 .name(topicEnrollment.getStudent().getName())
+                .build();
+    }
+
+    default LectureDTO mapLectureDTO(User lecture) {
+        return LectureDTO.builder()
+                .ntid(lecture.getNtid())
+                .name(lecture.getName())
                 .build();
     }
 }

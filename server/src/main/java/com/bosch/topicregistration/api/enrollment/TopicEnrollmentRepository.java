@@ -1,6 +1,6 @@
 package com.bosch.topicregistration.api.enrollment;
 
-import com.bosch.topicregistration.api.enrollment.topic.Topic;
+import com.bosch.topicregistration.api.topic.Topic;
 import com.bosch.topicregistration.api.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

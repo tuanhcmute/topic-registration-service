@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { HiOutlineUserGroup } from "react-icons/hi";
-import { CiLogout } from "react-icons/ci";
+import { CiDark, CiLogout } from "react-icons/ci";
 import { FaBars } from "react-icons/fa";
 import { PiUserCircleGearLight } from "react-icons/pi";
 import { FiBook } from "react-icons/fi";
@@ -89,19 +89,11 @@ function AppLectureHeader() {
               <HiOutlineUserGroup className='w-4 h-4 md:hidden' />
               <span>Giảng viên</span>
             </Link>
-            <div
-              className='hover:bg-primary hover:text-white transition-all ease-in-out flex items-center gap-1 w-full min-w-fit text-start md:p-2 px-2 py-3 dark:text-white cursor-pointer'
-              onClick={() => dispatch(toggleTheme())}
-            >
-              <HiOutlineUserGroup className='w-4 h-4 md:hidden' />
-              <span>Chế độ tối</span>
-            </div>
           </div>
           {/* Profile */}
           <div
             className='flex items-center text-primary cursor-pointer px-2 py-3 dark:text-whiteSmoke gap-1'
             id='info'
-            data-tooltip-variant='light'
           >
             <img
               className='object-cover w-6 h-6 rounded-full'
@@ -112,13 +104,23 @@ function AppLectureHeader() {
           </div>
           {/* End profile */}
           {/* Dropdown will be displayed when hovering on Profile */}
-          <Dropdown className='p-0 bg-white ' anchorSelect='#info'>
+          <Dropdown
+            className='p-0 bg-whiteSmoke rounded border-gray-400 dark:bg-sambuca dark:opacity-100 opacity-100'
+            anchorSelect='#info'
+          >
             <div className='w-44 text-sm shadow-md hover:shadow-lg transition-shadow ease-linear'>
+              <div
+                onClick={() => dispatch(toggleTheme())}
+                className='flex items-center gap-1 w-full p-[10px] cursor-pointer text-gray-700 hover:text-primary transition-all ease-in-out dark:text-gray-300'
+              >
+                <CiDark className='w-5 h-5' />
+                <span className='font-bold text-xs'>Chế độ tối</span>
+              </div>
               {dropdownItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <NavLink
-                    className='flex items-center gap-1 w-full p-[10px] cursor-pointer text-black hover:text-primary transition-all ease-in-out'
+                    className='flex items-center gap-1 w-full p-[10px] cursor-pointer text-gray-700 hover:text-primary transition-all ease-in-out dark:text-gray-300'
                     key={item.id}
                     to={item.to}
                     onClick={

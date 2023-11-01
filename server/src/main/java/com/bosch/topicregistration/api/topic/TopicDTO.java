@@ -1,5 +1,6 @@
-package com.bosch.topicregistration.api.enrollment.topic;
+package com.bosch.topicregistration.api.topic;
 
+import com.bosch.topicregistration.api.user.LectureDTO;
 import com.bosch.topicregistration.api.user.StudentDTO;
 import lombok.*;
 
@@ -28,5 +29,7 @@ public class TopicDTO {
     private Integer availableSlot;
 
     private Set<StudentDTO> students;
+
+    private LectureDTO lecture;
 
 }

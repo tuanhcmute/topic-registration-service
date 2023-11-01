@@ -1,4 +1,24 @@
-export const CREATED = "Đã được tạo";
-export const PENDING = "Đang xử lý";
-export const APPROVED = "Đã được duyệt";
-export const REJECTED = "Chưa được duyệt";
+const topicStatus = {
+  created: {
+    value: "CREATED",
+    label: "Đã được tạo",
+  },
+  pending: {
+    value: "PENDING",
+    label: "Đang chờ duyệt",
+  },
+  approved: {
+    value: "APPROVED",
+    label: "Đã được duyệt",
+  },
+  rejected: {
+    value: "REJECTED",
+    label: "Chưa được duyệt",
+  },
+  all: {
+    value: "ALL",
+    label: "Tất cả",
+  },
+};
+
+export default topicStatus;

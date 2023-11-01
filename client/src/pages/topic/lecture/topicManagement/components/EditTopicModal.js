@@ -1,12 +1,13 @@
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import Select from "react-select";
-import { Modal, Button, TextInput, Label, Textarea } from "flowbite-react";
+import { Modal, Button, TextInput, Label } from "flowbite-react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { useSelector } from "react-redux";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { useEffect, useState } from "react";
+
 import { topicStatus } from "../../../../../utils/constants";
 
 const validationSchema = Yup.object().shape({
@@ -134,7 +135,7 @@ function EditTopicModal(props) {
                 type='number'
                 onChange={formik.handleChange}
                 value={formik.values.maxSlot}
-                disabled={data?.status === "APPROVED"}
+                disabled={data?.status === topicStatus.approved.value}
               />
             </div>
             {/* End max slot field */}
@@ -156,7 +157,7 @@ function EditTopicModal(props) {
               id='topicName'
               onChange={formik.handleChange}
               value={formik.values.topicName}
-              disabled={data?.status === "APPROVED"}
+              disabled={data?.status === topicStatus.approved.value}
             />
           </div>
           {/* End topic field */}
@@ -168,7 +169,7 @@ function EditTopicModal(props) {
               value='Yêu cầu đề tài (*)'
               className='mb-2 block'
             />
-            {data?.status === "APPROVED" ? (
+            {data?.status === topicStatus.approved.value ? (
               <div
                 dangerouslySetInnerHTML={{ __html: data?.goal }}
                 className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500'
@@ -194,7 +195,7 @@ function EditTopicModal(props) {
               value='Kiến thức cần có (*)'
               className='mb-2 block'
             />
-            {data?.status === "APPROVED" ? (
+            {data?.status === topicStatus.approved.value ? (
               <div
                 dangerouslySetInnerHTML={{ __html: data?.requirement }}
                 className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500'
@@ -230,7 +231,7 @@ function EditTopicModal(props) {
           </div>
         </div>
       </Modal.Body>
-      {data?.status === "PENDING" && (
+      {data?.status === topicStatus.pending.value && (
         <Modal.Footer>
           <div className='w-full flex items-center justify-end gap-5'>
             <Button
