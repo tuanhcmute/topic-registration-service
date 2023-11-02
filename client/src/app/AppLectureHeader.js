@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { HiOutlineUserGroup } from "react-icons/hi";
-import { CiDark, CiLogout } from "react-icons/ci";
+import { CiDark, CiLight, CiLogout } from "react-icons/ci";
 import { FaBars } from "react-icons/fa";
 import { PiUserCircleGearLight } from "react-icons/pi";
 import { FiBook } from "react-icons/fi";
@@ -105,7 +105,7 @@ function AppLectureHeader() {
           {/* End profile */}
           {/* Dropdown will be displayed when hovering on Profile */}
           <Dropdown
-            className='p-0 bg-whiteSmoke rounded border-gray-400 dark:bg-sambuca dark:opacity-100 opacity-100'
+            className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
             anchorSelect='#info'
           >
             <div className='w-44 text-sm shadow-md hover:shadow-lg transition-shadow ease-linear'>
@@ -113,8 +113,14 @@ function AppLectureHeader() {
                 onClick={() => dispatch(toggleTheme())}
                 className='flex items-center gap-1 w-full p-[10px] cursor-pointer text-gray-700 hover:text-primary transition-all ease-in-out dark:text-gray-300'
               >
-                <CiDark className='w-5 h-5' />
-                <span className='font-bold text-xs'>Chế độ tối</span>
+                {darkMode ? (
+                  <CiLight className='w-5 h-5' />
+                ) : (
+                  <CiDark className='w-5 h-5' />
+                )}
+                <span className='font-bold text-xs'>
+                  Chế độ {darkMode ? "sáng" : "tối"}
+                </span>
               </div>
               {dropdownItems.map((item) => {
                 const Icon = item.icon;

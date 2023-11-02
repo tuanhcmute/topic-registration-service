@@ -1,5 +1,7 @@
-package com.bosch.topicregistration.api.topic;
+package com.bosch.topicregistration.api.approvalhistory;
 
+import com.bosch.topicregistration.api.topic.Topic;
+import com.bosch.topicregistration.api.topic.TopicStatus;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
