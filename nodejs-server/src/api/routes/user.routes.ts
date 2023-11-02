@@ -13,5 +13,6 @@ export default class UserRoutes implements IRoutes {
 
   public initializeRoutes(): void {
     this.router.get(`${this.path}/profile`, this.userController.getProfile);
+    this.router.put(`${this.path}/profile`, this.userController.updateUserBio);
   }
 }

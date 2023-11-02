@@ -56,6 +56,24 @@ class UserService {
       throw err;
     }
   };
+
+  public updateUserBio = async (
+    userId: string,
+    bio: string
+  ): Promise<boolean> => {
+    try {
+      const foundUser = await User.findByPk(userId);
+      if (!foundUser)
+        throw new UserNotFoundException(
+          ErrorMessages.USER_NOT_FOUND + "with userId: " + userId
+        );
+      foundUser.biography = bio;
+      await foundUser.save();
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  };
 }
 
 export default UserService;
