@@ -1,5 +1,7 @@
 package com.bosch.topicregistration.api.topic;
 
+import com.bosch.topicregistration.api.approvalhistory.ApprovalHistory;
+import com.bosch.topicregistration.api.approvalhistory.ApprovalHistoryRepository;
 import com.bosch.topicregistration.api.topicenrollment.TopicEnrollment;
 import com.bosch.topicregistration.api.topicenrollment.TopicEnrollmentRepository;
 import com.bosch.topicregistration.api.semester.Semester;
@@ -203,6 +205,7 @@ public class TopicServiceImpl implements TopicService {
             ApprovalHistory approvalHistory = ApprovalHistory.builder()
                     .status(status)
                     .reason(request.getReason())
+                    .topic(topic)
                     .build();
             approvalHistoryRepository.save(approvalHistory);
             log.info("Approval history: {}", approvalHistory.getId());

@@ -70,7 +70,7 @@ function ApprovalTopicManagementPage() {
   }, []);
 
   return (
-    <div className='w-full border border-lightGrey bg-white h-fit rounded-md dark:bg-sambuca dark:border-gray-500'>
+    <React.Fragment>
       <div className='w-full border border-lightGrey bg-white h-fit rounded-md dark:bg-sambuca dark:border-gray-500'>
         {/* Register topic */}
         <div className='flex items-center justify-between p-3 border-b border-lightGrey'>
@@ -184,7 +184,7 @@ function ApprovalTopicManagementPage() {
         setOpenModal={setOpenEditTopicMode}
       />
       {/* End content */}
-    </div>
+    </React.Fragment>
   );
 }
 

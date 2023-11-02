@@ -17,25 +17,12 @@ const options = [
 ];
 
 function AppreciationManagementPage() {
-  const [openModal, setOpenModal] = useState(undefined);
   const [openEditTopicModal, setOpenEditTopicMode] = useState(undefined);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [topics, setTopics] = useState([]);
   // Get current user from redux
   const currentUser = useSelector((state) => state.auth?.currentUser);
 
-  async function createNewTopicInLectureEnrollmentPeriod(data) {
-    try {
-      const response =
-        await topicService.createNewTopicInLectureEnrollmentPeriod(data);
-      if (response?.data?.statusCode === HttpStatusCode.Created) {
-        setOpenModal(undefined);
-        fetchTopicsInLectureEnrollmentPeriod();
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
   async function fetchTopicsInLectureEnrollmentPeriod() {
     try {
       const response = await topicService.getAllTopicsInLectureEnrollmentPeriod(
@@ -68,18 +55,14 @@ function AppreciationManagementPage() {
   }, []);
 
   return (
-    <div className='w-full border border-lightGrey bg-white h-fit rounded-md dark:bg-sambuca dark:border-gray-500'>
+    <React.Fragment>
       <div className='w-full border border-lightGrey bg-white h-fit rounded-md dark:bg-sambuca dark:border-gray-500'>
         {/* Register topic */}
         <div className='flex items-center justify-between p-3 border-b border-lightGrey'>
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
             TIỂU LUẬN CHUYÊN NGÀNH
           </span>
-          <Button
-            color='gray'
-            className='rounded-md p-0'
-            onClick={() => setOpenModal("default")}
-          >
+          <Button color='gray' className='rounded-md p-0'>
             Xuất Excel
           </Button>
         </div>
@@ -179,19 +162,14 @@ function AppreciationManagementPage() {
         {/* End table */}
       </div>
       {/* Enroll topic modal */}
-      {/* <EnrollTopicModal
-        openModal={openModal}
-        setOpenModal={setOpenModal}
-        handleNewTopic={createNewTopicInLectureEnrollmentPeriod}
-      />
-      <EditTopicModal
+      {/* <EditTopicModal
         handleUpdateTopic={updateTopicInLectureEnrollmentPeriod}
         data={selectedTopic}
         openModal={openEditTopicModal}
         setOpenModal={setOpenEditTopicMode}
-      /> */}
+      />  */}
       {/* End content */}
-    </div>
+    </React.Fragment>
   );
 }
 

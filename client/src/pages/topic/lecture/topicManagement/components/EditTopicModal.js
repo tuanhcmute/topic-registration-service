@@ -231,7 +231,7 @@ function EditTopicModal(props) {
           </div>
         </div>
       </Modal.Body>
-      {data?.status === topicStatus.pending.value && (
+      {data?.status !== topicStatus.approved.value && (
         <Modal.Footer>
           <div className='w-full flex items-center justify-end gap-5'>
             <Button

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
+import { BiMessageRoundedError } from "react-icons/bi";
 import { Button } from "flowbite-react";
-import Select from "react-select";
 import { useSelector } from "react-redux";
 import { HttpStatusCode } from "axios";
 import { toast } from "react-toastify";
@@ -9,25 +9,31 @@ import { AiOutlineFilter } from "react-icons/ai";
 
 import EnrollTopicModal from "./components/EnrollTopicModal";
 import EditTopicModal from "./components/EditTopicModal";
-import { topicService, userService } from "../../../../services";
-import { topicStatus, topicType } from "../../../../utils/constants";
+import {
+  enrollmentPeriodService,
+  topicService,
+  userService,
+} from "../../../../services";
+import {
+  enrollmentPeriodCodes,
+  topicStatus,
+  topicType,
+} from "../../../../utils/constants";
 import { Dropdown } from "../../../../components/dropdown";
-
-const options = [
-  {
-    value: "e71e687d-d5a9-4178-8225-c4b29a9ffb0d",
-    label:
-      "Đợt đề xuất tiểu luận chuyên ngành học kỳ I/2023 (ĐK và duyệt: 01/10 - 20/10/2023)",
-  },
-];
+import ApprovalTopicModal from "./components/ApprovalTopicModal";
 
 function TopicManagementPage() {
   const [openModal, setOpenModal] = useState(undefined);
   const [openEditTopicModal, setOpenEditTopicMode] = useState(undefined);
+  const [openApprovalTopicModal, setOpenApprovalTopicModal] =
+    useState(undefined);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [topics, setTopics] = useState([]);
+  const [enrollmentPeriod, setEnrollmentPeriod] = useState(undefined);
   const [studentOptions, setStudentOptions] = useState([]);
-  const [topicStatusFilter, setTopicStatusFilter] = useState("ALL");
+  const [topicStatusFilter, setTopicStatusFilter] = useState(
+    topicStatus.all.value
+  );
   // Get current user from redux
   const currentUser = useSelector((state) => state.auth?.currentUser);
 
@@ -38,9 +44,10 @@ function TopicManagementPage() {
       if (response?.data?.statusCode === HttpStatusCode.Created) {
         setOpenModal(undefined);
         fetchTopicsInLectureEnrollmentPeriod();
+        toast.success("Tạo đề tài thành công");
       }
       if (response?.data?.statusCode === HttpStatusCode.BadRequest) {
-        toast.error("Bad request");
+        toast.error("Đã có lỗi xảy ra, vui lòng kiểm tra lại thông tin");
       }
     } catch (error) {
       console.log(error);
@@ -86,14 +93,29 @@ function TopicManagementPage() {
       console.log(error);
     }
   }
+  async function fetchEnrollmentPeriodByTopicTypeAndPeriodCode() {
+    try {
+      const response =
+        await enrollmentPeriodService.getEnrollmentPeriodByTopicTypeAndPeriodCode(
+          topicType.TLCN,
+          enrollmentPeriodCodes.LECTURE_ENROLLMENT_PERIOD
+        );
+      if (response?.data?.statusCode === HttpStatusCode.Ok) {
+        setEnrollmentPeriod(response?.data?.data?.enrollmentPeriod);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   useEffect(() => {
     fetchTopicsInLectureEnrollmentPeriod();
     fetchStudentsNotEnrolledInTopic();
+    fetchEnrollmentPeriodByTopicTypeAndPeriodCode();
   }, []);
 
   return (
-    <div className='w-full border border-lightGrey bg-white h-fit rounded-md dark:bg-sambuca dark:border-gray-500'>
+    <React.Fragment>
       <div className='w-full border border-lightGrey bg-white h-fit rounded-md dark:bg-sambuca dark:border-gray-500'>
         {/* Register topic */}
         <div className='flex items-center justify-between p-3 border-b border-lightGrey'>
@@ -110,13 +132,8 @@ function TopicManagementPage() {
         </div>
         {/* End register topic */}
         {/* Select */}
-        <div className='p-3'>
-          <Select
-            className='w-full'
-            options={options}
-            isSearchable={false}
-            defaultValue={options[0]}
-          />
+        <div className='m-3 border border-gray-400 py-2 px-3 rounded text-sm truncate dark:text-gray-300'>
+          {enrollmentPeriod?.name}
         </div>
         {/* End select */}
         {/* Topic status filter */}
@@ -131,7 +148,7 @@ function TopicManagementPage() {
         </div>
         <Dropdown
           place='right-right'
-          className='p-0 bg-whiteSmoke rounded border-gray-400 dark:bg-sambuca dark:opacity-100 opacity-100'
+          className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
           anchorSelect='#topicStatusFilter'
         >
           <div className='flex flex-col gap-2 p-3'>
@@ -177,6 +194,16 @@ function TopicManagementPage() {
                           return item?.status === topicStatusFilter;
                         })
                         ?.map((item, index) => {
+                          let statusColor = "";
+                          if (item?.status === topicStatus.approved.value) {
+                            statusColor = "bg-green-200";
+                          }
+                          if (item?.status === topicStatus.rejected.value) {
+                            statusColor = "bg-red-300";
+                          }
+                          if (item?.status === topicStatus.pending.value) {
+                            statusColor = "bg-teal-200";
+                          }
                           return (
                             <tr
                               className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'
@@ -190,7 +217,7 @@ function TopicManagementPage() {
                               </td>
                               <td className='p-3 text-left border border-collapse border-lightGrey'>
                                 <div className=''>
-                                  <span className='bg-orange-400 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
+                                  <span className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
                                     {currentUser?.ntid}
                                   </span>
                                   <span className='block mt-2 font-normal'>
@@ -198,8 +225,10 @@ function TopicManagementPage() {
                                   </span>
                                 </div>
                               </td>
-                              <td className='p-3 text-center border border-collapse border-lightGrey'>
-                                <span className='bg-orange-400 py-1 px-3 text-sm font-medium rounded dark:text-black-pearl'>
+                              <td className='p-3 text-center border border-collapse border-lightGrey bg-'>
+                                <span
+                                  className={`${statusColor} py-1 px-3 text-sm font-medium rounded dark:text-black-pearl`}
+                                >
                                   {
                                     topicStatus?.[item?.status.toLowerCase()]
                                       ?.label
@@ -207,12 +236,12 @@ function TopicManagementPage() {
                                 </span>
                               </td>
                               <td className='p-3 text-center border border-collapse border-lightGrey'>
-                                <span className='bg-orange-400 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
+                                <span className='bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
                                   {item.maxSlot}
                                 </span>
                               </td>
                               <td className='border border-collapse border-lightGrey'>
-                                <div className='flex justify-center'>
+                                <div className='flex justify-center flex-wrap gap-1 items-center m-2'>
                                   <LiaEditSolid
                                     className='w-6 h-6 cursor-pointer'
                                     onClick={() => {
@@ -220,6 +249,16 @@ function TopicManagementPage() {
                                       setOpenEditTopicMode("default");
                                     }}
                                   />
+                                  {item?.status ===
+                                    topicStatus.rejected.value && (
+                                    <BiMessageRoundedError
+                                      className='w-6 h-6 cursor-pointer'
+                                      onClick={() => {
+                                        setSelectedTopic(item);
+                                        setOpenApprovalTopicModal("default");
+                                      }}
+                                    />
+                                  )}
                                 </div>
                               </td>
                             </tr>
@@ -252,8 +291,13 @@ function TopicManagementPage() {
         openModal={openEditTopicModal}
         setOpenModal={setOpenEditTopicMode}
       />
+      <ApprovalTopicModal
+        data={selectedTopic}
+        openModal={openApprovalTopicModal}
+        setOpenModal={setOpenApprovalTopicModal}
+      />
       {/* End content */}
-    </div>
+    </React.Fragment>
   );
 }
 
