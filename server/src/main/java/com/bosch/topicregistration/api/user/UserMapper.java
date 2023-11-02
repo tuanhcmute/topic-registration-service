@@ -3,7 +3,6 @@ package com.bosch.topicregistration.api.user;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import org.springframework.context.annotation.Bean;
 
 import java.util.Set;
 
@@ -14,7 +13,6 @@ public interface UserMapper {
             @Mapping(target = "updatedDate", source = "user.updatedDate", dateFormat = "dd-MM-yyyy HH:mm:ss")
     })
     UserDTO toDTO(User user);
-
     Set<String> map(Set<UserRole> userRoles);
 
     default String map(UserRole userRole) {
