@@ -12,7 +12,7 @@ function App(props) {
       <Header />
       <main
         id='app-main'
-        className='xl:mt-24 lg:mt-20 md:mt-16 mt-14 bg-whiteSmoke dark:bg-black-pearl'
+        className='xl:mt-24 lg:mt-20 md:mt-16 mt-14 bg-whiteSmoke dark:bg-black-pearl pb-5'
       >
         <Outlet />
       </main>
