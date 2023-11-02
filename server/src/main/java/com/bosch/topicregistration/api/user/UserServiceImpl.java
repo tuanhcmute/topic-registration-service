@@ -1,6 +1,6 @@
 package com.bosch.topicregistration.api.user;
 
-import com.bosch.topicregistration.api.enrollment.TopicEnrollmentRepository;
+import com.bosch.topicregistration.api.topicenrollment.TopicEnrollmentRepository;
 import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
 import com.bosch.topicregistration.api.response.Response;

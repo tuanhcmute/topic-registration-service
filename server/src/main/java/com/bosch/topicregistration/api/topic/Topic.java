@@ -1,6 +1,7 @@
 package com.bosch.topicregistration.api.topic;
 
-import com.bosch.topicregistration.api.enrollment.TopicEnrollment;
+import com.bosch.topicregistration.api.division.Division;
+import com.bosch.topicregistration.api.topicenrollment.TopicEnrollment;
 import com.bosch.topicregistration.api.semester.Semester;
 import com.bosch.topicregistration.api.user.Major;
 import com.bosch.topicregistration.api.user.User;
@@ -86,4 +87,7 @@ public class Topic implements Serializable {
     @OneToMany(mappedBy = "topic", fetch = FetchType.EAGER)
     @Builder.Default
     private Set<ApprovalHistory> approvalHistories = new HashSet<>();
+
+    @OneToOne(mappedBy = "topic")
+    private Division division;
 }

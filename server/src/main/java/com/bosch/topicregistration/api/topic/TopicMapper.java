@@ -1,6 +1,6 @@
 package com.bosch.topicregistration.api.topic;
 
-import com.bosch.topicregistration.api.enrollment.TopicEnrollment;
+import com.bosch.topicregistration.api.topicenrollment.TopicEnrollment;
 import com.bosch.topicregistration.api.user.LectureDTO;
 import com.bosch.topicregistration.api.user.StudentDTO;
 import com.bosch.topicregistration.api.user.User;

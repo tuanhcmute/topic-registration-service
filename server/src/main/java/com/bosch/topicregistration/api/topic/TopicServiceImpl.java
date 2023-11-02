@@ -1,7 +1,7 @@
 package com.bosch.topicregistration.api.topic;
 
-import com.bosch.topicregistration.api.enrollment.TopicEnrollment;
-import com.bosch.topicregistration.api.enrollment.TopicEnrollmentRepository;
+import com.bosch.topicregistration.api.topicenrollment.TopicEnrollment;
+import com.bosch.topicregistration.api.topicenrollment.TopicEnrollmentRepository;
 import com.bosch.topicregistration.api.semester.Semester;
 import com.bosch.topicregistration.api.semester.SemesterRepository;
 import com.bosch.topicregistration.api.semester.SemesterStatus;

@@ -1,5 +1,6 @@
 package com.bosch.topicregistration.api.user;
 
+import com.bosch.topicregistration.api.division.Division;
 import com.bosch.topicregistration.api.topic.Topic;
 import com.bosch.topicregistration.api.security.oauth2.OAuth2Provider;
 import lombok.*;
@@ -90,4 +91,7 @@ public class User implements Serializable {
     @Builder.Default
     private Set<Topic> topics = new HashSet<>();
 
+    @OneToMany(mappedBy = "lecture")
+    @Builder.Default
+    private Set<Division> divisions = new HashSet<>();
 }

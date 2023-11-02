@@ -1,4 +1,4 @@
-package com.bosch.topicregistration.api.enrollment;
+package com.bosch.topicregistration.api.topicenrollment;
 
 import com.bosch.topicregistration.api.topic.Topic;
 import com.bosch.topicregistration.api.user.User;
