@@ -2,18 +2,13 @@ import React, { useEffect, useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
 import { BiMessageRoundedError } from "react-icons/bi";
 import { Button } from "flowbite-react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { HttpStatusCode } from "axios";
-import { toast } from "react-toastify";
 import { AiOutlineFilter } from "react-icons/ai";
 
 import EnrollTopicModal from "./components/EnrollTopicModal";
 import EditTopicModal from "./components/EditTopicModal";
-import {
-  enrollmentPeriodService,
-  topicService,
-  userService,
-} from "../../../../services";
+import { enrollmentPeriodService, userService } from "../../../../services";
 import {
   enrollmentPeriodCodes,
   topicStatus,
@@ -21,63 +16,45 @@ import {
 } from "../../../../utils/constants";
 import { Dropdown } from "../../../../components/dropdown";
 import ApprovalTopicModal from "./components/ApprovalTopicModal";
+import {
+  createNewTopicInLectureEnrollmentPeriod,
+  fetchAllTopicsInLectureEnrollmentPeriod,
+  updateTopicInLectureEnrollmentPeriod,
+} from "../../../../features/topic/topicSlice";
 
 function TopicManagementPage() {
   const [openModal, setOpenModal] = useState(undefined);
-  const [openEditTopicModal, setOpenEditTopicMode] = useState(undefined);
+  const [openEditTopicModal, setOpenEditTopicModal] = useState(undefined);
   const [openApprovalTopicModal, setOpenApprovalTopicModal] =
     useState(undefined);
   const [selectedTopic, setSelectedTopic] = useState(null);
-  const [topics, setTopics] = useState([]);
   const [enrollmentPeriod, setEnrollmentPeriod] = useState(undefined);
   const [studentOptions, setStudentOptions] = useState([]);
   const [topicStatusFilter, setTopicStatusFilter] = useState(
     topicStatus.all.value
   );
   // Get current user from redux
-  const currentUser = useSelector((state) => state.auth?.currentUser);
+  const currentUser = useSelector((state) => state.user?.currentUser);
+  const topics = useSelector((state) => state.topic?.topics);
+  const dispatch = useDispatch();
 
-  async function createNewTopicInLectureEnrollmentPeriod(data) {
-    try {
-      const response =
-        await topicService.createNewTopicInLectureEnrollmentPeriod(data);
-      if (response?.data?.statusCode === HttpStatusCode.Created) {
-        setOpenModal(undefined);
-        fetchTopicsInLectureEnrollmentPeriod();
-        toast.success("Tạo đề tài thành công");
-      }
-      if (response?.data?.statusCode === HttpStatusCode.BadRequest) {
-        toast.error("Đã có lỗi xảy ra, vui lòng kiểm tra lại thông tin");
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  async function handleCreateNewTopicInLectureEnrollmentPeriod(data) {
+    dispatch(
+      createNewTopicInLectureEnrollmentPeriod({
+        data,
+        setOpenModal,
+        type: topicType.TLCN,
+      })
+    );
   }
-  async function fetchTopicsInLectureEnrollmentPeriod() {
-    try {
-      const response = await topicService.getAllTopicsInLectureEnrollmentPeriod(
-        topicType.TLCN
-      );
-      const { data } = response;
-      if (response?.data?.statusCode === HttpStatusCode.Ok) {
-        setTopics(data?.data?.topics);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  async function updateTopicInLectureEnrollmentPeriod(data) {
-    try {
-      const response = await topicService.updateTopicInLectureEnrollmentPeriod(
-        data
-      );
-      if (response?.data?.statusCode === HttpStatusCode.Ok) {
-        setOpenEditTopicMode(undefined);
-        fetchTopicsInLectureEnrollmentPeriod();
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  async function handleUpdateTopicInLectureEnrollmentPeriod(data) {
+    dispatch(
+      updateTopicInLectureEnrollmentPeriod({
+        data,
+        type: topicType.TLCN,
+        setOpenEditTopicModal,
+      })
+    );
   }
   async function fetchStudentsNotEnrolledInTopic() {
     try {
@@ -109,10 +86,10 @@ function TopicManagementPage() {
   }
 
   useEffect(() => {
-    fetchTopicsInLectureEnrollmentPeriod();
+    dispatch(fetchAllTopicsInLectureEnrollmentPeriod(topicType.TLCN));
     fetchStudentsNotEnrolledInTopic();
     fetchEnrollmentPeriodByTopicTypeAndPeriodCode();
-  }, []);
+  }, [dispatch]);
 
   return (
     <React.Fragment>
@@ -204,6 +181,9 @@ function TopicManagementPage() {
                           if (item?.status === topicStatus.pending.value) {
                             statusColor = "bg-teal-200";
                           }
+                          if (item?.status === topicStatus.updated.value) {
+                            statusColor = "bg-teal-200";
+                          }
                           return (
                             <tr
                               className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'
@@ -246,7 +226,7 @@ function TopicManagementPage() {
                                     className='w-6 h-6 cursor-pointer'
                                     onClick={() => {
                                       setSelectedTopic(item);
-                                      setOpenEditTopicMode("default");
+                                      setOpenEditTopicModal("default");
                                     }}
                                   />
                                   {item?.status ===
@@ -282,14 +262,14 @@ function TopicManagementPage() {
         options={studentOptions}
         openModal={openModal}
         setOpenModal={setOpenModal}
-        handleNewTopic={createNewTopicInLectureEnrollmentPeriod}
+        handleNewTopic={handleCreateNewTopicInLectureEnrollmentPeriod}
       />
       <EditTopicModal
         options={studentOptions}
-        handleUpdateTopic={updateTopicInLectureEnrollmentPeriod}
+        handleUpdateTopic={handleUpdateTopicInLectureEnrollmentPeriod}
         data={selectedTopic}
         openModal={openEditTopicModal}
-        setOpenModal={setOpenEditTopicMode}
+        setOpenModal={setOpenEditTopicModal}
       />
       <ApprovalTopicModal
         data={selectedTopic}

@@ -5,6 +5,8 @@ import thunk from "redux-thunk";
 
 import authSlice from "./features/auth/authSlice";
 import themeSlice from "./features/theme/themeSlice";
+import topicSlice from "./features/topic/topicSlice";
+import userSlice from "./features/user/userSlice";
 
 const persistConfig = {
   key: "root",
@@ -13,6 +15,8 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: authSlice,
   theme: themeSlice,
+  topic: topicSlice,
+  user: userSlice,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 export const store = configureStore({
