@@ -19,6 +19,10 @@ const topicStatus = {
     value: "ALL",
     label: "Tất cả",
   },
+  updated: {
+    value: "UPDATED",
+    label: "Đã cập nhật",
+  },
 };
 
 export default topicStatus;

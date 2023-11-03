@@ -20,7 +20,7 @@ import { useSelector } from "react-redux";
 
 const RedirectRoute = () => {
   const isAuthenticated = useSelector((state) => state.auth.authenticated);
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const currentUser = useSelector((state) => state.user?.currentUser);
   if (!isAuthenticated) return <Navigate to={paths.LOGIN} replace />;
   const isStudent = currentUser?.userRoles?.some(
     (item) => item === roles.ROLE_STUDENT

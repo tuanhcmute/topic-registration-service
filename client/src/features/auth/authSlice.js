@@ -1,65 +1,96 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { userService } from "../../services";
 import { ACCESS_TOKEN } from "../../utils/constants";
+import { removeUserInfo } from "../user/userSlice";
 
 const initialState = {
   authenticated: false,
-  currentUser: {},
   [ACCESS_TOKEN]: "",
-  errorMessage: "",
+  message: "",
+  loading: false,
 };
 
-export const fetchUserInfo = createAsyncThunk(
-  "auth/fetchUserInfo",
-  async (thunkAPI) => {
-    const response = await userService.fetchUserInfo();
-    return response.data?.data?.profile;
+const namespace = "auth";
+
+export const userLogin = createAsyncThunk(
+  `${namespace}/userLogin`,
+  async ({ accessToken, error }, { rejectWithValue }) => {
+    if (accessToken) {
+      return { accessToken };
+    }
+    if (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const userLogout = createAsyncThunk(
+  `${namespace}/userLogout`,
+  async (data, { dispatch }) => {
+    dispatch(removeUserInfo());
   }
 );
 
 export const authSlice = createSlice({
   name: "auth",
   initialState: initialState,
-  reducers: {
-    loggedIn: (state, action) => {
-      state = {
+  extraReducers: (builder) => {
+    // userLogin
+    builder.addCase(userLogin.fulfilled, (state, action) => {
+      return {
         ...state,
         authenticated: true,
-        [ACCESS_TOKEN]: action.payload,
+        [ACCESS_TOKEN]: action.payload?.accessToken,
+        message: "Đăng nhập thành công",
+        loading: false,
       };
-      return state;
-    },
-    logout: (state) => {
-      state = {
+    });
+    builder.addCase(userLogin.pending, (state) => {
+      return {
         ...state,
         authenticated: false,
-        [ACCESS_TOKEN]: "",
-        currentUser: {},
-        errorMessage: "",
+        [ACCESS_TOKEN]: null,
+        message: "",
+        loading: true,
       };
-      return state;
-    },
-  },
-  extraReducers: (builder) => {
-    builder.addCase(fetchUserInfo.fulfilled, (state, action) => {
-      state.currentUser = {
-        ...state.currentUser,
-        ...action.payload,
+    });
+    builder.addCase(userLogin.rejected, (state) => {
+      return {
+        ...state,
+        authenticated: false,
+        [ACCESS_TOKEN]: null,
+        message: "Đã có lỗi xảy ra vui lòng đăng nhập lại",
+        loading: false,
       };
-      state.errorMessage = "";
-      return state;
     });
-    builder.addCase(fetchUserInfo.pending, (state) => {
-      state.currentUser = {};
-      state.errorMessage = "";
-      return state;
+    // userLogout
+    builder.addCase(userLogout.fulfilled, (state) => {
+      return {
+        ...state,
+        authenticated: false,
+        [ACCESS_TOKEN]: null,
+        message: "Đăng xuất thành công",
+        loading: false,
+      };
     });
-    builder.addCase(fetchUserInfo.rejected, (state, action) => {
-      state.errorMessage = action.error.message;
-      return state;
+    builder.addCase(userLogout.pending, (state) => {
+      return {
+        ...state,
+        authenticated: false,
+        [ACCESS_TOKEN]: null,
+        message: "",
+        loading: true,
+      };
+    });
+    builder.addCase(userLogout.rejected, (state) => {
+      return {
+        ...state,
+        authenticated: false,
+        [ACCESS_TOKEN]: null,
+        message: "Đã có lỗi xảy ra vui lòng đăng nhập lại",
+        loading: false,
+      };
     });
   },
 });
 
-export const { loggedIn, logout } = authSlice.actions;
 export default authSlice.reducer;

@@ -11,7 +11,7 @@ import { roles } from "../../../utils/constants";
 
 function Sidebar() {
   const folderRef = useRef();
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const currentUser = useSelector((state) => state.user?.currentUser);
 
   function toggleFolder() {
     folderRef.current.classList.toggle("hidden");

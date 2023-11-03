@@ -5,7 +5,7 @@ import { TextInput, Label, Button } from "flowbite-react";
 import { Banner } from "../../components/banner";
 
 function LecturePage() {
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const currentUser = useSelector((state) => state.user?.currentUser);
 
   return (
     <React.Fragment>

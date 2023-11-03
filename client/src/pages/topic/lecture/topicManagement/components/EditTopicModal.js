@@ -23,7 +23,7 @@ const validationSchema = Yup.object().shape({
 
 function EditTopicModal(props) {
   const { openModal, setOpenModal, data, options, handleUpdateTopic } = props;
-  const currentUser = useSelector((state) => state.auth?.currentUser);
+  const currentUser = useSelector((state) => state.user?.currentUser);
   const [initialValues, setInitialValues] = useState({
     id: "",
     maxSlot: 0,

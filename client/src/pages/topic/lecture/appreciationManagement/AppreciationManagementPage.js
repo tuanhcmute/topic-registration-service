@@ -21,7 +21,7 @@ function AppreciationManagementPage() {
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [topics, setTopics] = useState([]);
   // Get current user from redux
-  const currentUser = useSelector((state) => state.auth?.currentUser);
+  const currentUser = useSelector((state) => state.user?.currentUser);
 
   async function fetchTopicsInLectureEnrollmentPeriod() {
     try {

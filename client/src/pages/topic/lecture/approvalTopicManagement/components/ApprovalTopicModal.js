@@ -17,7 +17,7 @@ const validationSchema = Yup.object().shape({
 
 function ApprovalTopicModal(props) {
   const { openModal, setOpenModal, data, options } = props;
-  const currentUser = useSelector((state) => state.auth?.currentUser);
+  const currentUser = useSelector((state) => state.user?.currentUser);
   const formik = useFormik({
     initialValues: {
       id: data?.id,
