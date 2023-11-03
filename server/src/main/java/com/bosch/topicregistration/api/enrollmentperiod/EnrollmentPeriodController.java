@@ -38,7 +38,7 @@ public class EnrollmentPeriodController {
 
     @PostMapping("/enrollment")
     @ResponseStatus(HttpStatus.OK)
-    // @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_ADMIN')")
     @LoggerAround
     public Response<EnrollmentPeriodDTO> registrationTopic(@RequestBody(required=false) NewTopicRegistration newTopicRegistration) {
         if(Objects.isNull(newTopicRegistration)) 
