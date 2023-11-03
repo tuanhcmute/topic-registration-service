@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class LoggingAspect {
 
     @Pointcut("@annotation(LoggerAround)")
-    public void logAroundPointcut(){
+    public void logAroundPointcut() {
     }
 
     @Around("logAroundPointcut()")

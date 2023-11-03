@@ -1,5 +1,8 @@
 import { NextFunction, Response, Request } from "express";
-import { IResponseModel } from "@interfaces";
+import { UserNotFoundException } from "@exceptions";
+import { ResponseModelBuilder } from "@interfaces";
+import { StatusCode } from "@configs/constants";
+import { ValidateFailException } from "@exceptions";
 
 export const errorHandler = (
   err: Error,
@@ -7,11 +10,35 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  const errorResponse: IResponseModel<{}> = {
-    message: "Internal server error",
-    statusCode: 500,
-  };
-  console.log(err.message);
-  res.status(500).json(errorResponse);
+  if (err instanceof UserNotFoundException) {
+    return res
+      .status(404)
+      .json(
+        new ResponseModelBuilder()
+          .withMessage(err.message)
+          .withStatusCode(StatusCode.NOT_FOUND)
+          .build()
+      );
+  }
+
+  if (err instanceof ValidateFailException) {
+    return res
+      .status(400)
+      .json(
+        new ResponseModelBuilder()
+          .withMessage(err.message)
+          .withStatusCode(StatusCode.BAD_REQUEST)
+          .build()
+      );
+  }
+
+  res
+    .status(500)
+    .json(
+      new ResponseModelBuilder()
+        .withMessage(err.message)
+        .withStatusCode(StatusCode.INTERNAL_SERVER_ERROR)
+        .build()
+    );
   next();
 };

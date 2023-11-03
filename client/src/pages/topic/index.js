@@ -1,1 +1,1 @@
-export { default as TopicPage } from "./TopicPage";
+export { default as LectureTopicPageWrapper } from "./lecture/TopicPageWrapper";

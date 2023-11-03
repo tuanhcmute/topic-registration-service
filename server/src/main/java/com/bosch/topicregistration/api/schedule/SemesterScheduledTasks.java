@@ -1,8 +1,8 @@
 package com.bosch.topicregistration.api.schedule;
 
-import com.bosch.topicregistration.api.enrollment.semester.Semester;
-import com.bosch.topicregistration.api.enrollment.semester.SemesterRepository;
-import com.bosch.topicregistration.api.enrollment.semester.SemesterStatus;
+import com.bosch.topicregistration.api.semester.Semester;
+import com.bosch.topicregistration.api.semester.SemesterRepository;
+import com.bosch.topicregistration.api.semester.SemesterStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

@@ -1,10 +1,9 @@
 package com.bosch.topicregistration.api.user;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Getter
 @Setter
