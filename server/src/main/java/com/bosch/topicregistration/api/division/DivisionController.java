@@ -23,10 +23,10 @@ public class DivisionController {
     @GetMapping
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ROLE_LECTTURE')")
+    @PreAuthorize("hasAuthority('ROLE_LECTURE')")
     public Response<List<DivisionDTO>> getDivisionByTopicType(@RequestParam("topicType") String topicType) {
 //        Validate
-        if(StringUtils.isNotBlank(topicType)) throw new BadRequestException("Topic type is not valid");
+        if(StringUtils.isBlank(topicType)) throw new BadRequestException("Topic type is not valid");
         log.info("Topic type is not blank");
 //        Call service
         return divisionService.getDivisionByTopicType(topicType);
@@ -38,7 +38,7 @@ public class DivisionController {
     @PreAuthorize("hasAuthority('ROLE_HEAD')")
     public Response<Void> createDivisionByTopicType(@RequestParam("topicType") String topicType, @RequestBody CreateDivisionRequest request) {
 //        Validate topicType
-        if(StringUtils.isNotBlank(topicType)) throw new BadRequestException("Topic type is not valid");
+        if(StringUtils.isBlank(topicType)) throw new BadRequestException("Topic type is not valid");
         log.info("Topic type is not blank");
 //        Validate request body
 //        Call service

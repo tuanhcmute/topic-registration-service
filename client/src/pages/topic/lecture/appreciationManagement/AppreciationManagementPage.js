@@ -3,10 +3,9 @@ import { LiaEditSolid } from "react-icons/lia";
 import { Button } from "flowbite-react";
 import Select from "react-select";
 
-import topicService from "../../../../services/topicService";
-import { topicStatus, topicType } from "../../../../utils/constants";
-import { useSelector } from "react-redux";
-import { HttpStatusCode } from "axios";
+import { topicType } from "../../../../utils/constants";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchDivisionByTopicType } from "../../../../features/division/divisionSlice";
 
 const options = [
   {
@@ -19,39 +18,13 @@ const options = [
 function AppreciationManagementPage() {
   const [openEditTopicModal, setOpenEditTopicMode] = useState(undefined);
   const [selectedTopic, setSelectedTopic] = useState(null);
-  const [topics, setTopics] = useState([]);
   // Get current user from redux
   const currentUser = useSelector((state) => state.user?.currentUser);
-
-  async function fetchTopicsInLectureEnrollmentPeriod() {
-    try {
-      const response = await topicService.getAllTopicsInLectureEnrollmentPeriod(
-        topicType.TLCN
-      );
-      const { data } = response;
-      if (response?.data?.statusCode === HttpStatusCode.Ok) {
-        setTopics(data?.data?.topics);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  async function updateTopicInLectureEnrollmentPeriod(data) {
-    try {
-      const response = await topicService.updateTopicInLectureEnrollmentPeriod(
-        data
-      );
-      if (response?.data?.statusCode === HttpStatusCode.Ok) {
-        setOpenEditTopicMode(undefined);
-        fetchTopicsInLectureEnrollmentPeriod();
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  const divisions = useSelector((state) => state.division?.divisions);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    fetchTopicsInLectureEnrollmentPeriod();
+    dispatch(fetchDivisionByTopicType(topicType.TLCN));
   }, []);
 
   return (
@@ -99,7 +72,7 @@ function AppreciationManagementPage() {
                       </tr>
                     </thead>
                     <tbody className='text-gray-600 text-sm font-light'>
-                      {topics?.map((item, index) => {
+                      {divisions?.map((item, index) => {
                         return (
                           <tr
                             className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'
@@ -109,29 +82,29 @@ function AppreciationManagementPage() {
                               {index + 1}
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey w-[300px]'>
-                              <p className='font-normal'>{item.name}</p>
+                              <p className='font-normal'>Thiếu data</p>
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey'>
                               <div className=''>
                                 <span className='bg-orange-400 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
-                                  {currentUser?.ntid}
+                                  Thiếu data
                                 </span>
                                 <span className='block mt-2 font-normal'>
-                                  {currentUser?.name}
+                                  Thiếu data
                                 </span>
                               </div>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey flex flex-col gap-2'>
                               <span className='bg-orange-400 py-1 px-3 text-sm font-medium rounded dark:text-black-pearl'>
-                                Thứ 3, 8 - 9h
+                                {item?.specifiedTime}
                               </span>
                               <span className='bg-orange-400 py-1 px-3 text-sm font-medium rounded dark:text-black-pearl'>
-                                20/05/2023
+                                {item?.startDate}
                               </span>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey'>
                               <span className='bg-orange-400 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
-                                A3-302
+                                {item?.place}
                               </span>
                             </td>
                             <td className='border border-collapse border-lightGrey'>

@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import topicService from "../../services/topicService";
 
 const initialState = {
+  approvedTopics: [],
   topics: [],
   statusCode: null,
   message: "",
@@ -14,9 +15,10 @@ const namespace = "topic";
 export const fetchAllTopicsInLectureEnrollmentPeriod = createAsyncThunk(
   `${namespace}/fetchAllTopicsInLectureEnrollmentPeriod`,
   async (type) => {
-    const response = await topicService.getAllTopicsInLectureEnrollmentPeriod(
-      type
-    );
+    const response =
+      await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
+        type
+      );
     if (response?.data?.statusCode === HttpStatusCode.Ok) {
       return response.data;
     }
@@ -26,7 +28,6 @@ export const fetchAllTopicsInLectureEnrollmentPeriod = createAsyncThunk(
 export const createNewTopicInLectureEnrollmentPeriod = createAsyncThunk(
   `${namespace}/createNewTopicInLectureEnrollmentPeriod`,
   async ({ data, type, setOpenModal }, { dispatch }) => {
-    console.log(data);
     const response = await topicService.createNewTopicInLectureEnrollmentPeriod(
       data
     );
@@ -50,6 +51,21 @@ export const updateTopicInLectureEnrollmentPeriod = createAsyncThunk(
     }
   }
 );
+
+export const fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor =
+  createAsyncThunk(
+    `${namespace}/fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor`,
+    async ({ type, status }, { rejectWithValue }) => {
+      const response =
+        await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor(
+          type,
+          status
+        );
+      if (response?.data?.statusCode === HttpStatusCode.BadRequest)
+        return rejectWithValue(response.data);
+      return response?.data;
+    }
+  );
 
 export const topicSlide = createSlice({
   name: namespace,
@@ -157,6 +173,43 @@ export const topicSlide = createSlice({
         return {
           ...state,
           message: action.payload?.message,
+          loading: false,
+        };
+      }
+    );
+    // fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor
+    builder.addCase(
+      fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor.pending,
+      (state) => {
+        return {
+          ...state,
+          approvedTopics: [],
+          message: "",
+          statusCode: null,
+          loading: false,
+        };
+      }
+    );
+    builder.addCase(
+      fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor.fulfilled,
+      (state, action) => {
+        return {
+          ...state,
+          approvedTopics: action.payload?.data?.topics,
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    builder.addCase(
+      fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor.rejected,
+      (state, action) => {
+        return {
+          ...state,
+          approvedTopics: [],
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
           loading: false,
         };
       }

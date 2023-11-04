@@ -11,4 +11,6 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query("SELECT u FROM User u WHERE u.ntid IN ?1")
     List<User> findAllByNtids(Iterable<String> ntids);
+
+    List<User> findByMajor(Major major);
 }

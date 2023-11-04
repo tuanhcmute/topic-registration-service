@@ -9,5 +9,7 @@ public interface UserService {
 
     Response<UserDTO> updateBiographyInUserProfile(String biography);
 
-    Response<List<UserDTO>> getStudentsNotEnrolledInTopic();
+    Response<List<StudentDTO>> getStudentsNotEnrolledInTopic();
+
+    Response<List<LectureDTO>> getLecturesByMajor(String majorCode);
 }

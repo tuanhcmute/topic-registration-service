@@ -2,6 +2,7 @@ package com.bosch.topicregistration.api.topic;
 
 import com.bosch.topicregistration.api.approvalhistory.ApprovalHistory;
 import com.bosch.topicregistration.api.approvalhistory.ApprovalHistoryRepository;
+import com.bosch.topicregistration.api.semester.SemesterService;
 import com.bosch.topicregistration.api.topicenrollment.TopicEnrollment;
 import com.bosch.topicregistration.api.topicenrollment.TopicEnrollmentRepository;
 import com.bosch.topicregistration.api.semester.Semester;
@@ -29,6 +30,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TopicServiceImpl implements TopicService {
 
+    private final SemesterService semesterService;
+
     private final TopicRepository topicRepository;
     private final SemesterRepository semesterRepository;
     private final UserCommon userCommon;
@@ -40,35 +43,24 @@ public class TopicServiceImpl implements TopicService {
 
     @LoggerAround
     @Override
-    public Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriod(String type, Integer pageNumber, Integer pageSize, String sortBy) {
+    public Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(String type, Integer pageNumber, Integer pageSize, String sortBy) {
 //         Validate type
         boolean isMatch = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
         if (!isMatch) throw new BadRequestException("Topic type is not valid");
         TopicType topicType = TopicType.valueOf(type);
 
 //        Get current semester
-        List<Semester> semesters = semesterRepository.findByStatus(SemesterStatus.ACTIVATED);
-        if (semesters.size() == 0) throw new BadRequestException("Current semester is not activated");
-        Semester currentSemester = semesters.get(0);
+        Semester currentSemester = semesterService.getActivatedSemester();
 
 //        Get current user
-        Optional<User> userOptional = userCommon.getCurrentUserByCurrentAuditor();
-        if (!userOptional.isPresent()) throw new BadRequestException("Lecture could not be found");
-        User lecture = userOptional.get();
+        User lecture = userCommon.getCurrentUserByCurrentAuditor();
 
 //        Define paging
         Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
 
 //         Get topics
         Page<Topic> topicPage = topicRepository.findBySemesterAndTypeAndLecture(currentSemester, topicType, lecture, paging);
-        List<TopicDTO> listTopicDTO = topicMapper.toListDTO(topicPage.getContent());
-        Map<String, List<TopicDTO>> data = new HashMap<>();
-        data.put("topics", listTopicDTO);
-        return Response.<List<TopicDTO>>builder()
-                .message("Topics have been successfully retrieved")
-                .statusCode(HttpStatus.OK.value())
-                .data(data)
-                .build();
+        return buildResponse(topicPage);
     }
 
     @Override
@@ -85,9 +77,7 @@ public class TopicServiceImpl implements TopicService {
         if (!result.equals(TopicValidatorResult.VALID)) throw new BadRequestException(result.getMessage());
 
 //        Get lecture
-        Optional<User> userOptional = userCommon.getCurrentUserByCurrentAuditor();
-        if (!userOptional.isPresent()) throw new BadRequestException("Lecture could not be found");
-        User lecture = userOptional.get();
+        User lecture = userCommon.getCurrentUserByCurrentAuditor();
         if (!StringUtils.equals(lecture.getNtid(), request.getNtid()))
             throw new BadRequestException("Lecture code is not valid");
         log.info("Lecture: {}", lecture.getId());
@@ -213,6 +203,43 @@ public class TopicServiceImpl implements TopicService {
         return Response.<Void>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Topic has been updated successfully")
+                .build();
+    }
+
+    @Override
+    @LoggerAround
+    public Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor(String type, String status, Integer pageNumber, Integer pageSize, String sortBy) {
+//                Validate type
+        boolean hasType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
+        if (!hasType) throw new BadRequestException("Topic type is not valid");
+        TopicType topicType = TopicType.valueOf(type);
+
+//        Validate status
+        boolean hasStatus = Arrays.stream(TopicStatus.values()).anyMatch(item -> item.name().equals(status));
+        if (!hasStatus) throw new BadRequestException("Topic status is not valid");
+        TopicStatus currentStatus = TopicStatus.valueOf(status);
+
+        //        Get current semester
+        Semester currentSemester = semesterService.getActivatedSemester();
+
+//        Get current user
+        User currentHead = userCommon.getCurrentUserByCurrentAuditor();
+
+//        Define paging
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
+
+        Page<Topic> topicPage = topicRepository.findBySemesterAndTypeAndStatusAndMajor(currentSemester, topicType, currentStatus, currentHead.getMajor(), paging);
+        return buildResponse(topicPage);
+    }
+
+    private Response<List<TopicDTO>> buildResponse(Page<Topic> topicPage) {
+        List<TopicDTO> listTopicDTO = topicMapper.toListDTO(topicPage.getContent());
+        Map<String, List<TopicDTO>> data = new HashMap<>();
+        data.put("topics", listTopicDTO);
+        return Response.<List<TopicDTO>>builder()
+                .message("Topics have been successfully retrieved")
+                .statusCode(HttpStatus.OK.value())
+                .data(data)
                 .build();
     }
 }

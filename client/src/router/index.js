@@ -17,6 +17,7 @@ import { LoginPage as LoginRoute } from "../pages/login";
 import { paths, roles, topicType } from "../utils/constants";
 import AppLectureHeader from "../app/AppLectureHeader";
 import { useSelector } from "react-redux";
+import { DivisionTopicManagement } from "../pages/topic/lecture/divisionTopicManagement";
 
 const RedirectRoute = () => {
   const isAuthenticated = useSelector((state) => state.auth.authenticated);
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
               {
                 path: `${topicType.TLCN.toLowerCase()}/approval`,
                 element: <ApprovalTopicManagementPageRoute />,
+              },
+              {
+                path: `${topicType.TLCN.toLowerCase()}/division`,
+                element: <DivisionTopicManagement />,
               },
             ],
           },
