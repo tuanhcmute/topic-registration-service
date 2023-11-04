@@ -128,6 +128,7 @@ function EnrollTopicModal(props) {
                 htmlFor='maxSlot'
                 value='Số lượng SVTH (*)'
                 className='mb-2 block'
+                color={formik.errors.maxSlot ? "failure" : "gray"}
               />
               <TextInput
                 id='maxSlot'

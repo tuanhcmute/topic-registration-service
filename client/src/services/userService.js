@@ -19,6 +19,10 @@ const userService = {
     const requestUrl = `${baseUrl}/student`;
     return axiosClient.get(requestUrl);
   },
+  fetchLecturesByMajor: (majorCode) => {
+    const requestUrl = `${baseUrl}/lecture?majorCode=${majorCode}`;
+    return axiosClient.get(requestUrl);
+  },
 };
 
 export default userService;

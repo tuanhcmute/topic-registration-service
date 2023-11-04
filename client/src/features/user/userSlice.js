@@ -3,6 +3,7 @@ import { HttpStatusCode } from "axios";
 import { userService } from "../../services";
 
 const initialState = {
+  lectures: [],
   currentUser: {},
   statusCode: null,
   message: "",
@@ -30,13 +31,22 @@ export const removeUserInfo = createAsyncThunk(
   }
 );
 
+export const fetchLecturesByMajor = createAsyncThunk(
+  `${namespace}/fetchLecturesByMajor`,
+  async (majorCode, { rejectWithValue }) => {
+    const response = await userService.fetchLecturesByMajor(majorCode);
+    if (response.data?.statusCode === HttpStatusCode.BadRequest)
+      return rejectWithValue(response?.data);
+    return response.data;
+  }
+);
+
 export const userSlice = createSlice({
   name: namespace,
   initialState,
   extraReducers: (builder) => {
     // fetchUserInfo
     builder.addCase(fetchUserInfo.fulfilled, (state, action) => {
-      console.log({ action });
       return {
         ...state,
         currentUser: action.payload?.data?.profile,
@@ -55,7 +65,6 @@ export const userSlice = createSlice({
       };
     });
     builder.addCase(fetchUserInfo.rejected, (state, action) => {
-      console.log({ action });
       return {
         ...state,
         currentUser: {},
@@ -87,6 +96,34 @@ export const userSlice = createSlice({
         message: action.payload?.data?.message,
         statusCode: action.payload?.data?.statusCode,
         loading: false,
+      };
+    });
+    // fetchLecturesByMajor
+    builder.addCase(fetchLecturesByMajor.fulfilled, (state, action) => {
+      return {
+        ...state,
+        lectures: action.payload?.data?.lectures,
+        message: action.payload?.data?.message,
+        statusCode: action.payload?.data?.statusCode,
+        loading: false,
+      };
+    });
+    builder.addCase(fetchLecturesByMajor.rejected, (state, action) => {
+      return {
+        ...state,
+        lectures: [],
+        message: action.payload?.data?.message,
+        statusCode: action.payload?.data?.statusCode,
+        loading: false,
+      };
+    });
+    builder.addCase(fetchLecturesByMajor.pending, (state) => {
+      return {
+        ...state,
+        lectures: [],
+        message: "",
+        statusCode: null,
+        loading: true,
       };
     });
   },
