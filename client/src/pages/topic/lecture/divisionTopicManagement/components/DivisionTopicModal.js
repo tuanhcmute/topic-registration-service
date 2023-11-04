@@ -1,43 +1,48 @@
 import PropTypes from "prop-types";
 import Select from "react-select";
 import { Modal, Button, TextInput, Label } from "flowbite-react";
-import { useSelector } from "react-redux";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-
-import { topicStatus } from "../../../../../utils/constants";
-import { topicService } from "../../../../../services";
+import { createDivisionByTopicType } from "../../../../../features/division/divisionSlice";
+import { topicType } from "../../../../../utils/constants";
 
 const validationSchema = Yup.object().shape({
-  reason: Yup.string().required(),
-  status: Yup.string().required(),
+  startDate: Yup.date().required("Vui lòng nhập ngày phản biện"),
+  specifiedTime: Yup.string().required("Vui lòng nhập thời gian phản biện"),
+  place: Yup.string().required("Vui lòng nhập địa điểm phản biện"),
+  lectureCode: Yup.string().required(),
+  topicId: Yup.string().required(),
 });
 
-function ApprovalTopicModal(props) {
-  const { openModal, setOpenModal, data, options } = props;
+function DivisionTopicModal(props) {
+  const dispatch = useDispatch();
+  const { openModal, setOpenModal, data } = props;
   const currentUser = useSelector((state) => state.user?.currentUser);
+  const options = useSelector((state) => state?.user?.lectures);
   const formik = useFormik({
     initialValues: {
-      id: data?.id,
-      status: topicStatus.rejected.value,
-      reason: "",
+      topicId: data?.id,
+      startDate: "",
+      specifiedTime: "",
+      place: "",
+      lectureCode: "",
     },
     validationSchema,
     enableReinitialize: true,
     onSubmit: (values) => {
-      handleUpdateStatusTopic(values);
+      dispatch(
+        createDivisionByTopicType({
+          type: topicType.TLCN,
+          data: values,
+          setOpenModal,
+        })
+      );
     },
   });
 
-  async function handleUpdateStatusTopic(values) {
-    console.log(values);
-    // topicService;
-    const response = await topicService.approveTopicInLectureEnrollmentPeriod(
-      values
-    );
-    console.log(response);
+  function changeSelect(selectedOption) {
+    formik.setFieldValue("lectureCode", selectedOption?.value);
   }
 
   return (
@@ -48,7 +53,7 @@ function ApprovalTopicModal(props) {
     >
       <Modal.Header className='pt-4 pb-3 bg-primary'>
         <p className='font-Roboto text-base font-bold uppercase text-white'>
-          TIỂU LUẬN CHUYÊN NGÀNH
+          PHÂN CÔNG PHẢN BIỆN TIỂU LUẬN CHUYÊN NGÀNH
         </p>
       </Modal.Header>
       <Modal.Body>
@@ -155,6 +160,7 @@ function ApprovalTopicModal(props) {
             ></div>
           </div>
           {/* End goal field */}
+          {/* Requirement field */}
           <div className='mb-2 block font-Roboto'>
             <Label
               htmlFor='requirement'
@@ -166,76 +172,115 @@ function ApprovalTopicModal(props) {
               className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500'
             ></div>
           </div>
+          {/* End requirement field */}
+          <div className='grid grid-cols-3 gap-3'>
+            {/* Start date field */}
+            <div className='mb-2 block font-Roboto'>
+              <Label
+                htmlFor='startDate'
+                value='Ngày phản biện (*)'
+                className='mb-2 block'
+                color={formik.errors.startDate && "failure"}
+              />
+              <TextInput
+                placeholder='Lựa chọn thời gian phản biện...'
+                required
+                type='date'
+                id='startDate'
+                value={formik.values.startDate}
+                onChange={formik.handleChange}
+                color={formik.errors.startDate && "failure"}
+                helperText={formik.errors.startDate}
+              />
+            </div>
+            {/* End start date field */}
+            {/* Specified time field */}
+            <div className='mb-2 block font-Roboto'>
+              <Label
+                htmlFor='specifiedTime'
+                value='Thời gian phản biện (*)'
+                className='mb-2 block'
+                color={formik.errors.specifiedTime && "failure"}
+              />
+              <TextInput
+                placeholder='Lựa chọn thời gian phản biện...'
+                required
+                type='text'
+                id='specifiedTime'
+                value={formik.values.specifiedTime}
+                onChange={formik.handleChange}
+                color={formik.errors.specifiedTime && "failure"}
+                helperText={formik.errors.specifiedTime}
+              />
+            </div>
+            {/* End start date field */}
+            {/* Start date field */}
+            <div className='mb-2 block font-Roboto'>
+              <Label
+                htmlFor='place'
+                value='Địa điểm phản biện (*)'
+                className='mb-2 block'
+                color={formik.errors.place && "failure"}
+              />
+              <TextInput
+                placeholder='Lựa chọn địa điểm phản biện...'
+                required
+                type='text'
+                id='place'
+                value={formik.values.place}
+                onChange={formik.handleChange}
+                color={formik.errors.place && "failure"}
+                helperText={formik.errors.place}
+              />
+            </div>
+            {/* End start date field */}
+          </div>
+          {/* Lecture select */}
           <div className='grid grid-cols-1 gap-3'>
             <div className='mb-2 block font-Roboto'>
-              <Label value='SVTH' className='mb-2 block' />
+              <Label
+                value='Giảng viên phản biện (*)'
+                className='mb-2 block'
+                color={formik.errors.lectureCode && "failure"}
+              />
               <Select
-                isDisabled
-                options={options}
-                isSearchable
-                isMulti
-                defaultValue={data?.students.map((item) => ({
-                  label: item?.name,
+                options={options?.map((item) => ({
                   value: item?.ntid,
+                  label: item?.name,
                 }))}
+                onChange={(selectedOption) => changeSelect(selectedOption)}
+                isSearchable
               />
             </div>
           </div>
+          {/* End lecture select */}
         </div>
       </Modal.Body>
-      {data?.status !== topicStatus.approved.value && (
-        <Modal.Footer>
-          <div className='w-full'>
-            <div className='mb-10 block font-Roboto'>
-              <Label
-                value='Lý do không duyệt'
-                className='mb-2 block'
-                color={formik.errors.reason && "failure"}
-              />
-              <CKEditor
-                editor={ClassicEditor}
-                onChange={(event, editor) => {
-                  const data = editor.getData();
-                  formik.setFieldValue("reason", data);
-                }}
-              />
-            </div>
-            <div className='w-full flex items-center justify-end gap-5'>
-              <form onSubmit={formik.handleSubmit}>
-                <Button
-                  color='red'
-                  // onClick={() => setOpenModal(undefined)}
-                  className='p-0'
-                  type='submit'
-                >
-                  Không duyệt
-                </Button>
-              </form>
-              <Button
-                className='p-0'
-                color='green'
-                onClick={() =>
-                  handleUpdateStatusTopic({
-                    id: data?.id,
-                    status: topicStatus.approved.value,
-                    reason: topicStatus.approved.label,
-                  })
-                }
-              >
-                Duyệt đề tài
+      <Modal.Footer>
+        <div className='w-full'>
+          <div className='w-full flex items-center justify-end gap-5'>
+            <Button
+              color='red'
+              className='p-0'
+              onClick={() => setOpenModal(undefined)}
+            >
+              Hủy bỏ
+            </Button>
+            <form onSubmit={formik.handleSubmit}>
+              <Button className='p-0' color='green' type='submit'>
+                Phân công
               </Button>
-            </div>
+            </form>
           </div>
-        </Modal.Footer>
-      )}
+        </div>
+      </Modal.Footer>
     </Modal>
   );
 }
 
-export default ApprovalTopicModal;
+export default DivisionTopicModal;
 
-ApprovalTopicModal.propTypes = {
-  options: PropTypes.array.isRequired,
+DivisionTopicModal.propTypes = {
   openModal: PropTypes.any,
   setOpenModal: PropTypes.func.isRequired,
   handleUpdateTopic: PropTypes.func.isRequired,

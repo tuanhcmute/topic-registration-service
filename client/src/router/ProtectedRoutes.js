@@ -6,7 +6,7 @@ import { paths } from "../utils/constants";
 
 function ProtectedRoutes({ role }) {
   const isAuthenticated = useSelector((state) => state.auth.authenticated);
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const currentUser = useSelector((state) => state.user?.currentUser);
   const userHasRequiredRole = currentUser?.userRoles?.some(
     (item) => item === role
   );

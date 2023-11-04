@@ -26,7 +26,7 @@ public class TopicController {
     @PreAuthorize("hasAuthority('ROLE_LECTURE')")
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
-    public Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriod(@RequestParam("type") String type,
+    public Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(@RequestParam("type") String type,
                                                                           @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
                                                                           @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
                                                                           @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
@@ -34,7 +34,25 @@ public class TopicController {
         boolean isMatch = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
         if (!isMatch) throw new BadRequestException("Topic type is not valid");
 //        Call service
-        return topicService.getAllTopicsInLectureEnrollmentPeriod(type, pageNumber, pageSize, sortBy);
+        return topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(type, pageNumber, pageSize, sortBy);
+    }
+
+    @GetMapping("/head")
+    @PreAuthorize("hasAuthority('ROLE_HEAD')")
+    @ResponseStatus(HttpStatus.OK)
+    @LoggerAround
+    public  Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor(@RequestParam("type") String type, @RequestParam("status") String status,
+                                                                                               @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+                                                                                               @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                                                                               @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
+//                Validate type
+        boolean hasType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
+        if (!hasType) throw new BadRequestException("Topic type is not valid");
+//        Validate status
+        boolean hasStatus = Arrays.stream(TopicStatus.values()).anyMatch(item -> item.name().equals(status));
+        if (!hasStatus) throw new BadRequestException("Topic status is not valid");
+
+        return topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor(type, status, pageNumber, pageSize, sortBy);
     }
 
     //    [POST] /api/v1/topic/lecture

@@ -1,75 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
-import { BiMessageRoundedError } from "react-icons/bi";
 import { Button } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
-import { HttpStatusCode } from "axios";
 import { AiOutlineFilter } from "react-icons/ai";
 
-import EnrollTopicModal from "./components/EnrollTopicModal";
-import EditTopicModal from "./components/EditTopicModal";
-import { enrollmentPeriodService, userService } from "../../../../services";
 import {
   enrollmentPeriodCodes,
   topicStatus,
   topicType,
 } from "../../../../utils/constants";
 import { Dropdown } from "../../../../components/dropdown";
-import ApprovalTopicModal from "./components/ApprovalTopicModal";
-import {
-  createNewTopicInLectureEnrollmentPeriod,
-  fetchAllTopicsInLectureEnrollmentPeriod,
-  updateTopicInLectureEnrollmentPeriod,
-} from "../../../../features/topic/topicSlice";
+import { fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor } from "../../../../features/topic/topicSlice";
+import { enrollmentPeriodService } from "../../../../services";
+import { HttpStatusCode } from "axios";
+import DivisionTopicModal from "./components/DivisionTopicModal";
+import { fetchLecturesByMajor } from "../../../../features/user/userSlice";
 
-function TopicManagementPage() {
+function DivisionTopicManagement() {
   const [openModal, setOpenModal] = useState(undefined);
-  const [openEditTopicModal, setOpenEditTopicModal] = useState(undefined);
-  const [openApprovalTopicModal, setOpenApprovalTopicModal] =
-    useState(undefined);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [enrollmentPeriod, setEnrollmentPeriod] = useState(undefined);
-  const [studentOptions, setStudentOptions] = useState([]);
   const [topicStatusFilter, setTopicStatusFilter] = useState(
     topicStatus.all.value
   );
   // Get current user from redux
   const currentUser = useSelector((state) => state.user?.currentUser);
-  const topics = useSelector((state) => state.topic?.topics);
+  const topics = useSelector((state) => state.topic?.approvedTopics);
   const dispatch = useDispatch();
 
-  async function handleCreateNewTopicInLectureEnrollmentPeriod(data) {
-    dispatch(
-      createNewTopicInLectureEnrollmentPeriod({
-        data,
-        setOpenModal,
-        type: topicType.TLCN,
-      })
-    );
-  }
-  async function handleUpdateTopicInLectureEnrollmentPeriod(data) {
-    dispatch(
-      updateTopicInLectureEnrollmentPeriod({
-        data,
-        type: topicType.TLCN,
-        setOpenEditTopicModal,
-      })
-    );
-  }
-  async function fetchStudentsNotEnrolledInTopic() {
-    try {
-      const response = await userService.getStudentsNotEnrolledInTopic();
-      if (response?.data?.statusCode === HttpStatusCode.Ok) {
-        const data = response.data?.data?.students?.map((item) => ({
-          value: item?.ntid,
-          label: item?.name,
-        }));
-        setStudentOptions(data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
   async function fetchEnrollmentPeriodByTopicTypeAndPeriodCode() {
     try {
       const response =
@@ -86,10 +44,15 @@ function TopicManagementPage() {
   }
 
   useEffect(() => {
-    dispatch(fetchAllTopicsInLectureEnrollmentPeriod(topicType.TLCN));
-    fetchStudentsNotEnrolledInTopic();
+    dispatch(
+      fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor({
+        type: topicType.TLCN,
+        status: topicStatus.approved.value,
+      })
+    );
+    dispatch(fetchLecturesByMajor(currentUser?.major?.code));
     fetchEnrollmentPeriodByTopicTypeAndPeriodCode();
-  }, [dispatch]);
+  }, [dispatch, currentUser]);
 
   return (
     <React.Fragment>
@@ -99,13 +62,6 @@ function TopicManagementPage() {
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
             TIỂU LUẬN CHUYÊN NGÀNH
           </span>
-          <Button
-            color='gray'
-            className='rounded-md p-0'
-            onClick={() => setOpenModal("default")}
-          >
-            Đăng ký
-          </Button>
         </div>
         {/* End register topic */}
         {/* Select */}
@@ -226,19 +182,9 @@ function TopicManagementPage() {
                                     className='w-6 h-6 cursor-pointer'
                                     onClick={() => {
                                       setSelectedTopic(item);
-                                      setOpenEditTopicModal("default");
+                                      setOpenModal("default");
                                     }}
                                   />
-                                  {item?.status ===
-                                    topicStatus.rejected.value && (
-                                    <BiMessageRoundedError
-                                      className='w-6 h-6 cursor-pointer'
-                                      onClick={() => {
-                                        setSelectedTopic(item);
-                                        setOpenApprovalTopicModal("default");
-                                      }}
-                                    />
-                                  )}
                                 </div>
                               </td>
                             </tr>
@@ -258,27 +204,14 @@ function TopicManagementPage() {
         {/* End table */}
       </div>
       {/* Enroll topic modal */}
-      <EnrollTopicModal
-        options={studentOptions}
+      <DivisionTopicModal
         openModal={openModal}
         setOpenModal={setOpenModal}
-        handleNewTopic={handleCreateNewTopicInLectureEnrollmentPeriod}
-      />
-      <EditTopicModal
-        options={studentOptions}
-        handleUpdateTopic={handleUpdateTopicInLectureEnrollmentPeriod}
         data={selectedTopic}
-        openModal={openEditTopicModal}
-        setOpenModal={setOpenEditTopicModal}
-      />
-      <ApprovalTopicModal
-        data={selectedTopic}
-        openModal={openApprovalTopicModal}
-        setOpenModal={setOpenApprovalTopicModal}
       />
       {/* End content */}
     </React.Fragment>
   );
 }
 
-export default TopicManagementPage;
+export default DivisionTopicManagement;

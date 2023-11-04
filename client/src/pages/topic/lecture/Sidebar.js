@@ -11,7 +11,7 @@ import { roles } from "../../../utils/constants";
 
 function Sidebar() {
   const folderRef = useRef();
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const currentUser = useSelector((state) => state.user?.currentUser);
 
   function toggleFolder() {
     folderRef.current.classList.toggle("hidden");
@@ -61,7 +61,7 @@ function Sidebar() {
 
           {currentUser?.userRoles?.includes(roles.ROLE_HEAD) && (
             <NavLink
-              to={`/lecture/topic/assignment`}
+              to={`/lecture/topic/${topicType.TLCN.toLowerCase()}/division`}
               className='flex items-center gap-2 px-5 py-3 hover:bg-primary hover:text-white cursor-pointer hover:rounded-b-md dark:hover:bg-transparent'
             >
               <AiOutlineFileProtect />

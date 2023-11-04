@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import { HttpStatusCode } from "axios";
 
 function ProfilePage() {
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const currentUser = useSelector((state) => state.user?.currentUser);
   const [biography, setBiography] = useState(
     (currentUser) => currentUser?.biography || ""
   );

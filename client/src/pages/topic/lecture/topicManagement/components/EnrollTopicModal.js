@@ -25,7 +25,7 @@ const validationSchema = Yup.object().shape({
 
 function EnrollTopicModal(props) {
   const { openModal, setOpenModal, handleNewTopic, options } = props;
-  const currentUser = useSelector((state) => state.auth?.currentUser);
+  const currentUser = useSelector((state) => state.user?.currentUser);
   const formik = useFormik({
     initialValues: {
       type: toipcType.TLCN,
@@ -128,6 +128,7 @@ function EnrollTopicModal(props) {
                 htmlFor='maxSlot'
                 value='Số lượng SVTH (*)'
                 className='mb-2 block'
+                color={formik.errors.maxSlot ? "failure" : "gray"}
               />
               <TextInput
                 id='maxSlot'

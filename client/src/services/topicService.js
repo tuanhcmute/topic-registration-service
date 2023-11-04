@@ -2,7 +2,7 @@ import axiosClient from "./axiosClient";
 
 const baseUrl = "/topic";
 const topicService = {
-  getAllTopicsInLectureEnrollmentPeriod: (type) => {
+  getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture: (type) => {
     const requestUrl = `${baseUrl}/lecture?type=${type}`;
     return axiosClient.get(requestUrl);
   },
@@ -17,6 +17,13 @@ const topicService = {
   approveTopicInLectureEnrollmentPeriod: (data) => {
     const requestUrl = `${baseUrl}/lecture/approval`;
     return axiosClient.put(requestUrl, data);
+  },
+  getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor: (
+    type,
+    status
+  ) => {
+    const requestUrl = `${baseUrl}/head?type=${type}&status=${status}`;
+    return axiosClient.get(requestUrl);
   },
 };
 

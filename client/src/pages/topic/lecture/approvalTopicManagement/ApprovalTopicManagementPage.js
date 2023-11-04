@@ -17,7 +17,6 @@ const options = [
 ];
 
 function ApprovalTopicManagementPage() {
-  const [openModal, setOpenModal] = useState(undefined);
   const [openEditTopicModal, setOpenEditTopicMode] = useState(undefined);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [topics, setTopics] = useState([]);
@@ -25,9 +24,10 @@ function ApprovalTopicManagementPage() {
 
   async function fetchTopicsInLectureEnrollmentPeriod() {
     try {
-      const response = await topicService.getAllTopicsInLectureEnrollmentPeriod(
-        topicType.TLCN
-      );
+      const response =
+        await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
+          topicType.TLCN
+        );
       const { data } = response;
       if (response?.data?.statusCode === HttpStatusCode.Ok) {
         setTopics(data?.data?.topics);
@@ -77,13 +77,6 @@ function ApprovalTopicManagementPage() {
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
             TIỂU LUẬN CHUYÊN NGÀNH
           </span>
-          <Button
-            color='gray'
-            className='rounded-md p-0'
-            onClick={() => setOpenModal("default")}
-          >
-            Đăng ký
-          </Button>
         </div>
         {/* End register topic */}
         {/* Select */}

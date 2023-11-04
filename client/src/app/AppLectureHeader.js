@@ -9,7 +9,7 @@ import { Link, NavLink } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import { Dropdown } from "../components/dropdown";
-import { logout } from "../features/auth/authSlice";
+import { userLogout } from "../features/auth/authSlice";
 import { toggleTheme } from "../features/theme/themeSlice";
 import { paths } from "../utils/constants";
 
@@ -32,7 +32,7 @@ function AppLectureHeader() {
   const dispatch = useDispatch();
   const overlayRef = useRef();
   const navigationRef = useRef();
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const currentUser = useSelector((state) => state.user.currentUser);
   const darkMode = useSelector((state) => state.theme.darkMode);
 
   function toggleOverlay() {
@@ -47,7 +47,7 @@ function AppLectureHeader() {
   }
   function clickLogout(e) {
     e.preventDefault();
-    dispatch(logout());
+    dispatch(userLogout());
   }
 
   useEffect(() => {
@@ -97,10 +97,10 @@ function AppLectureHeader() {
           >
             <img
               className='object-cover w-6 h-6 rounded-full'
-              src={currentUser.imageUrl}
+              src={currentUser?.imageUrl}
               alt=''
             />
-            <span className='font-bold'>{currentUser.name}</span>
+            <span className='font-bold'>{currentUser?.name}</span>
           </div>
           {/* End profile */}
           {/* Dropdown will be displayed when hovering on Profile */}
