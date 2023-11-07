@@ -8,6 +8,7 @@ interface TopicAttributes {
   name: string;
   type?: string;
   goal?: string;
+  majorCode?: string;
   expectation?: string;
   requirement?: string;
   status?: string;
@@ -39,6 +40,10 @@ const Topic = db.define<TopicInstance>(
     ntid: {
       type: DataTypes.STRING,
       field: "code",
+    },
+    majorCode: {
+      type: DataTypes.STRING,
+      field: "marjorCode",
     },
     name: {
       type: DataTypes.STRING,
@@ -108,6 +113,6 @@ const Topic = db.define<TopicInstance>(
 );
 
 User.hasMany(Topic, { foreignKey: "lecturerId" });
-Topic.belongsTo(User, { foreignKey: "code" });
+Topic.belongsTo(User, { foreignKey: "id" });
 
 export { Topic, TopicAttributes, TopicInstance };

@@ -21,7 +21,11 @@ export default class TopicRoutes implements IRoutes {
       this.topicController.getAllTopics
     );
     // this.router.get("/topics/:id", this.topicController.getTopicById);
-    this.router.post(`${this.path}/`, this.topicController.createTopic);
+    this.router.post(
+      `${this.path}/`,
+      authFilterRestrictAccess(Role.TEACHER),
+      this.topicController.createTopic
+    );
     // this.router.put("/topics/:id", this.topicController.updateTopic);
     // this.router.delete("/topics/:id", this.topicController.deleteTopic);
   }

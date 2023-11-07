@@ -5,7 +5,7 @@ import { Specialization } from "./specialization.model";
 import { Class } from "./class.model";
 
 interface UserAttributes {
-  id: string;
+  id?: string;
   code: string;
   role?: string;
   email?: string;
@@ -31,7 +31,9 @@ const User = db.define<UserInstance>(
   "user",
   {
     id: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID, // Use UUIDV4 as the default value
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
       primaryKey: true,
       field: "id",
     },

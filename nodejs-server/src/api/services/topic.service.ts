@@ -58,6 +58,7 @@ export default class TopicService {
       const topic = await Topic.create(
         {
           ntid: newTopic.ntid,
+          majorCode: newTopic.majorCode,
           name: newTopic.topicName,
           goal: newTopic.goal,
           requirement: newTopic.requirement,
@@ -76,11 +77,11 @@ export default class TopicService {
           transaction,
         });
 
-        if (student) {
+        if (student && topic.id && student.id) {
           await Enrollment.create(
             {
-              topicId: topic.ntid, // Use the ID of the created topic
-              studentId: student.code, // Use the ID of the fetched student
+              topicId: topic.id, // Use the ID of the created topic
+              studentId: student.id, // Use the ID of the fetched student
               // Set other relevant fields as needed
             },
             { transaction }
