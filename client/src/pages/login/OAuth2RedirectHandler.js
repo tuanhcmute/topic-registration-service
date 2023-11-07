@@ -4,7 +4,7 @@ import { Navigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import { userLogin } from "../../features/auth/authSlice";
-import { ACCESS_TOKEN, paths } from "../../utils/constants";
+import { ACCESS_TOKEN, roles } from "../../utils/constants";
 import { fetchUserInfo } from "../../features/user/userSlice";
 
 // The task of this function is to get access token from URL and redirect to home page
@@ -14,6 +14,7 @@ function OAuth2RedirectHandler() {
   const [searchParams] = useSearchParams();
   const authenticated = useSelector((state) => state.auth.authenticated);
   const darkMode = useSelector((state) => state.theme.darkMode);
+  const currentUser = useSelector((state) => state.user.currentUser);
 
   // Display message after login successful
   useEffect(() => {
@@ -44,10 +45,17 @@ function OAuth2RedirectHandler() {
     }
   }, [dispatch, searchParams]);
 
-  if (!authenticated) return <Navigate to={paths.LOGIN} replace />;
-  // if (currentUser?.userRoles.includes(roles.ROLE_STUDENT))
-  //   return <Navigate to='/student/home' replace />;
-  return <Navigate to='/lecture/home' replace />;
+  // if (!authenticated) return <Navigate to={paths.LOGIN} replace />;
+  if (
+    authenticated &&
+    currentUser?.userRoles?.some((item) => item === roles.ROLE_STUDENT)
+  )
+    return <Navigate to='/student/home' replace />;
+  else if (
+    authenticated &&
+    currentUser?.userRoles?.some((item) => item === roles.ROLE_LECTURE)
+  )
+    return <Navigate to='/lecture/home' replace />;
 }
 
 export default OAuth2RedirectHandler;

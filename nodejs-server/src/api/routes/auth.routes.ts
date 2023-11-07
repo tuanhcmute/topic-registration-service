@@ -12,7 +12,10 @@ export default class AuthRoutes implements IRoutes {
     this.initializeRoutes();
   }
   public initializeRoutes(): void {
-    this.router.get(`/${this.path}/google`, this.authController.getGoogleLogin);
+    this.router.get(
+      `/${this.path}/authorization/google`,
+      this.authController.getGoogleLogin
+    );
     this.router.get(
       `/login/${this.path}/code/google`,
       passport.authenticate("google", {

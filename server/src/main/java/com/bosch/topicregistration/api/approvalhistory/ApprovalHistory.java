@@ -26,10 +26,11 @@ public class ApprovalHistory {
     @Column(name = "id_column", updatable = false)
     private String id;
 
-    @Column(name = "reason_column", updatable = false)
+    @Lob
+    @Column(name = "reason_column")
     private String reason;
 
-    @Column(name = "status_column", updatable = false)
+    @Column(name = "status_column")
     @Enumerated(EnumType.STRING)
     private TopicStatus status;
 

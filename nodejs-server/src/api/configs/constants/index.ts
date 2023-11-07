@@ -1,4 +1,3 @@
-export { default as StatusCode } from "./statusCode";
 export { default as Role } from "./role.enum";
 export { default as HttpMethod } from "./httpMethod.enum";
 export {
@@ -8,3 +7,4 @@ export {
   CONTENT_TYPE,
   AUTHORIZATION,
 } from "./header.constant";
+export { POSTFIX } from "./model.constant";

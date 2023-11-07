@@ -232,6 +232,12 @@ public class TopicServiceImpl implements TopicService {
         return buildResponse(topicPage);
     }
 
+    @Override
+    public Response<List<TopicDTO>> getAllApprovedTopicsInStudentEnrollmentPeriod(String type, Integer pageNumber, Integer pageSize, String sortBy) {
+
+        return null;
+    }
+
     private Response<List<TopicDTO>> buildResponse(Page<Topic> topicPage) {
         List<TopicDTO> listTopicDTO = topicMapper.toListDTO(topicPage.getContent());
         Map<String, List<TopicDTO>> data = new HashMap<>();

@@ -1,16 +1,15 @@
 import { DataTypes, Model } from "sequelize";
 import db from "../configs/db.config";
+import { POSTFIX } from "@configs/constants";
+import { Clazz } from "./clazz.model";
 import { Major } from "./major.model";
-import { Specialization } from "./specialization.model";
-import { Class } from "./class.model";
 
 interface UserAttributes {
   id: string;
-  code?: string;
-  role?: string;
+  ntid?: string;
   email?: string;
   imageUrl?: string;
-  fullname?: string;
+  name?: string;
   phoneNumber?: string;
   providerId?: string;
   password?: string;
@@ -20,111 +19,101 @@ interface UserAttributes {
   createdBy?: string;
   createdDate?: Date;
   updatedDate?: Date;
-  classId?: string;
-  specializationId?: string;
+  clazzId?: string;
   majorId?: string;
 }
 
 interface UserInstance extends Model<UserAttributes>, UserAttributes {}
 
+const modelName: string = "user";
 const User = db.define<UserInstance>(
-  "user",
+  modelName,
   {
     id: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       primaryKey: true,
-      field: "id",
+      field: "id".concat(POSTFIX),
+      defaultValue: DataTypes.UUIDV4,
     },
-    code: {
+    ntid: {
       type: DataTypes.STRING,
-      field: "code",
-    },
-    role: {
-      type: DataTypes.STRING,
-      field: "role",
+      field: "ntid".concat(POSTFIX),
+      unique: true,
+      allowNull: false,
     },
     email: {
       type: DataTypes.STRING,
-      field: "email",
+      field: "email".concat(POSTFIX),
+      unique: true,
+      allowNull: false,
     },
     imageUrl: {
       type: DataTypes.STRING,
-      field: "image_url",
+      field: "image_url".concat(POSTFIX),
     },
-    fullname: {
+    name: {
       type: DataTypes.STRING,
-      field: "full_name",
+      field: "name".concat(POSTFIX),
     },
     phoneNumber: {
       type: DataTypes.STRING,
-      field: "phone_number",
+      field: "phone_number".concat(POSTFIX),
     },
     providerId: {
       type: DataTypes.STRING,
-      field: "provider_id",
+      field: "provider_id".concat(POSTFIX),
     },
     password: {
       type: DataTypes.STRING,
-      field: "password",
+      field: "password".concat(POSTFIX),
     },
     provider: {
       type: DataTypes.STRING,
-      field: "provider",
+      field: "provider".concat(POSTFIX),
     },
     biography: {
-      type: DataTypes.STRING,
-      field: "biography",
+      type: DataTypes.BLOB("long"),
+      field: "biography".concat(POSTFIX),
     },
     schoolYear: {
       type: DataTypes.DATE,
-      field: "school_year",
+      field: "school_year".concat(POSTFIX),
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: "created_by",
+      field: "created_by".concat(POSTFIX),
     },
     createdDate: {
       type: DataTypes.DATE,
-      field: "created_date",
+      field: "created_date".concat(POSTFIX),
+      defaultValue: DataTypes.NOW,
+      allowNull: false,
     },
     updatedDate: {
       type: DataTypes.DATE,
-      field: "updated_date",
+      field: "updated_date".concat(POSTFIX),
+      defaultValue: DataTypes.NOW,
+      allowNull: false,
     },
-    classId: {
-      type: DataTypes.STRING,
-      field: "class_id",
-    },
-    specializationId: {
-      type: DataTypes.STRING,
-      field: "specialization_id",
+    clazzId: {
+      type: DataTypes.UUID,
+      field: "clazz_id".concat(POSTFIX),
     },
     majorId: {
-      type: DataTypes.STRING,
-      field: "major_id",
+      type: DataTypes.UUID,
+      field: "major_id".concat(POSTFIX),
     },
   },
   {
     timestamps: false,
-    tableName: "User",
+    tableName: "user_tbl",
   }
 );
 
-// one to one relationship
-// Define the User model
-// User.hasOne(Major, {
-//   foreignKey: "majorId",
-// });
+Major.hasMany(User, { foreignKey: "majorId", as: "users" });
+User.belongsTo(Major, { as: "major" });
 
-// Define the Major model
-// Major.belongsTo(User, {
-//   foreignKey: "id",
-// });
-
-// User.hasOne(Specialization, { foreignKey: "specializationId" });
-// Specialization.belongsTo(User, { foreignKey: "id" });
-
-// User.hasOne(Class, { foreignKey: "classId" });
-// Class.belongsTo(User);
+Clazz.hasMany(User, { foreignKey: "clazzId", as: "users" });
+User.belongsTo(Clazz, { as: "clazz" });
 
 export { User, UserAttributes, UserInstance };

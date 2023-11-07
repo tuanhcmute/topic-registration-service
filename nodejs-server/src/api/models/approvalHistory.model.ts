@@ -1,9 +1,10 @@
+import { POSTFIX } from "@configs/constants";
 import db from "@configs/db.config";
 import { DataTypes, Model } from "sequelize";
+import { Topic } from "./topic.model";
 
 interface ApprovalHistoryAttributes {
   id: string;
-  code: string;
   reason?: string;
   status?: string;
   topicId: string;
@@ -16,47 +17,55 @@ interface ApprovalHistoryInstance
   extends Model<ApprovalHistoryAttributes>,
     ApprovalHistoryAttributes {}
 
+const modelName: string = "approvalHistory";
 const ApprovalHistory = db.define<ApprovalHistoryInstance>(
-  "approvalHistory",
+  modelName,
   {
     id: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       primaryKey: true,
-      field: "id",
-    },
-    code: {
-      type: DataTypes.STRING,
-      field: "code",
+      field: "id".concat(POSTFIX),
+      defaultValue: DataTypes.UUIDV4,
     },
     reason: {
-      type: DataTypes.STRING,
-      field: "reason",
+      type: DataTypes.BLOB("long"),
+      field: "reason".concat(POSTFIX),
     },
     status: {
       type: DataTypes.STRING,
-      field: "status",
+      field: "status".concat(POSTFIX),
     },
     topicId: {
-      type: DataTypes.STRING,
-      field: "topic_id",
+      type: DataTypes.UUID,
+      field: "topic_id".concat(POSTFIX),
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: "created_by",
+      field: "created_by".concat(POSTFIX),
     },
     createdDate: {
       type: DataTypes.DATE,
-      field: "created_date",
+      field: "created_date".concat(POSTFIX),
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
     updatedDate: {
       type: DataTypes.DATE,
-      field: "updated_date",
+      field: "updated_date".concat(POSTFIX),
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
   },
   {
     timestamps: false,
-    tableName: "ApprovalHistory",
+    tableName: "approval_history_tbl",
   }
 );
+
+Topic.hasMany(ApprovalHistory, {
+  foreignKey: "topicId",
+  as: "approvalHistories",
+});
+ApprovalHistory.belongsTo(Topic, { as: "topic" });
 
 export { ApprovalHistoryAttributes, ApprovalHistoryInstance, ApprovalHistory };

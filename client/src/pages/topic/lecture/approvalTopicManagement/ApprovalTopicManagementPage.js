@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
-import { Button } from "flowbite-react";
 import Select from "react-select";
 
 import { topicService, userService } from "../../../../services";

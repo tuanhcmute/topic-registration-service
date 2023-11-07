@@ -7,7 +7,7 @@ import { OAuth2RedirectHandler } from "../pages/login";
 import ProtectedRoutes from "./ProtectedRoutes";
 import { HomePage as HomeRoute } from "../pages/home";
 import { ProfilePage as ProfileRoute } from "../pages/profile";
-import { LectureTopicPageWrapper as LectureTopicRoutes } from "../pages/topic";
+import { TopicPageWrapper as TopicPageWrapperRoutes } from "../pages/topic";
 import { TopicManagementPage as TopicManagementRoute } from "../pages/topic/lecture/topicManagement";
 import { AppreciationManagementPage as AppreciationManagementPageRoute } from "../pages/topic/lecture/appreciationManagement";
 import { ApprovalTopicManagementPage as ApprovalTopicManagementPageRoute } from "../pages/topic/lecture/approvalTopicManagement";
@@ -16,8 +16,12 @@ import { LoginPage as LoginRoute } from "../pages/login";
 
 import { paths, roles, topicType } from "../utils/constants";
 import AppLectureHeader from "../app/AppLectureHeader";
+import AppStudentHeader from "../app/AppStudentHeader";
 import { useSelector } from "react-redux";
 import { DivisionTopicManagement } from "../pages/topic/lecture/divisionTopicManagement";
+import Sidebar from "../pages/topic/lecture/Sidebar";
+import StudentSidebar from "../pages/topic/student/StudentSidebar";
+import { ProgressionManagement } from "../pages/topic/lecture/progressionManagement";
 
 const RedirectRoute = () => {
   const isAuthenticated = useSelector((state) => state.auth.authenticated);
@@ -36,6 +40,47 @@ const RedirectRoute = () => {
 const router = createBrowserRouter([
   { path: "", element: <RedirectRoute /> },
   {
+    path: "student",
+    element: <AppLayout header={AppStudentHeader} />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        element: <ProtectedRoutes role={roles.ROLE_STUDENT} />,
+        children: [
+          {
+            path: "home",
+            element: <HomeRoute />,
+          },
+          { path: "lecture", element: <LectureRoute /> },
+          { path: "profile", element: <ProfileRoute /> },
+          {
+            path: "topic",
+
+            element: (
+              <TopicPageWrapperRoutes>
+                <StudentSidebar />
+              </TopicPageWrapperRoutes>
+            ),
+            children: [
+              {
+                path: topicType.TLCN.toLowerCase(),
+                element: <TopicManagementRoute />,
+              },
+              {
+                path: `${topicType.TLCN.toLowerCase()}/progression`,
+                element: <ProgressionManagement />,
+              },
+              {
+                path: `${topicType.TLCN.toLowerCase()}/appreciation`,
+                element: <AppreciationManagementPageRoute />,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
     path: "lecture",
     element: <AppLayout header={AppLectureHeader} />,
     errorElement: <ErrorPage />,
@@ -49,7 +94,11 @@ const router = createBrowserRouter([
           },
           {
             path: "topic",
-            element: <LectureTopicRoutes />,
+            element: (
+              <TopicPageWrapperRoutes>
+                <Sidebar />
+              </TopicPageWrapperRoutes>
+            ),
             children: [
               {
                 path: topicType.TLCN.toLowerCase(),
@@ -66,6 +115,10 @@ const router = createBrowserRouter([
               {
                 path: `${topicType.TLCN.toLowerCase()}/division`,
                 element: <DivisionTopicManagement />,
+              },
+              {
+                path: `${topicType.TLCN.toLowerCase()}/progression`,
+                element: <ProgressionManagement />,
               },
             ],
           },

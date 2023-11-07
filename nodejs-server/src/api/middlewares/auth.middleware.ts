@@ -1,52 +1,38 @@
 import { Request, Response, NextFunction } from "express";
+import { StatusCodes, ReasonPhrases } from "http-status-codes";
+
 import { verifyToken } from "@utils/jwt.util";
 import { ResponseModelBuilder } from "@interfaces";
-import { StatusCode } from "@configs/constants";
-import { ErrorMessages } from "@exceptions";
+
 export const authFilterRestrictAccess =
   (role: string) => async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // Check token exist in header
       const token = parseBearerToken(req.headers.authorization);
-
       if (!token) {
         return res
-          .status(401)
+          .status(StatusCodes.UNAUTHORIZED)
           .json(
             new ResponseModelBuilder<null>()
-              .withStatusCode(StatusCode.UNAUTHORIZED)
-              .withMessage(ErrorMessages.UNAUTHORIZED)
+              .withStatusCode(StatusCodes.UNAUTHORIZED)
+              .withMessage(ReasonPhrases.UNAUTHORIZED)
               .build()
           );
       }
-
+      // Verify token
       let decoded;
       try {
         decoded = await verifyToken(token);
       } catch (err: any) {
         return res
-          .status(401)
+          .status(StatusCodes.UNAUTHORIZED)
           .json(
             new ResponseModelBuilder()
-              .withStatusCode(StatusCode.UNAUTHORIZED)
+              .withStatusCode(StatusCodes.UNAUTHORIZED)
               .withMessage(err.message)
               .build()
           );
       }
-
-      const userRole = decoded.role;
-
-      if (userRole !== role) {
-        return res
-          .status(403)
-          .json(
-            new ResponseModelBuilder()
-              .withMessage("Forbidden")
-              .withStatusCode(StatusCode.FORBIDDEN)
-              .withData(null)
-              .build()
-          );
-      }
-
       next();
     } catch (err) {
       next(err);
@@ -68,22 +54,20 @@ export const authorizeUser = async (
 ) => {
   try {
     let token = req.headers.authorization;
-
-    console.log(req.path);
+    // Permit all request
     if (
-      req.path === "/api/v1/oauth2/google" ||
+      req.path === "/api/v1/oauth2/authorization/google" ||
       req.path === "/api/v1/login/oauth2/code/google"
     ) {
       return next();
     }
-
     if (!token) {
       return res
-        .status(401)
+        .status(StatusCodes.UNAUTHORIZED)
         .json(
           new ResponseModelBuilder()
-            .withStatusCode(StatusCode.UNAUTHORIZED)
-            .withMessage(ErrorMessages.UNAUTHORIZED)
+            .withStatusCode(StatusCodes.UNAUTHORIZED)
+            .withMessage(ReasonPhrases.UNAUTHORIZED)
             .build()
         );
     } else {
@@ -96,17 +80,17 @@ export const authorizeUser = async (
         decoded = await verifyToken(token);
       } catch (err: any) {
         return res
-          .status(401)
+          .status(StatusCodes.UNAUTHORIZED)
           .json(
             new ResponseModelBuilder()
-              .withStatusCode(StatusCode.UNAUTHORIZED)
+              .withStatusCode(StatusCodes.UNAUTHORIZED)
               .withMessage(err.message)
               .build()
           );
       }
 
-      const userId = decoded.id;
-      res.locals.userId = userId;
+      const email = decoded.email;
+      res.locals.email = email;
     }
     next();
   } catch (err) {

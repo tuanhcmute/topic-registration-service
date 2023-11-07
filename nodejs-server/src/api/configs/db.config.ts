@@ -3,7 +3,11 @@ import dotenv from "dotenv";
 import { keys } from "./keys";
 dotenv.config();
 
-const { dbName, dbUser, dbPassword, dbHost } = keys.db.development;
+const keysDatabase =
+  process.env.NODE_ENV === "production"
+    ? keys.db.production
+    : keys.db.development;
+const { dbName, dbUser, dbPassword, dbHost } = keysDatabase;
 
 const db = new Sequelize(dbName, dbUser, dbPassword, {
   host: dbHost,

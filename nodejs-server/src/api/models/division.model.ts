@@ -1,13 +1,14 @@
+import { POSTFIX } from "@configs/constants";
 import db from "@configs/db.config";
 import { DataTypes, Model } from "sequelize";
+import { Topic } from "./topic.model";
+import { User } from "./user.model";
 
 interface DivisionAttributes {
   id: string;
-  name?: string;
-  status?: string;
-  position?: string;
+  place?: string;
   startDate?: Date;
-  detailedTime?: Date;
+  specifiedTime?: Date;
   topicId: string;
   lectureId: string;
   createdBy?: string;
@@ -19,59 +20,66 @@ interface DivisionInstance
   extends Model<DivisionAttributes>,
     DivisionAttributes {}
 
+const modelName: string = "division";
 const Division = db.define<DivisionInstance>(
-  "division",
+  modelName,
   {
     id: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       primaryKey: true,
-      field: "id",
+      field: "id".concat(POSTFIX),
+      defaultValue: DataTypes.UUIDV4,
     },
-    name: {
+    place: {
       type: DataTypes.STRING,
-      field: "name",
-    },
-    status: {
-      type: DataTypes.STRING,
-      field: "status",
-    },
-    position: {
-      type: DataTypes.STRING,
-      field: "position",
+      field: "place",
+      allowNull: false,
     },
     startDate: {
-      type: DataTypes.DATE,
-      field: "start_date",
+      type: DataTypes.DATEONLY,
+      field: "start_date".concat(POSTFIX),
+      allowNull: false,
     },
-    detailedTime: {
-      type: DataTypes.DATE,
-      field: "detailed_time",
+    specifiedTime: {
+      type: DataTypes.STRING,
+      field: "specified_time".concat(POSTFIX),
+      allowNull: false,
     },
     topicId: {
-      type: DataTypes.STRING,
-      field: "topic_id",
+      type: DataTypes.UUID,
+      field: "topic_id".concat(POSTFIX),
     },
     lectureId: {
-      type: DataTypes.STRING,
-      field: "lecture_id",
+      type: DataTypes.UUID,
+      field: "lecture_id".concat(POSTFIX),
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: "created_by",
+      field: "created_by".concat(POSTFIX),
     },
     createdDate: {
       type: DataTypes.DATE,
-      field: "created_date",
+      field: "created_date".concat(POSTFIX),
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
     updatedDate: {
       type: DataTypes.DATE,
-      field: "updated_date",
+      field: "updated_date".concat(POSTFIX),
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
   },
   {
     timestamps: false,
-    tableName: "Division",
+    tableName: "division_tbl",
   }
 );
+
+User.hasMany(Division, { foreignKey: "lectureId", as: "divisions" });
+Division.belongsTo(User, { as: "lecture" });
+
+Topic.hasMany(Division, { foreignKey: "topicId", as: "divisions" });
+Division.belongsTo(Topic, { as: "topic" });
 
 export { Division, DivisionInstance, DivisionAttributes };

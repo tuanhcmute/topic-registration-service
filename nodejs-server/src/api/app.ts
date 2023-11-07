@@ -20,7 +20,7 @@ const app: Application = express();
 // middlewares
 app.use(express.json());
 app.use(cookieParser());
-// app.use(morgan("tiny"));
+app.use(morgan("tiny"));
 app.use(corsMiddleware);
 app.use(
   cookieSession({
@@ -52,13 +52,17 @@ app.use(errorHandler);
   try {
     // Attempt to authenticate with the database (assuming 'db' is your database object)
     await db.authenticate();
-    console.log("Connection has been established successfully.");
+    console.info("Connection has been established successfully.");
+    await db.sync();
+    console.info("All models were synchronized successfully.");
 
     // If the database authentication is successful, start your Express.js application
     app.listen(process.env.PORT, () => {
-      console.log("The app is listening on port " + process.env.PORT);
+      console.info("The app is listening on port " + process.env.PORT);
     });
   } catch (error) {
+    await db.drop();
+    console.error("Drop all tables defined through this sequelize instance");
     // If there is an error during database authentication, catch and handle it here
     console.error("Unable to connect to the database:", error);
   }
