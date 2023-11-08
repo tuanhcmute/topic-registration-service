@@ -6,11 +6,10 @@ export interface TeacherTopicOut {
   name: string;
   type: string;
   goal: string;
-  expectation: string | null;
   requirement: string | null;
   status: string;
   maxSlot: number;
-  students: UserInstance[] | undefined;
+  // students: UserInstance[] | undefined;
   lecture: UserInstance;
 }
 
@@ -24,11 +23,9 @@ export const mapTopicToDTO = (
     name: topic.name,
     type: topic.type || "",
     goal: topic.goal || "",
-    expectation: topic.expectation || "",
     requirement: topic.requirement || "",
     status: topic.status || "",
     maxSlot: topic.maxSlot || 2,
-    students: topic.students,
     lecture: user,
   };
 

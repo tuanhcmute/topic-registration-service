@@ -1,36 +1,57 @@
+import _ from "lodash";
+import { SemesterStatus, TopicType } from "@configs/constants";
+import ValidateException from "@exceptions/ValidateFailException";
 import { TeacherTopicOut, mapTopicToDTO } from "@interfaces/topic.interface";
-import { Topic, TopicInstance, User } from "@models";
+import { Semester, Topic, TopicInstance, User } from "@models";
 
 export default class TopicService {
   // Class implementation goes here
-  public getAllTopics = async (
+  public getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture = async (
     type: string,
-    periodId: string,
-    lecturerId: string
+    email: string
   ): Promise<TeacherTopicOut[]> => {
     let topics: TopicInstance[] = [];
     try {
-      const lecture = await User.findByPk(lecturerId, {
-        attributes: ["code", "fullname"],
+      // Validate type
+      const isTypeValid = Object.keys(TopicType).some(
+        (item) => item === type.toUpperCase()
+      );
+      if (!isTypeValid) throw new ValidateException("Topic type is not valid");
+
+      // Validate lecture
+      const lecture = await User.findOne({
+        where: {
+          email: email,
+        },
       });
-      if (lecture === null) {
-        throw new Error("Lecturer not found");
-      }
+      if (_.isNull(lecture) || _.isEmpty(lecture))
+        throw new ValidateException("Lecture could not be found");
+
+      // Validate current semester
+      const currentSemester = await Semester.findOne({
+        where: {
+          status: SemesterStatus.ACTIVATED,
+        },
+      });
+      if (_.isNull(currentSemester) || _.isEmpty(currentSemester))
+        throw new ValidateException("Current semester could not be found");
+
+      // Get the list of topics from db
       topics = await Topic.findAll({
         where: {
           type: type,
-          periodId: periodId,
-          lecturerId: lecturerId,
+          lectureId: lecture.id,
+          semesterId: currentSemester.id,
         },
         include: [
-          {
-            model: User,
-            as: "students",
-            attributes: ["code", "fullname"],
-            through: {
-              attributes: [],
-            },
-          },
+          // {
+          //   model: User,
+          //   as: "students",
+          //   attributes: ["code", "name"],
+          //   through: {
+          //     attributes: [],
+          //   },
+          // },
         ],
       });
 

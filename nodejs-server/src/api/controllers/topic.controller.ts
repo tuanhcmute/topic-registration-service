@@ -1,27 +1,34 @@
 import { NextFunction, Request, Response, query } from "express";
-import { TopicInstance } from "@models";
 import { TopicService } from "@services";
 import { error } from "console";
 import { TeacherTopicOut } from "@interfaces/topic.interface";
+import { StatusCodes } from "http-status-codes";
+import { ResponseModelBuilder } from "@interfaces";
 
 export default class TopicController {
   private topicService: TopicService = new TopicService();
 
-  public getAllTopics = async (
+  public getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      const userId = res.locals.userId;
+      const email = res.locals.email;
       const type = req.query.type as string;
-      const periodId = req.query["enrollment-period"] as string;
-      const topics: TeacherTopicOut[] = await this.topicService.getAllTopics(
-        type,
-        periodId,
-        userId
-      );
-      res.status(200).json(topics);
+      const topics: TeacherTopicOut[] =
+        await this.topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
+          type,
+          email
+        );
+      res
+        .status(StatusCodes.OK)
+        .json(
+          new ResponseModelBuilder<TeacherTopicOut[]>()
+            .withStatusCode(StatusCodes.OK)
+            .withMessage("Topics have been successfully retrieved")
+            .withData(topics)
+        );
     } catch (err) {
       console.log(error);
       next(err);

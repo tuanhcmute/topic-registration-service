@@ -18,7 +18,7 @@ export default class AuthController {
           as: "userRoles",
         },
       });
-      const token = createJwtToken(user.email || "");
+      const token = createJwtToken(foundUser?.email || "");
       const refreshToken = "12345";
       const redirectUrl = req.query.state;
       res.redirect(

@@ -88,7 +88,6 @@ export const authorizeUser = async (
               .build()
           );
       }
-
       const email = decoded.email;
       res.locals.email = email;
     }

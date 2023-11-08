@@ -26,13 +26,13 @@ export const passportSetup = passport.use(
       callbackURL: keys.google.callbackURL,
     },
     async (accessToken, refreshToken, profile, done) => {
-      console.log({ profile, accessToken, refreshToken });
       const email = profile._json.email;
       let ntid = uuidv4();
       if (email?.includes("@student.hcmute.edu.vn")) {
         ntid = email.substring(0, 7);
       }
       try {
+        // Find or create if user doesnt exist
         const [user, created] = await User.findOrCreate({
           where: { email: profile._json.email },
           defaults: {
@@ -45,14 +45,22 @@ export const passportSetup = passport.use(
             provider: profile.provider.toUpperCase(),
           },
         });
+        // Validate created
         if (created) {
           console.log("New account created for " + user.email);
         } else {
+          // Update some field of the user
+          if (!user.imageUrl) {
+            user.imageUrl = profile._json.picture;
+            user.providerId = profile._json.sub;
+            await user.save();
+          }
           console.log("Existing user logged in: " + user.email);
         }
         done(null, user);
       } catch (err) {
         console.error("Error finding or creating user:", err);
+        throw err;
       }
     }
   )
