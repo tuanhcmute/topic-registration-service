@@ -1,5 +1,7 @@
 import { TeacherTopicOut, mapTopicToDTO } from "@interfaces/topic.interface";
-import { Topic, TopicInstance, User } from "@models";
+import { Enrollment, Topic, TopicInstance, User, UserInstance } from "@models";
+import { createReqTopic } from "@interfaces/topic.interface";
+import { db } from "@configs";
 
 export default class TopicService {
   // Class implementation goes here
@@ -38,6 +40,66 @@ export default class TopicService {
       return topicData;
     } catch (err) {
       console.log(err);
+      throw err;
+    }
+  };
+
+  public createTopic = async (
+    newTopic: createReqTopic,
+    userId: string
+  ): Promise<TopicInstance> => {
+    let transaction;
+
+    const user = await User.findOne({ where: { id: userId } });
+    try {
+      // Start a database transaction to ensure data consistency
+      transaction = await db.transaction();
+
+      const topic = await Topic.create(
+        {
+          ntid: newTopic.ntid,
+          majorCode: newTopic.majorCode,
+          name: newTopic.topicName,
+          goal: newTopic.goal,
+          requirement: newTopic.requirement,
+          type: newTopic.type,
+          maxSlot: newTopic.maxSlot,
+          lecturerId: user?.code,
+        },
+        { transaction }
+      );
+
+      for (const code of newTopic.students) {
+        const student = await User.findOne({
+          where: {
+            code: code,
+          },
+          transaction,
+        });
+
+        if (student && topic.id && student.id) {
+          await Enrollment.create(
+            {
+              topicId: topic.id, // Use the ID of the created topic
+              studentId: student.id, // Use the ID of the fetched student
+              // Set other relevant fields as needed
+            },
+            { transaction }
+          );
+        }
+      }
+
+      // Commit the transaction to save changes to the database
+      await transaction.commit();
+
+      console.info("create topic success");
+      return topic;
+    } catch (err) {
+      // Roll back the transaction in case of an error
+      if (transaction) {
+        await transaction.rollback();
+      }
+      console.error(err);
       throw err;
     }
   };

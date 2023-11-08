@@ -1,8 +1,8 @@
 enum Role {
-  STUDENT,
-  TEACHER,
-  HEAD,
-  ADMIN,
+  STUDENT = "STUDENT",
+  TEACHER = "TEACHER",
+  HEAD = "HEAD",
+  ADMIN = "ADMIN",
 }
 
 export default Role;

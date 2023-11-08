@@ -32,6 +32,7 @@ export const passportSetup = passport.use(
           defaults: {
             id: uuidv4(),
             providerId: profile.id,
+            code: "123456",
             email: profile.emails ? profile.emails[0].value : "",
             imageUrl: profile._json.picture || "",
             fullname: profile.displayName,

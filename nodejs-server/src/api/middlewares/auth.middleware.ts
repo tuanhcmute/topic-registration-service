@@ -42,7 +42,6 @@ export const authFilterRestrictAccess =
             new ResponseModelBuilder()
               .withMessage("Forbidden")
               .withStatusCode(StatusCode.FORBIDDEN)
-              .withData(null)
               .build()
           );
       }

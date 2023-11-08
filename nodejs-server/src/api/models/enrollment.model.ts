@@ -3,7 +3,7 @@ import { DataTypes, Model } from "sequelize";
 import { User, Topic } from "@models";
 
 interface EnrollmentAttributes {
-  id: string;
+  id?: string;
   topicId: string;
   studentId: string;
   createdDate?: Date;
@@ -19,7 +19,9 @@ const Enrollment = db.define<EnrollmentInstance>(
   "enrollment",
   {
     id: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
       primaryKey: true,
       field: "id",
     },
