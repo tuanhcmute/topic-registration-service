@@ -1,57 +1,98 @@
 import { Request, Response, NextFunction } from "express";
+import { StatusCodes } from "http-status-codes";
+import _ from "lodash";
+
 import { verifyToken } from "@utils/jwt.util";
 import { ResponseModelBuilder } from "@interfaces";
-import { StatusCode } from "@configs/constants";
-import { ErrorMessages } from "@exceptions";
-export const authFilterRestrictAccess =
-  (role: string) => async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const token = parseBearerToken(req.headers.authorization);
+import { Role, User, UserRole } from "@models";
 
-      if (!token) {
+export const preAuthorizeFilter =
+  (roles: string[]) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Check token exist in header
+      const token = parseBearerToken(req.headers.authorization);
+      if (_.isNull(token))
         return res
-          .status(401)
+          .status(StatusCodes.UNAUTHORIZED)
           .json(
-            new ResponseModelBuilder<null>()
-              .withStatusCode(StatusCode.UNAUTHORIZED)
-              .withMessage(ErrorMessages.UNAUTHORIZED)
+            new ResponseModelBuilder()
+              .withStatusCode(StatusCodes.UNAUTHORIZED)
+              .withMessage("Token could not be found")
               .build()
           );
-      }
 
+      // Decode token and get email from decoded
       let decoded;
       try {
         decoded = await verifyToken(token);
       } catch (err: any) {
         return res
-          .status(401)
+          .status(StatusCodes.UNAUTHORIZED)
           .json(
             new ResponseModelBuilder()
-              .withStatusCode(StatusCode.UNAUTHORIZED)
+              .withStatusCode(StatusCodes.UNAUTHORIZED)
               .withMessage(err.message)
               .build()
           );
       }
 
-      const userRole = decoded.role;
+      // Get user by email
+      const email = decoded.email;
+      const currentUser = await User.findOne({
+        where: {
+          email: email,
+        },
+        include: {
+          model: UserRole,
+          as: "userRoles",
+        },
+      });
 
-      if (userRole !== role) {
+      // Validate user
+      if (
+        _.isNull(currentUser) ||
+        _.isEmpty(currentUser) ||
+        _.isUndefined(currentUser)
+      )
         return res
-          .status(403)
+          .status(StatusCodes.BAD_REQUEST)
           .json(
             new ResponseModelBuilder()
-              .withMessage("Forbidden")
-              .withStatusCode(StatusCode.FORBIDDEN)
+              .withStatusCode(StatusCodes.BAD_REQUEST)
+              .withMessage("Current user could not be found")
               .build()
           );
-      }
 
-      next();
+      // Get roles of current user
+      const authorities = await Promise.all(
+        currentUser.userRoles.map(async (item) => {
+          const role = await Role.findOne({ where: { id: item.roleId } });
+          return role;
+        })
+      );
+
+      // Check role
+      const hasPermission = authorities.some((item) => {
+        if (_.isNull(item)) return false;
+        return roles.some((role) => _.isEqual(role, item.dataValues.code));
+      });
+      console.log({ hasPermission });
+      if (hasPermission) return next();
+      return res
+        .status(StatusCodes.FORBIDDEN)
+        .json(
+          new ResponseModelBuilder()
+            .withStatusCode(StatusCodes.FORBIDDEN)
+            .withMessage("Access is denied")
+            .build()
+        );
     } catch (err) {
       next(err);
     }
   };
 
+// Get token from header
 const parseBearerToken = (authorizationHeader: string | undefined) => {
   if (!authorizationHeader) return null;
   if (authorizationHeader.toLowerCase().startsWith("bearer ")) {
@@ -60,53 +101,48 @@ const parseBearerToken = (authorizationHeader: string | undefined) => {
   return null;
 };
 
-export const authorizeUser = async (
+// Check authorization
+export const tokenAuthenticationFilter = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    let token = req.headers.authorization;
-
-    console.log(req.path);
+    // Permit all request
     if (
-      req.path === "/api/v1/oauth2/google" ||
+      req.path === "/api/v1/oauth2/authorization/google" ||
       req.path === "/api/v1/login/oauth2/code/google"
-    ) {
+    )
       return next();
-    }
 
-    if (!token) {
+    // Check token exist in header
+    const token = parseBearerToken(req.headers.authorization);
+    if (_.isNull(token))
       return res
-        .status(401)
+        .status(StatusCodes.UNAUTHORIZED)
         .json(
           new ResponseModelBuilder()
-            .withStatusCode(StatusCode.UNAUTHORIZED)
-            .withMessage(ErrorMessages.UNAUTHORIZED)
+            .withStatusCode(StatusCodes.UNAUTHORIZED)
+            .withMessage("Token could not be found")
             .build()
         );
-    } else {
-      if (token.toLocaleLowerCase().startsWith("bearer ")) {
-        token = token.slice("bearer".length).trim();
-      }
 
-      let decoded;
-      try {
-        decoded = await verifyToken(token);
-      } catch (err: any) {
-        return res
-          .status(401)
-          .json(
-            new ResponseModelBuilder()
-              .withStatusCode(StatusCode.UNAUTHORIZED)
-              .withMessage(err.message)
-              .build()
-          );
-      }
-
-      const userId = decoded.id;
-      res.locals.userId = userId;
+    // Verify token
+    let decoded;
+    try {
+      decoded = await verifyToken(token);
+    } catch (err: any) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new ResponseModelBuilder()
+            .withStatusCode(StatusCodes.UNAUTHORIZED)
+            .withMessage(err.message)
+            .build()
+        );
     }
+    const email = decoded.email;
+    res.locals.email = email;
     next();
   } catch (err) {
     // Handle errors here

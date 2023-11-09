@@ -1,43 +1,74 @@
-import { TeacherTopicOut, mapTopicToDTO } from "@interfaces/topic.interface";
-import { Enrollment, Topic, TopicInstance, User, UserInstance } from "@models";
-import { createReqTopic } from "@interfaces/topic.interface";
+import _ from "lodash";
+
+import { SemesterStatus, TopicType } from "@configs/constants";
+import ValidateException from "@exceptions/ValidateFailException";
+import { Topic, TopicInstance, User, Semester, TopicEnrollment } from "@models";
+import { createReqTopic, Data } from "@interfaces/topic.interface";
 import { db } from "@configs";
+import { IResponseModel, ResponseModelBuilder } from "@interfaces";
+import { StatusCodes } from "http-status-codes";
 
 export default class TopicService {
   // Class implementation goes here
-  public getAllTopics = async (
+  public getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture = async (
     type: string,
-    periodId: string,
-    lecturerId: string
-  ): Promise<TeacherTopicOut[]> => {
-    let topics: TopicInstance[] = [];
+    email: string
+  ): Promise<IResponseModel<Data>> => {
     try {
-      const lecture = await User.findByPk(lecturerId, {
-        attributes: ["code", "fullname"],
+      // Validate type
+      if (_.isEmpty(type)) throw new ValidateException("type is not valid");
+      const isTypeValid = Object.keys(TopicType).some(
+        (item) => item === type.toUpperCase()
+      );
+      if (!isTypeValid) throw new ValidateException("Topic type is not valid");
+
+      // Validate lecture
+      const lecture = await User.findOne({
+        where: {
+          email: email,
+        },
       });
-      if (lecture === null) {
-        throw new Error("Lecturer not found");
-      }
-      topics = await Topic.findAll({
+      if (_.isNull(lecture) || _.isEmpty(lecture))
+        throw new ValidateException("Lecture could not be found");
+
+      // Validate current semester
+      const currentSemester = await Semester.findOne({
+        where: {
+          status: SemesterStatus.ACTIVATED,
+        },
+      });
+      if (_.isNull(currentSemester) || _.isEmpty(currentSemester))
+        throw new ValidateException("Current semester could not be found");
+
+      // Get the list of topics from db
+      const topics = await Topic.findAll({
         where: {
           type: type,
-          periodId: periodId,
-          lecturerId: lecturerId,
+          lectureId: lecture.dataValues.id,
+          semesterId: currentSemester.dataValues.id,
         },
         include: [
           {
             model: User,
-            as: "students",
-            attributes: ["code", "fullname"],
-            through: {
-              attributes: [],
-            },
+            as: "lecture",
+            attributes: ["ntid", "name"],
+          },
+          {
+            model: TopicEnrollment,
+            as: "topicEnrollments",
           },
         ],
+        attributes: {
+          exclude: ["createdBy", "createdDate", "updatedDate", "lectureId"],
+        },
+        order: ["createdDate"],
       });
-
-      const topicData = topics.map((topic) => mapTopicToDTO(topic, lecture));
-      return topicData;
+      const data: Data = { topics };
+      return new ResponseModelBuilder<Data>()
+        .withMessage("Topics have been successfully retrieved")
+        .withStatusCode(StatusCodes.OK)
+        .withData(data)
+        .build();
     } catch (err) {
       console.log(err);
       throw err;
@@ -57,14 +88,13 @@ export default class TopicService {
 
       const topic = await Topic.create(
         {
-          ntid: newTopic.ntid,
-          majorCode: newTopic.majorCode,
+          code: newTopic.ntid,
+          majorCode: newTopic.majorCode || "",
           name: newTopic.topicName,
           goal: newTopic.goal,
           requirement: newTopic.requirement,
           type: newTopic.type,
           maxSlot: newTopic.maxSlot,
-          lecturerId: user?.code,
         },
         { transaction }
       );
@@ -72,21 +102,21 @@ export default class TopicService {
       for (const code of newTopic.students) {
         const student = await User.findOne({
           where: {
-            code: code,
+            ntid: code,
           },
           transaction,
         });
 
-        if (student && topic.id && student.id) {
-          await Enrollment.create(
-            {
-              topicId: topic.id, // Use the ID of the created topic
-              studentId: student.id, // Use the ID of the fetched student
-              // Set other relevant fields as needed
-            },
-            { transaction }
-          );
-        }
+        // if (student && topic.id && student.id) {
+        //   await TopicEnrollment.create(
+        //     {
+        //       topicId: topic.id, // Use the ID of the created topic
+        //       studentId: student.id, // Use the ID of the fetched student
+        //       // Set other relevant fields as needed
+        //     },
+        //     { transaction }
+        //   );
+        // }
       }
 
       // Commit the transaction to save changes to the database

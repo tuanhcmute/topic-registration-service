@@ -36,7 +36,7 @@ function Sidebar() {
             <span className='font-medium text-sm'>Đăng ký đề tài</span>
           </NavLink>
           <NavLink
-            to={`/lecture/topic/${topicType.TLCN.toLowerCase()}/management`}
+            to={`/lecture/topic/${topicType.TLCN.toLowerCase()}/progression`}
             className='flex items-center gap-2 px-5 py-3 hover:bg-primary hover:text-white cursor-pointer hover:rounded-b-md dark:hover:bg-transparent'
           >
             <MdOutlineManageHistory />

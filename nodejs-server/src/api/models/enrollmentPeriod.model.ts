@@ -1,17 +1,16 @@
-import db from "@configs/db.config";
 import { DataTypes, Model } from "sequelize";
-import { Topic } from "./topic.model";
+import { POSTFIX } from "@configs/constants";
+import db from "@configs/db.config";
+import { Semester } from "./semester.model";
 
 interface EnrollmentPeriodAttributes {
-  id: string;
+  id?: string;
   code: string;
   name: string;
-  description?: string;
   startDate?: Date;
   endDate?: Date;
-  active: string;
+  status: string;
   type?: string;
-  period?: string;
   semesterId?: string;
   createdBy?: string;
   createdDate?: Date;
@@ -22,76 +21,80 @@ interface EnrollmentPeriodInstance
   extends Model<EnrollmentPeriodAttributes>,
     EnrollmentPeriodAttributes {}
 
+const modelName: string = "enrollmentPeriod";
 const EnrollmentPeriod = db.define<EnrollmentPeriodInstance>(
-  "enrollmentPeriod",
+  modelName,
   {
     id: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       primaryKey: true,
-      field: "id",
+      field: "id".concat(POSTFIX),
+      defaultValue: DataTypes.UUIDV4,
     },
     code: {
       type: DataTypes.STRING,
-      field: "code",
+      field: "code".concat(POSTFIX),
+      allowNull: false,
     },
     name: {
       type: DataTypes.STRING,
-      field: "name",
-    },
-    description: {
-      type: DataTypes.STRING,
-      field: "description",
+      field: "name".concat(POSTFIX),
+      allowNull: false,
     },
     startDate: {
-      type: DataTypes.DATE,
-      field: "start_date",
+      type: DataTypes.DATEONLY,
+      field: "start_date".concat(POSTFIX),
+      allowNull: false,
+      unique: true,
     },
     endDate: {
-      type: DataTypes.DATE,
-      field: "end_date",
+      type: DataTypes.DATEONLY,
+      field: "end_date".concat(POSTFIX),
+      allowNull: false,
     },
-    active: {
+    status: {
       type: DataTypes.STRING,
-      field: "active",
+      field: "status".concat(POSTFIX),
+      allowNull: false,
     },
     type: {
       type: DataTypes.STRING,
-      field: "type",
-    },
-    period: {
-      type: DataTypes.STRING,
-      field: "period",
+      field: "type".concat(POSTFIX),
+      allowNull: false,
     },
     semesterId: {
-      type: DataTypes.STRING,
-      field: "semester_id",
+      type: DataTypes.UUID,
+      field: "semester_id".concat(POSTFIX),
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: "created_by",
+      field: "created_by".concat(POSTFIX),
     },
     createdDate: {
       type: DataTypes.DATE,
-      field: "created_date",
+      field: "created_date".concat(POSTFIX),
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
     updatedDate: {
       type: DataTypes.DATE,
-      field: "updated_date",
+      field: "updated_date".concat(POSTFIX),
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
   },
   {
     timestamps: false,
-    tableName: "EnrollmentPeriod",
+    tableName: "enrollment_period_tbl",
   }
 );
 
-EnrollmentPeriod.hasMany(Topic, {
-  as: "EnrollmentPeriod",
-  foreignKey: "periodId",
+Semester.hasMany(EnrollmentPeriod, {
+  foreignKey: "semesterId",
+  as: "enrollmentPeriods",
 });
-Topic.belongsTo(EnrollmentPeriod, {
-  foreignKey: "code",
-  as: "enrollmentPeriod",
+EnrollmentPeriod.belongsTo(Semester, {
+  as: "semester",
 });
 
 export {

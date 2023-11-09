@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { LiaEditSolid } from "react-icons/lia";
 import { Button } from "flowbite-react";
 import Select from "react-select";
@@ -16,16 +16,13 @@ const options = [
 ];
 
 function AppreciationManagementPage() {
-  const [openEditTopicModal, setOpenEditTopicMode] = useState(undefined);
-  const [selectedTopic, setSelectedTopic] = useState(null);
   // Get current user from redux
-  const currentUser = useSelector((state) => state.user?.currentUser);
   const divisions = useSelector((state) => state.division?.divisions);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchDivisionByTopicType(topicType.TLCN));
-  }, []);
+  }, [dispatch]);
 
   return (
     <React.Fragment>
@@ -109,13 +106,7 @@ function AppreciationManagementPage() {
                             </td>
                             <td className='border border-collapse border-lightGrey'>
                               <div className='flex justify-center'>
-                                <LiaEditSolid
-                                  className='w-6 h-6 cursor-pointer'
-                                  onClick={() => {
-                                    setSelectedTopic(item);
-                                    setOpenEditTopicMode("default");
-                                  }}
-                                />
+                                <LiaEditSolid className='w-6 h-6 cursor-pointer' />
                               </div>
                             </td>
                           </tr>
@@ -134,13 +125,6 @@ function AppreciationManagementPage() {
         </div>
         {/* End table */}
       </div>
-      {/* Enroll topic modal */}
-      {/* <EditTopicModal
-        handleUpdateTopic={updateTopicInLectureEnrollmentPeriod}
-        data={selectedTopic}
-        openModal={openEditTopicModal}
-        setOpenModal={setOpenEditTopicMode}
-      />  */}
       {/* End content */}
     </React.Fragment>
   );

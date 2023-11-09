@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from "express";
 import {
   ACCESS_CONTROL_ALLOW_HEADERS,
   ACCESS_CONTROL_ALLOW_METHODS,
@@ -5,8 +6,7 @@ import {
   AUTHORIZATION,
   CONTENT_TYPE,
   HttpMethod,
-} from "../configs/constants/index";
-import { Request, Response, NextFunction } from "express";
+} from "../configs/constants";
 
 export const corsMiddleware = (
   req: Request,

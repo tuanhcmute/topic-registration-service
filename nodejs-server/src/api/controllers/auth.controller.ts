@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { User, UserInstance } from "@models";
-import { createJwtToken } from "@utils/jwt.util";
-import { Role } from "@configs/constants";
+import { User, UserInstance, UserRole } from "@models";
 import passport from "passport";
+
+import { createJwtToken } from "@utils/jwt.util";
 
 export default class AuthController {
   public handleGoogleLogin = async (
@@ -13,13 +13,19 @@ export default class AuthController {
     try {
       const user = req.user as UserInstance;
       // find user role by id
-      const foundUser = await User.findByPk(user.id);
-      const token = createJwtToken(
-        user.id,
-        foundUser?.role || String(Role.STUDENT)
-      );
+      const foundUser = await User.findByPk(user.id, {
+        include: {
+          model: UserRole,
+          as: "userRoles",
+        },
+      });
+      const token = createJwtToken(foundUser?.email || "");
+      const refreshToken = "12345";
       const redirectUrl = req.query.state;
-      res.redirect(`${redirectUrl}?token=${token}`);
+      console.log(redirectUrl);
+      res.redirect(
+        `${redirectUrl}?accessToken=${token}&refreshToken=${refreshToken}`
+      );
     } catch (err) {
       console.log(err);
       next(err);
@@ -28,16 +34,17 @@ export default class AuthController {
 
   public getGoogleLogin = (req: Request, res: Response, next: NextFunction) => {
     try {
-      let redirectUrl = req.query.redirectUrl;
+      let redirectUrl = req.query["redirect_url"];
       if (!redirectUrl) {
         redirectUrl = "http://localhost:3000";
       }
       // Pass the redirectUrl as a query parameter to the Google authentication
       passport.authenticate("google", {
-        scope: ["profile"],
+        scope: ["profile", "email"],
         state: String(redirectUrl), // Pass the redirectUrl as state
       })(req, res, next);
     } catch (err) {
+      console.log("error");
       next(err);
     }
   };

@@ -1,118 +1,121 @@
+import { DataTypes, Model } from "sequelize";
 import db from "../configs/db.config";
-import { DataTypes, Model, Sequelize } from "sequelize";
 import { User, UserInstance } from "./user.model";
+import { POSTFIX } from "@configs/constants";
+import { Semester } from "./semester.model";
+import { Major } from "./major.model";
 
 interface TopicAttributes {
   id?: string;
-  ntid: string;
+  code: string;
   name: string;
   type?: string;
   goal?: string;
-  majorCode?: string;
-  expectation?: string;
   requirement?: string;
   status?: string;
   maxSlot?: number;
-  restSlot?: number;
+  availableSlot?: number;
   createdBy?: string;
   createdDate?: string;
   updatedDate?: string;
   semesterId?: string;
-  specializationId?: string;
-  lecturerId?: string;
-  periodId?: string;
+  lectureId?: string;
+  majorId: string;
 }
 
 interface TopicInstance extends Model<TopicAttributes>, TopicAttributes {
   students?: UserInstance[];
 }
 
+const modelName: string = "topic";
 const Topic = db.define<TopicInstance>(
-  "topic",
+  modelName,
   {
     id: {
-      type: DataTypes.UUID, // Use UUIDV4 as the default value
-      defaultValue: DataTypes.UUIDV4,
-      allowNull: false,
+      type: DataTypes.UUID,
       primaryKey: true,
-      field: "id",
+      field: "id".concat(POSTFIX),
+      defaultValue: DataTypes.UUIDV4,
     },
-    ntid: {
+    code: {
       type: DataTypes.STRING,
       field: "code",
     },
-    majorCode: {
-      type: DataTypes.STRING,
-      field: "marjorCode",
-    },
     name: {
       type: DataTypes.STRING,
-      field: "name",
+      field: "name".concat(POSTFIX),
     },
     type: {
       type: DataTypes.STRING,
-      field: "type",
+      field: "type".concat(POSTFIX),
     },
     goal: {
-      type: DataTypes.STRING,
-      field: "goal",
-    },
-    expectation: {
-      type: DataTypes.STRING,
-      field: "expectation",
+      type: DataTypes.BLOB("long"),
+      field: "goal".concat(POSTFIX),
+      get() {
+        return this.getDataValue("goal")?.toString();
+      },
     },
     requirement: {
-      type: DataTypes.STRING,
-      field: "requirement",
+      type: DataTypes.BLOB("long"),
+      field: "requirement".concat(POSTFIX),
+      get() {
+        return this.getDataValue("requirement")?.toString();
+      },
     },
     status: {
       type: DataTypes.STRING,
-      field: "status",
+      field: "status".concat(POSTFIX),
     },
     maxSlot: {
       type: DataTypes.INTEGER,
-      field: "max_slot",
+      field: "max_slot".concat(POSTFIX),
     },
-    restSlot: {
+    availableSlot: {
       type: DataTypes.INTEGER,
-      field: "rest_slot",
+      field: "available_slot".concat(POSTFIX),
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: "created_by",
+      field: "created_by".concat(POSTFIX),
     },
     createdDate: {
       type: DataTypes.DATE,
-      field: "created_date",
+      field: "created_date".concat(POSTFIX),
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
     updatedDate: {
       type: DataTypes.DATE,
-      field: "updated_date",
+      field: "updated_date".concat(POSTFIX),
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
     semesterId: {
-      type: DataTypes.STRING,
-      field: "semester_id",
+      type: DataTypes.UUID,
+      field: "semester_id".concat(POSTFIX),
     },
-    lecturerId: {
-      type: DataTypes.STRING,
-      field: "lecture_id",
+    lectureId: {
+      type: DataTypes.UUID,
+      field: "lecture_id".concat(POSTFIX),
     },
-    specializationId: {
-      type: DataTypes.STRING,
-      field: "specialization_id",
-    },
-    periodId: {
-      type: DataTypes.STRING,
-      field: "enrollment_period_id",
+    majorId: {
+      type: DataTypes.UUID,
+      field: "major_id".concat(POSTFIX),
     },
   },
   {
     timestamps: false,
-    tableName: "Topic",
+    tableName: "topic_tbl",
   }
 );
 
-User.hasMany(Topic, { foreignKey: "lecturerId" });
-Topic.belongsTo(User, { foreignKey: "id" });
+Semester.hasMany(Topic, { foreignKey: "semesterId", as: "topics" });
+Topic.belongsTo(Semester, { as: "semester" });
 
+User.hasMany(Topic, { foreignKey: "lectureId", as: "topics" });
+Topic.belongsTo(User, { as: "lecture" });
+
+Major.hasMany(Topic, { foreignKey: "majorId", as: "topics" });
+Topic.belongsTo(Major, { as: "major" });
 export { Topic, TopicAttributes, TopicInstance };

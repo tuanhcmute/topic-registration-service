@@ -16,7 +16,6 @@ export const fetchUserInfo = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     console.log({ rejectWithValue });
     const response = await userService.fetchUserInfo();
-    console.log(response);
     if (response?.data?.statusCode === HttpStatusCode.Unauthorized) {
       return rejectWithValue(response.data);
     }

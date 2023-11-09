@@ -14,4 +14,6 @@ public interface TopicService {
     Response<Void> approveTopicInLectureEnrollmentPeriod(ApprovalTopicRequest request);
 
     Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor(String type, String status, Integer pageNumber, Integer pageSize, String sortBy);
+
+    Response<List<TopicDTO>> getAllApprovedTopicsInStudentEnrollmentPeriod(String type, Integer pageNumber, Integer pageSize, String sortBy);
 }

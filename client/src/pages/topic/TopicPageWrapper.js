@@ -1,10 +1,9 @@
 import React from "react";
 import { useOutlet } from "react-router-dom";
 
-import { Banner } from "../../../components/banner";
-import Sidebar from "./Sidebar";
+import { Banner } from "../../components/banner";
 
-function TopicPageWrapper() {
+function TopicPageWrapper({ children }) {
   const outlet = useOutlet();
 
   return (
@@ -15,7 +14,7 @@ function TopicPageWrapper() {
       {/* Content */}
       <div className='xl:w-[1140px] lg:w-[960px] md:w-full md:p-5 p-3 mx-auto my-0 flex justify-start gap-5 font-Roboto flex-col xl:flex-row'>
         {/* Sidebar */}
-        <Sidebar />
+        {children}
         {/* End sidebar */}
         {/* Right content */}
         {outlet || (

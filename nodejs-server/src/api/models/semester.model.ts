@@ -1,12 +1,12 @@
-import db from "@configs/db.config";
 import { DataTypes, Model } from "sequelize";
+import { POSTFIX } from "@configs/constants";
+import db from "@configs/db.config";
 
 interface SemesterAttributes {
-  id: string;
-  code: string;
+  id?: string;
+  type: string;
   name: string;
-  description?: string;
-  active: string;
+  status: string;
   startDate?: Date;
   endDate?: Date;
   createdBy?: string;
@@ -18,54 +18,56 @@ interface SemesterInstance
   extends Model<SemesterAttributes>,
     SemesterAttributes {}
 
+const modelName: string = "semester";
 const Semester = db.define<SemesterInstance>(
-  "semester",
+  modelName,
   {
     id: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       primaryKey: true,
-      field: "id",
+      field: "id".concat(POSTFIX),
+      defaultValue: DataTypes.UUIDV4,
     },
-    code: {
+    type: {
       type: DataTypes.STRING,
-      field: "code",
+      field: "type".concat(POSTFIX),
     },
     name: {
       type: DataTypes.STRING,
-      field: "name",
+      field: "name".concat(POSTFIX),
     },
-    description: {
+    status: {
       type: DataTypes.STRING,
-      field: "description",
-    },
-    active: {
-      type: DataTypes.STRING,
-      field: "active",
+      field: "status".concat(POSTFIX),
     },
     startDate: {
       type: DataTypes.DATE,
-      field: "start_date",
+      field: "start_date".concat(POSTFIX),
     },
     endDate: {
       type: DataTypes.DATE,
-      field: "end_date",
+      field: "end_date".concat(POSTFIX),
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: "created_by",
+      field: "created_by".concat(POSTFIX),
     },
     createdDate: {
       type: DataTypes.DATE,
-      field: "created_date",
+      field: "created_date".concat(POSTFIX),
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
     updatedDate: {
       type: DataTypes.DATE,
-      field: "updated_date",
+      field: "updated_date".concat(POSTFIX),
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
   },
   {
     timestamps: false,
-    tableName: "Semester",
+    tableName: "semester_tbl",
   }
 );
 

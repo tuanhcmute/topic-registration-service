@@ -2,20 +2,19 @@ import { DataTypes, Model } from "sequelize";
 import db from "../configs/db.config";
 import { POSTFIX } from "@configs/constants";
 
-interface MajorAttributes {
+interface RoleAttributes {
   id?: string;
   code: string;
-  name: string;
-  description?: string;
+  description: string;
   createdBy?: string;
-  createdDate?: Date;
-  updatedDate?: Date;
+  createdDate?: string;
+  updatedDate?: string;
 }
 
-interface MajorInstance extends Model<MajorAttributes>, MajorAttributes {}
+interface RoleInstance extends Model<RoleAttributes>, RoleAttributes {}
 
-const modelName: string = "major";
-const Major = db.define<MajorInstance>(
+const modelName: string = "role";
+const Role = db.define<RoleInstance>(
   modelName,
   {
     id: {
@@ -28,12 +27,6 @@ const Major = db.define<MajorInstance>(
       type: DataTypes.STRING,
       field: "code".concat(POSTFIX),
       unique: true,
-      allowNull: false,
-    },
-    name: {
-      type: DataTypes.STRING,
-      field: "name".concat(POSTFIX),
-      unique: false,
       allowNull: false,
     },
     description: {
@@ -57,10 +50,7 @@ const Major = db.define<MajorInstance>(
       defaultValue: DataTypes.NOW,
     },
   },
-  {
-    timestamps: false,
-    tableName: "major_tbl",
-  }
+  { timestamps: false, tableName: "role_tbl" }
 );
 
-export { MajorInstance, MajorAttributes, Major };
+export { Role, RoleAttributes, RoleInstance };

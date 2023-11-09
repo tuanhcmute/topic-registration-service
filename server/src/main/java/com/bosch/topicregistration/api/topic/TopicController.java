@@ -100,4 +100,15 @@ public class TopicController {
 //        TODO: Handling
         return topicService.approveTopicInLectureEnrollmentPeriod(request);
     }
+
+    @GetMapping("/student")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
+    @ResponseStatus(HttpStatus.OK)
+    @LoggerAround
+    public Response<List<TopicDTO>> getAllApprovedTopicsInStudentEnrollmentPeriod(@RequestParam("type") String type,
+                                                                                  @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+                                                                                  @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                                                                  @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
+        return topicService.getAllApprovedTopicsInStudentEnrollmentPeriod(type, pageNumber, pageSize, sortBy);
+    }
 }

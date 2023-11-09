@@ -1,21 +1,21 @@
 import { DataTypes, Model } from "sequelize";
+
 import db from "../configs/db.config";
 import { POSTFIX } from "@configs/constants";
 
-interface MajorAttributes {
+interface ClazzAttributes {
   id?: string;
   code: string;
-  name: string;
   description?: string;
   createdBy?: string;
   createdDate?: Date;
   updatedDate?: Date;
 }
 
-interface MajorInstance extends Model<MajorAttributes>, MajorAttributes {}
+interface ClazzInstance extends Model<ClazzAttributes>, ClazzAttributes {}
 
-const modelName: string = "major";
-const Major = db.define<MajorInstance>(
+const modelName: string = "clazz";
+const Clazz = db.define<ClazzInstance>(
   modelName,
   {
     id: {
@@ -27,14 +27,8 @@ const Major = db.define<MajorInstance>(
     code: {
       type: DataTypes.STRING,
       field: "code".concat(POSTFIX),
+      allowNull: false,
       unique: true,
-      allowNull: false,
-    },
-    name: {
-      type: DataTypes.STRING,
-      field: "name".concat(POSTFIX),
-      unique: false,
-      allowNull: false,
     },
     description: {
       type: DataTypes.STRING,
@@ -47,20 +41,20 @@ const Major = db.define<MajorInstance>(
     createdDate: {
       type: DataTypes.DATE,
       field: "created_date".concat(POSTFIX),
-      allowNull: false,
       defaultValue: DataTypes.NOW,
+      allowNull: false,
     },
     updatedDate: {
       type: DataTypes.DATE,
       field: "updated_date".concat(POSTFIX),
-      allowNull: false,
       defaultValue: DataTypes.NOW,
+      allowNull: false,
     },
   },
   {
     timestamps: false,
-    tableName: "major_tbl",
+    tableName: "clazz_tbl",
   }
 );
 
-export { MajorInstance, MajorAttributes, Major };
+export { ClazzInstance, ClazzAttributes, Clazz };

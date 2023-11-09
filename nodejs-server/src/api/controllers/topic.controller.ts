@@ -1,34 +1,30 @@
-import { NextFunction, Request, Response, query } from "express";
+import { NextFunction, Request, Response } from "express";
 import { TopicService } from "@services";
-import { error } from "console";
-import { TeacherTopicOut, createReqTopic } from "@interfaces/topic.interface";
-import { plainToClass, plainToInstance } from "class-transformer";
-import { validate } from "class-validator";
-import { StatusCode } from "@configs/constants";
-import { STATUS_CODES } from "http";
+import { IResponseModel, ResponseModelBuilder } from "@interfaces";
 import { StatusCodes } from "http-status-codes";
-import { ResponseModelBuilder } from "@interfaces";
+import { plainToInstance } from "class-transformer";
+import { validate } from "class-validator";
+import { createReqTopic, Data } from "@interfaces/topic.interface";
 
 export default class TopicController {
   private topicService: TopicService = new TopicService();
 
-  public getAllTopics = async (
+  public getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      const userId = res.locals.userId;
+      const email = res.locals.email;
       const type = req.query.type as string;
-      const periodId = req.query["enrollment-period"] as string;
-      const topics: TeacherTopicOut[] = await this.topicService.getAllTopics(
-        type,
-        periodId,
-        userId
-      );
-      res.status(200).json(topics);
+      const data: IResponseModel<Data> =
+        await this.topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
+          type,
+          email
+        );
+      res.status(StatusCodes.OK).json(data);
     } catch (err) {
-      console.log(error);
+      console.log(err);
       next(err);
     }
   };
@@ -68,7 +64,7 @@ export default class TopicController {
           .json(
             new ResponseModelBuilder()
               .withMessage("Topic has been created successfully")
-              .withStatusCode(StatusCode.CREATED)
+              .withStatusCode(StatusCodes.CREATED)
               .build()
           );
       }

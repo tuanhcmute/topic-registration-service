@@ -1,5 +1,11 @@
-import { User, UserInstance, Major, Specialization, Class } from "@models";
+import { StatusCodes } from "http-status-codes";
+import { User, UserInstance, Major, Clazz, UserRole, Role } from "@models";
 import { UserNotFoundException, ErrorMessages } from "@exceptions";
+import {
+  IResponseModel,
+  IUserProfile,
+  ResponseModelBuilder,
+} from "@interfaces";
 
 class UserService {
   public finUserById = async (userId: string): Promise<UserInstance> => {
@@ -16,9 +22,13 @@ class UserService {
     }
   };
 
-  public getProfileUserData = async (userId: string): Promise<UserInstance> => {
+  public getUserProfile = async (
+    email: string
+  ): Promise<IResponseModel<IUserProfile>> => {
     try {
-      const foundUser = await User.findByPk(userId, {
+      // Get current user
+      const foundUser = await User.findOne({
+        where: { email },
         include: [
           {
             model: Major,
@@ -26,32 +36,51 @@ class UserService {
             attributes: ["code", "name"],
           },
           {
-            model: Specialization,
-            as: "specialization",
-            attributes: ["code", "name"],
+            model: Clazz,
+            as: "clazz",
+            attributes: ["code", "description"],
           },
           {
-            model: Class,
-            as: "clazz",
-            attributes: ["code", "name"],
+            model: UserRole,
+            as: "userRoles",
+            include: [{ model: Role, as: "role", attributes: ["code"] }],
+            attributes: {
+              exclude: [
+                "userId",
+                "roleId",
+                "createdBy",
+                "createdDate",
+                "updatedDate",
+              ],
+            },
           },
         ],
         attributes: [
-          "code",
-          "role",
+          "ntid",
           "email",
           "imageUrl",
-          "fullname",
+          "name",
           "phoneNumber",
           "biography",
           "schoolYear",
         ],
       });
+
+      // Validate user
       if (!foundUser)
         throw new UserNotFoundException(
-          ErrorMessages.USER_NOT_FOUND + "with userId: " + userId
+          ErrorMessages.USER_NOT_FOUND + "with email: " + email
         );
-      return foundUser;
+      const data: IUserProfile = {
+        profile: foundUser,
+      };
+
+      // Buid response
+      return new ResponseModelBuilder<IUserProfile>()
+        .withMessage("User's profile has been successfully retrieved")
+        .withStatusCode(StatusCodes.OK)
+        .withData(data)
+        .build();
     } catch (err) {
       throw err;
     }
