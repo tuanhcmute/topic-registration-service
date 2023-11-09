@@ -1,5 +1,5 @@
-import db from "@configs/db.config";
 import { DataTypes, Model } from "sequelize";
+import db from "@configs/db.config";
 import { User, Topic } from "@models";
 
 interface EnrollmentAttributes {

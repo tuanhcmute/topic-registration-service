@@ -1,8 +1,8 @@
 import { NextFunction, Response, Request } from "express";
+import { StatusCodes } from "http-status-codes";
 import { UserNotFoundException } from "@exceptions";
 import { ResponseModelBuilder } from "@interfaces";
 import { ValidateFailException } from "@exceptions";
-import { StatusCodes } from "http-status-codes";
 
 export const errorHandler = (
   err: Error,

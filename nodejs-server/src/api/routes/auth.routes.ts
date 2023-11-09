@@ -1,6 +1,6 @@
-import { IRoutes } from "@interfaces";
 import { Router } from "express";
 import passport from "passport";
+import { IRoutes } from "@interfaces";
 import { AuthController } from "@controllers";
 
 export default class AuthRoutes implements IRoutes {
