@@ -1,8 +1,8 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { v4 as uuidv4 } from "uuid";
 import { keys } from "./keys";
 import { User } from "../models/user.model";
-import { v4 as uuidv4 } from "uuid";
 
 passport.serializeUser((user: any, done) => {
   done(null, user.id);
@@ -36,13 +36,13 @@ export const passportSetup = passport.use(
         const [user, created] = await User.findOrCreate({
           where: { email: profile._json.email },
           defaults: {
-            id: uuidv4(),
             ntid: ntid,
             providerId: profile._json.sub,
             email: profile._json.email,
             imageUrl: profile._json.picture,
             name: profile._json.name,
             provider: profile.provider.toUpperCase(),
+            emailVerified: true,
           },
         });
         // Validate created

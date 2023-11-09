@@ -1,14 +1,15 @@
 import express, { Application, Request, Response, NextFunction } from "express";
-
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cookieSession from "cookie-session";
+import cors from "cors";
+import { ReasonPhrases, StatusCodes } from "http-status-codes";
+
 import apiRoutes from "./routes";
 import {
   errorHandler,
-  corsMiddleware,
-  authorizeUser,
+  tokenAuthenticationFilter,
   logMiddleware,
 } from "@middlewares";
 import { keys, db, passportSetup } from "@configs";
@@ -21,14 +22,14 @@ const app: Application = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("tiny"));
-app.use(corsMiddleware);
+app.use(cors());
 app.use(
   cookieSession({
     maxAge: 10 * 60 * 1000,
     keys: [keys.session.cookieKey],
   })
 );
-app.use(authorizeUser);
+app.use(tokenAuthenticationFilter);
 app.use(logMiddleware);
 
 //initialize passport
@@ -42,7 +43,7 @@ apiRoutes.forEach((route) => {
 
 // Hanlde 404 error
 app.use((req: Request, res: Response, next: NextFunction) => {
-  res.status(404).json({ message: "Page not found" });
+  res.status(StatusCodes.NOT_FOUND).json({ message: ReasonPhrases.NOT_FOUND });
 });
 
 // add error handler

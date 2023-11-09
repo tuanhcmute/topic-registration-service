@@ -3,9 +3,10 @@ import db from "../configs/db.config";
 import { POSTFIX } from "@configs/constants";
 import { Clazz } from "./clazz.model";
 import { Major } from "./major.model";
+import { UserRoleInstance } from "./userRole.model";
 
 interface UserAttributes {
-  id: string;
+  id?: string;
   ntid?: string;
   email?: string;
   imageUrl?: string;
@@ -15,15 +16,18 @@ interface UserAttributes {
   password?: string;
   provider?: string;
   biography?: string;
-  schoolYear?: Date;
+  schoolYear?: string;
   createdBy?: string;
   createdDate?: Date;
   updatedDate?: Date;
   clazzId?: string;
   majorId?: string;
+  emailVerified: boolean;
 }
 
-interface UserInstance extends Model<UserAttributes>, UserAttributes {}
+interface UserInstance extends Model<UserAttributes>, UserAttributes {
+  userRoles: UserRoleInstance[];
+}
 
 const modelName: string = "user";
 const User = db.define<UserInstance>(
@@ -76,7 +80,7 @@ const User = db.define<UserInstance>(
       field: "biography".concat(POSTFIX),
     },
     schoolYear: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING,
       field: "school_year".concat(POSTFIX),
     },
     createdBy: {
@@ -102,6 +106,10 @@ const User = db.define<UserInstance>(
     majorId: {
       type: DataTypes.UUID,
       field: "major_id".concat(POSTFIX),
+    },
+    emailVerified: {
+      type: DataTypes.BOOLEAN,
+      field: "email_verified".concat(POSTFIX),
     },
   },
   {

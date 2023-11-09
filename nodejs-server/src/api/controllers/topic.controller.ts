@@ -1,11 +1,10 @@
-import { NextFunction, Request, Response, query } from "express";
+import { NextFunction, Request, Response } from "express";
 import { TopicService } from "@services";
-import { error } from "console";
+import { IResponseModel, ResponseModelBuilder } from "@interfaces";
 import { StatusCodes } from "http-status-codes";
-import { ResponseModelBuilder } from "@interfaces";
-import { TeacherTopicOut, createReqTopic } from "@interfaces/topic.interface";
-import { plainToClass, plainToInstance } from "class-transformer";
+import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
+import { createReqTopic, Data } from "@interfaces/topic.interface";
 
 export default class TopicController {
   private topicService: TopicService = new TopicService();
@@ -18,21 +17,14 @@ export default class TopicController {
     try {
       const email = res.locals.email;
       const type = req.query.type as string;
-      const topics: TeacherTopicOut[] =
+      const data: IResponseModel<Data> =
         await this.topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
           type,
           email
         );
-      res
-        .status(StatusCodes.OK)
-        .json(
-          new ResponseModelBuilder<TeacherTopicOut[]>()
-            .withStatusCode(StatusCodes.OK)
-            .withMessage("Topics have been successfully retrieved")
-            .withData(topics)
-        );
+      res.status(StatusCodes.OK).json(data);
     } catch (err) {
-      console.log(error);
+      console.log(err);
       next(err);
     }
   };

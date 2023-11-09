@@ -1,42 +1,28 @@
 import { Request, Response, NextFunction } from "express";
-import { UserService } from "@services";
-import { UserInstance } from "@models";
-import {
-  IResponseModel,
-  ResponseModelBuilder,
-  UpdatedBio,
-  IUserProfile,
-} from "@interfaces";
-import { StatusCode } from "@configs/constants";
-import { ValidateFailException } from "@exceptions";
+import _ from "lodash";
+import { StatusCodes } from "http-status-codes";
 import { validate } from "class-validator";
-import { classToPlain, plainToClass, plainToInstance } from "class-transformer";
+import { plainToInstance } from "class-transformer";
+
+import { UserService } from "@services";
+import { ResponseModelBuilder, UpdatedBio } from "@interfaces";
+import { ValidateFailException } from "@exceptions";
 
 export default class UserController {
   private userService = new UserService();
 
-  public getProfile = async (
+  public getUserProfile = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const userId = res.locals.userId;
-      const user: UserInstance = await this.userService.getProfileUserData(
-        userId
-      );
-
-      const profile: IUserProfile = {
-        profile: user,
-      };
-
-      const userProfile: IResponseModel<IUserProfile> = {
-        message: "Get user profile successfully.",
-        statusCode: StatusCode.OK,
-        data: profile,
-      };
-
-      res.status(200).json(userProfile);
+      const email = res.locals.email;
+      if (_.isNull(email))
+        throw new ValidateFailException("Email could not be found");
+      res
+        .status(StatusCodes.OK)
+        .json(await this.userService.getUserProfile(email));
     } catch (error) {
       next(error);
     }
@@ -77,7 +63,7 @@ export default class UserController {
           .json(
             new ResponseModelBuilder()
               .withMessage("Update user bio successfully.")
-              .withStatusCode(StatusCode.OK)
+              .withStatusCode(StatusCodes.OK)
               .build()
           );
       }

@@ -1,20 +1,22 @@
 import _ from "lodash";
+
 import { SemesterStatus, TopicType } from "@configs/constants";
 import ValidateException from "@exceptions/ValidateFailException";
-import { TeacherTopicOut, mapTopicToDTO } from "@interfaces/topic.interface";
-import { TopicEnrollment, Topic, TopicInstance, User, UserInstance, Semester } from "@models";
-import { createReqTopic } from "@interfaces/topic.interface";
+import { Topic, TopicInstance, User, Semester, TopicEnrollment } from "@models";
+import { createReqTopic, Data } from "@interfaces/topic.interface";
 import { db } from "@configs";
+import { IResponseModel, ResponseModelBuilder } from "@interfaces";
+import { StatusCodes } from "http-status-codes";
 
 export default class TopicService {
   // Class implementation goes here
   public getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture = async (
     type: string,
     email: string
-  ): Promise<TeacherTopicOut[]> => {
-    let topics: TopicInstance[] = [];
+  ): Promise<IResponseModel<Data>> => {
     try {
       // Validate type
+      if (_.isEmpty(type)) throw new ValidateException("type is not valid");
       const isTypeValid = Object.keys(TopicType).some(
         (item) => item === type.toUpperCase()
       );
@@ -39,26 +41,34 @@ export default class TopicService {
         throw new ValidateException("Current semester could not be found");
 
       // Get the list of topics from db
-      topics = await Topic.findAll({
+      const topics = await Topic.findAll({
         where: {
           type: type,
-          lectureId: lecture.id,
-          semesterId: currentSemester.id,
+          lectureId: lecture.dataValues.id,
+          semesterId: currentSemester.dataValues.id,
         },
         include: [
-          // {
-          //   model: User,
-          //   as: "students",
-          //   attributes: ["code", "name"],
-          //   through: {
-          //     attributes: [],
-          //   },
-          // },
+          {
+            model: User,
+            as: "lecture",
+            attributes: ["ntid", "name"],
+          },
+          {
+            model: TopicEnrollment,
+            as: "topicEnrollments",
+          },
         ],
+        attributes: {
+          exclude: ["createdBy", "createdDate", "updatedDate", "lectureId"],
+        },
+        order: ["createdDate"],
       });
-
-      const topicData = topics.map((topic) => mapTopicToDTO(topic, lecture));
-      return topicData;
+      const data: Data = { topics };
+      return new ResponseModelBuilder<Data>()
+        .withMessage("Topics have been successfully retrieved")
+        .withStatusCode(StatusCodes.OK)
+        .withData(data)
+        .build();
     } catch (err) {
       console.log(err);
       throw err;

@@ -1,10 +1,10 @@
+import { DataTypes, Model } from "sequelize";
 import { POSTFIX } from "@configs/constants";
 import db from "@configs/db.config";
-import { DataTypes, Model } from "sequelize";
 import { Semester } from "./semester.model";
 
 interface EnrollmentPeriodAttributes {
-  id: string;
+  id?: string;
   code: string;
   name: string;
   startDate?: Date;

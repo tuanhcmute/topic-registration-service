@@ -1,37 +1,10 @@
-import { TopicInstance, UserInstance } from "@models";
+import { TopicType } from "@configs/constants";
+import { TopicInstance } from "@models";
 import { IsNotEmpty, Length, IsIn, Min, Max, IsNumber } from "class-validator";
 
-export interface TeacherTopicOut {
-  id: string;
-  code: string;
-  name: string;
-  type: string;
-  goal: string;
-  requirement: string | null;
-  status: string;
-  maxSlot: number;
-  // students: UserInstance[] | undefined;
-  lecture: UserInstance;
+export interface Data {
+  topics: TopicInstance[];
 }
-
-export const mapTopicToDTO = (
-  topic: TopicInstance,
-  user: UserInstance
-): TeacherTopicOut => {
-  const topicOut: TeacherTopicOut = {
-    id: topic.id || "undefined",
-    code: topic.ntid,
-    name: topic.name,
-    type: topic.type || "",
-    goal: topic.goal || "",
-    requirement: topic.requirement || "",
-    status: topic.status || "",
-    maxSlot: topic.maxSlot || 2,
-    lecture: user,
-  };
-
-  return topicOut;
-};
 
 export class createReqTopic {
   @IsNotEmpty()
@@ -49,7 +22,7 @@ export class createReqTopic {
   @IsIn(["TLCN", "KLTN"], {
     message: "Type must be TLCN or KLTN",
   })
-  type: Type;
+  type: TopicType;
 
   @IsNumber()
   @Min(2, { message: "Value must be greater than 2" })

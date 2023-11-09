@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { User, UserInstance, UserRole } from "@models";
-import { createJwtToken } from "@utils/jwt.util";
 import passport from "passport";
+
+import { createJwtToken } from "@utils/jwt.util";
 
 export default class AuthController {
   public handleGoogleLogin = async (
@@ -21,6 +22,7 @@ export default class AuthController {
       const token = createJwtToken(foundUser?.email || "");
       const refreshToken = "12345";
       const redirectUrl = req.query.state;
+      console.log(redirectUrl);
       res.redirect(
         `${redirectUrl}?accessToken=${token}&refreshToken=${refreshToken}`
       );
@@ -32,7 +34,7 @@ export default class AuthController {
 
   public getGoogleLogin = (req: Request, res: Response, next: NextFunction) => {
     try {
-      let redirectUrl = req.query.redirectUrl;
+      let redirectUrl = req.query["redirect_url"];
       if (!redirectUrl) {
         redirectUrl = "http://localhost:3000";
       }

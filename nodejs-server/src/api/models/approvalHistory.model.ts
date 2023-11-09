@@ -1,10 +1,11 @@
+import { DataTypes, Model } from "sequelize";
+
 import { POSTFIX } from "@configs/constants";
 import db from "@configs/db.config";
-import { DataTypes, Model } from "sequelize";
 import { Topic } from "./topic.model";
 
 interface ApprovalHistoryAttributes {
-  id: string;
+  id?: string;
   reason?: string;
   status?: string;
   topicId: string;

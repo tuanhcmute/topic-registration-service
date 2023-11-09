@@ -1,9 +1,9 @@
-import db from "../configs/db.config";
 import { DataTypes, Model } from "sequelize";
+import db from "../configs/db.config";
 import { POSTFIX } from "@configs/constants";
 
 interface RoleAttributes {
-  id: string;
+  id?: string;
   code: string;
   description: string;
   createdBy?: string;

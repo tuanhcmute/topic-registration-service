@@ -1,9 +1,9 @@
+import { DataTypes, Model } from "sequelize";
 import { POSTFIX } from "@configs/constants";
 import db from "@configs/db.config";
-import { DataTypes, Model } from "sequelize";
 
 interface SemesterAttributes {
-  id: string;
+  id?: string;
   type: string;
   name: string;
   status: string;

@@ -1,11 +1,12 @@
-import db from "../configs/db.config";
 import { DataTypes, Model } from "sequelize";
+import db from "../configs/db.config";
 import { User, UserInstance } from "./user.model";
 import { POSTFIX } from "@configs/constants";
 import { Semester } from "./semester.model";
+import { Major } from "./major.model";
 
 interface TopicAttributes {
-  id: string;
+  id?: string;
   code: string;
   name: string;
   type?: string;
@@ -19,6 +20,7 @@ interface TopicAttributes {
   updatedDate?: string;
   semesterId?: string;
   lectureId?: string;
+  majorId: string;
 }
 
 interface TopicInstance extends Model<TopicAttributes>, TopicAttributes {
@@ -50,10 +52,16 @@ const Topic = db.define<TopicInstance>(
     goal: {
       type: DataTypes.BLOB("long"),
       field: "goal".concat(POSTFIX),
+      get() {
+        return this.getDataValue("goal")?.toString();
+      },
     },
     requirement: {
       type: DataTypes.BLOB("long"),
       field: "requirement".concat(POSTFIX),
+      get() {
+        return this.getDataValue("requirement")?.toString();
+      },
     },
     status: {
       type: DataTypes.STRING,
@@ -91,6 +99,10 @@ const Topic = db.define<TopicInstance>(
       type: DataTypes.UUID,
       field: "lecture_id".concat(POSTFIX),
     },
+    majorId: {
+      type: DataTypes.UUID,
+      field: "major_id".concat(POSTFIX),
+    },
   },
   {
     timestamps: false,
@@ -103,4 +115,7 @@ Topic.belongsTo(Semester, { as: "semester" });
 
 User.hasMany(Topic, { foreignKey: "lectureId", as: "topics" });
 Topic.belongsTo(User, { as: "lecture" });
+
+Major.hasMany(Topic, { foreignKey: "majorId", as: "topics" });
+Topic.belongsTo(Major, { as: "major" });
 export { Topic, TopicAttributes, TopicInstance };

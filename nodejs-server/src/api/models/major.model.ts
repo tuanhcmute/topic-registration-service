@@ -1,9 +1,9 @@
-import db from "../configs/db.config";
 import { DataTypes, Model } from "sequelize";
+import db from "../configs/db.config";
 import { POSTFIX } from "@configs/constants";
 
 interface MajorAttributes {
-  id: string;
+  id?: string;
   code: string;
   name: string;
   description?: string;

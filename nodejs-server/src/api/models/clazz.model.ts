@@ -1,10 +1,10 @@
-import db from "../configs/db.config";
 import { DataTypes, Model } from "sequelize";
-import { User } from "./user.model";
+
+import db from "../configs/db.config";
 import { POSTFIX } from "@configs/constants";
 
 interface ClazzAttributes {
-  id: string;
+  id?: string;
   code: string;
   description?: string;
   createdBy?: string;

@@ -1,10 +1,10 @@
-import db from "@configs/db.config";
 import { DataTypes, Model } from "sequelize";
+import db from "@configs/db.config";
 import { User, Topic } from "@models";
 import { POSTFIX } from "@configs/constants";
 
 interface TopicEnrollmentAttributes {
-  id: string;
+  id?: string;
   topicId: string;
   studentId: string;
   createdDate?: Date;

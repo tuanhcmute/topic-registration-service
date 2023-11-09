@@ -1,11 +1,11 @@
+import { DataTypes, Model } from "sequelize";
 import { POSTFIX } from "@configs/constants";
 import db from "@configs/db.config";
-import { DataTypes, Model } from "sequelize";
 import { Topic } from "./topic.model";
 import { User } from "./user.model";
 
 interface DivisionAttributes {
-  id: string;
+  id?: string;
   place?: string;
   startDate?: Date;
   specifiedTime?: Date;
