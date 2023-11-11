@@ -1,5 +1,5 @@
 {
-  "name": "store-app",
+  "name": "node-topic-registration-service",
   "version": "1.0.0",
   "description": "",
   "main": "./dist/app.js",
@@ -28,6 +28,7 @@
     "module-alias": "^2.2.3",
     "morgan": "^1.10.0",
     "mysql2": "^3.6.1",
+    "node-cron": "^3.0.3",
     "nodemailer": "^6.9.4",
     "passport": "^0.5.3",
     "passport-google-oauth20": "^2.0.0",

@@ -4,13 +4,11 @@ import { StatusCodes } from "http-status-codes";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
 
-import { UserService } from "@services";
+import { userService } from "@services";
 import { ResponseModelBuilder, UpdatedBio } from "@interfaces";
 import { ValidateFailException } from "@exceptions";
 
-export default class UserController {
-  private userService = new UserService();
-
+class UserController {
   public getUserProfile = async (
     req: Request,
     res: Response,
@@ -20,10 +18,23 @@ export default class UserController {
       const email = res.locals.email;
       if (_.isNull(email))
         throw new ValidateFailException("Email could not be found");
+      res.status(StatusCodes.OK).json(await userService.getUserProfile(email));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getStudentsNotEnrolledInTopic = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
       res
         .status(StatusCodes.OK)
-        .json(await this.userService.getUserProfile(email));
+        .json(await userService.getStudentsNotEnrolledInTopic());
     } catch (error) {
+      console.error(error);
       next(error);
     }
   };
@@ -53,7 +64,7 @@ export default class UserController {
       }
 
       console.log(bio.biography.length);
-      const result: boolean = await this.userService.updateUserBio(
+      const result: boolean = await userService.updateUserBio(
         userId,
         bio.biography
       );
@@ -72,3 +83,5 @@ export default class UserController {
     }
   };
 }
+
+export default new UserController();

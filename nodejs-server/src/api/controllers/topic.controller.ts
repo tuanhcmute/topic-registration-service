@@ -1,14 +1,15 @@
 import { NextFunction, Request, Response } from "express";
-import { TopicService } from "@services";
+import { topicService } from "@services";
 import { IResponseModel, ResponseModelBuilder } from "@interfaces";
 import { StatusCodes } from "http-status-codes";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
-import { createReqTopic, Data } from "@interfaces/topic.interface";
+import {
+  NewTopicRequest,
+  ListTopicResponse,
+} from "@interfaces/topic.interface";
 
-export default class TopicController {
-  private topicService: TopicService = new TopicService();
-
+class TopicController {
   public getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture = async (
     req: Request,
     res: Response,
@@ -17,8 +18,8 @@ export default class TopicController {
     try {
       const email = res.locals.email;
       const type = req.query.type as string;
-      const data: IResponseModel<Data> =
-        await this.topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
+      const data: IResponseModel<ListTopicResponse> =
+        await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
           type,
           email
         );
@@ -29,25 +30,26 @@ export default class TopicController {
     }
   };
 
-  public createTopic = async (
+  public createNewTopicInLectureEnrollmentPeriod = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      const rawTopic = req.body;
-      console.log(rawTopic);
-      const newTopic = plainToInstance(createReqTopic, rawTopic);
-      console.info(newTopic);
-
+      // Get raw topic from client
+      const requestData = req.body;
+      console.log({ requestData });
+      // Convert raw to instance
+      const newTopic = plainToInstance(NewTopicRequest, requestData);
+      console.info({ newTopic });
+      // Validate instance
       const errors = await validate(newTopic);
       if (errors.length > 0) {
         const firstError = errors[0];
-
         const errorMessage = firstError.constraints
           ? Object.values(firstError.constraints)[0]
           : "No error message available";
-
+        // Build response
         res
           .status(StatusCodes.BAD_REQUEST)
           .json(
@@ -56,18 +58,19 @@ export default class TopicController {
               .withStatusCode(StatusCodes.BAD_REQUEST)
               .build()
           );
-      } else {
-        const userId = res.locals.userId;
-        await this.topicService.createTopic(newTopic, userId);
-        res
-          .status(StatusCodes.CREATED)
-          .json(
-            new ResponseModelBuilder()
-              .withMessage("Topic has been created successfully")
-              .withStatusCode(StatusCodes.CREATED)
-              .build()
-          );
+        return;
       }
+
+      // Handle call service
+      const email = res.locals.email;
+      res
+        .status(StatusCodes.OK)
+        .json(
+          await topicService.createNewTopicInLectureEnrollmentPeriod(
+            newTopic,
+            email
+          )
+        );
     } catch (err) {
       console.log(err);
       next(err);
@@ -124,3 +127,5 @@ export default class TopicController {
   //     }
   //   }
 }
+
+export default new TopicController();

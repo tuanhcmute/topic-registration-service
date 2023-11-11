@@ -7,7 +7,7 @@ import { Major } from "./major.model";
 
 interface TopicAttributes {
   id?: string;
-  code: string;
+  code?: string;
   name: string;
   type?: string;
   goal?: string;
@@ -20,7 +20,7 @@ interface TopicAttributes {
   updatedDate?: string;
   semesterId?: string;
   lectureId?: string;
-  majorId: string;
+  majorId?: string;
 }
 
 interface TopicInstance extends Model<TopicAttributes>, TopicAttributes {
