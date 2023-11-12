@@ -19,13 +19,14 @@ export default class TopicRoutes implements IRoutes {
       preAuthorizeFilter([RoleCode.ROLE_LECTURE]),
       this.topicController.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture
     );
-    // this.router.get("/topics/:id", this.topicController.getTopicById);
     this.router.post(
       `${this.path}/`,
       preAuthorizeFilter([RoleCode.ROLE_LECTURE]),
       this.topicController.createTopic
     );
-    // this.router.put("/topics/:id", this.topicController.updateTopic);
-    // this.router.delete("/topics/:id", this.topicController.deleteTopic);
+    this.router.put(
+      `${this.path}/lecture`,
+      this.topicController.updateTeacherTopic
+    );
   }
 }

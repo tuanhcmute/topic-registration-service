@@ -6,7 +6,7 @@ export interface Data {
   topics: TopicInstance[];
 }
 
-export class createReqTopic {
+export class CreateReqTopic {
   @IsNotEmpty()
   public ntid: string;
   @IsNotEmpty()
@@ -24,6 +24,24 @@ export class createReqTopic {
   })
   type: TopicType;
 
+  @IsNumber()
+  @Min(2, { message: "Value must be greater than 2" })
+  @Max(3, { message: "Value must be less than 3" })
+  maxSlot: number;
+  students: string[];
+}
+
+export class UpdateTopic {
+  @IsNotEmpty()
+  id: string;
+  @Length(0, 255, {
+    message:
+      "Topic name must be between $constraint1 and $constraint2 characters",
+  })
+  @IsNotEmpty()
+  topicName: string;
+  goal: string;
+  requirement: string;
   @IsNumber()
   @Min(2, { message: "Value must be greater than 2" })
   @Max(3, { message: "Value must be less than 3" })
