@@ -2,8 +2,19 @@ import { TopicType } from "@configs/constants";
 import { TopicInstance } from "@models";
 import { IsNotEmpty, IsIn, Min, Max, IsNumber } from "class-validator";
 
-export interface ListTopicResponse {
+export interface IListTopicResponse {
   topics: TopicInstance[];
+}
+
+export class ApprovalTopicRequest {
+  @IsNotEmpty({ message: "Topic id is not valid" })
+  id: string;
+
+  @IsNotEmpty({ message: "Status is not valid" })
+  status: string;
+
+  @IsNotEmpty({ message: "Reason is not valid" })
+  reason: string;
 }
 
 export class NewTopicRequest {

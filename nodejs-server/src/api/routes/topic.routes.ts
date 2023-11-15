@@ -26,6 +26,19 @@ class TopicRoutes implements IRoutes {
       preAuthorizeFilter([RoleCode.ROLE_LECTURE]),
       topicController.createNewTopicInLectureEnrollmentPeriod
     );
+
+    // [PUT] /api/v1/topic/approval
+    this.router.put(
+      `${this.path}/lecture/approval`,
+      topicController.approveTopicInLectureEnrollmentPeriod
+    );
+
+    // [GET] /api/v1/topic/head
+    this.router.get(
+      `${this.path}/head`,
+      preAuthorizeFilter([RoleCode.ROLE_HEAD]),
+      topicController.getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor
+    );
     // this.router.put("/topics/:id", this.topicController.updateTopic);
     // this.router.delete("/topics/:id", this.topicController.deleteTopic);
   }

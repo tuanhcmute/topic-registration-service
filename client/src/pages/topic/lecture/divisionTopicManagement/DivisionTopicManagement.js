@@ -9,7 +9,7 @@ import {
   topicStatus,
   topicType,
 } from "../../../../utils/constants";
-import { Dropdown } from "../../../../components/dropdown";
+import { Dropdown } from "../../../../components/dropdown1";
 import { fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor } from "../../../../features/topic/topicSlice";
 import { enrollmentPeriodService } from "../../../../services";
 import { HttpStatusCode } from "axios";

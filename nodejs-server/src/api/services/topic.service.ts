@@ -1,15 +1,23 @@
+import { StatusCodes } from "http-status-codes";
 import _ from "lodash";
 
 import { SemesterStatus, TopicStatus, TopicType } from "@configs/constants";
 import ValidateException from "@exceptions/ValidateFailException";
-import { Topic, User, Semester, TopicEnrollment, Major } from "@models";
+import {
+  Topic,
+  User,
+  Semester,
+  TopicEnrollment,
+  Major,
+  ApprovalHistory,
+} from "@models";
 import {
   NewTopicRequest,
-  ListTopicResponse,
+  IListTopicResponse,
+  ApprovalTopicRequest,
 } from "@interfaces/topic.interface";
-import { db } from "@configs";
+import { db, logger } from "@configs";
 import { IResponseModel, ResponseModelBuilder } from "@interfaces";
-import { StatusCodes } from "http-status-codes";
 import { UserNotFoundException, ValidateFailException } from "@exceptions";
 import InternalServerErrorException from "@exceptions/InternalServerErrorException";
 
@@ -18,7 +26,7 @@ class TopicService {
   public getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture = async (
     type: string,
     email: string
-  ): Promise<IResponseModel<ListTopicResponse>> => {
+  ): Promise<IResponseModel<IListTopicResponse>> => {
     try {
       // Validate type
       if (_.isEmpty(type)) throw new ValidateException("type is not valid");
@@ -72,8 +80,8 @@ class TopicService {
         },
         order: ["createdDate"],
       });
-      const data: ListTopicResponse = { topics };
-      return new ResponseModelBuilder<ListTopicResponse>()
+      const data: IListTopicResponse = { topics };
+      return new ResponseModelBuilder<IListTopicResponse>()
         .withMessage("Topics have been successfully retrieved")
         .withStatusCode(StatusCodes.OK)
         .withData(data)
@@ -176,6 +184,106 @@ class TopicService {
       throw err;
     }
   };
+
+  public async approveTopicInLectureEnrollmentPeriod(
+    request: ApprovalTopicRequest
+  ): Promise<IResponseModel<void>> {
+    // Get topic status
+    const isStatusValid = Object.values(TopicStatus).some((item) =>
+      _.isEqual(item, request.status)
+    );
+    if (!isStatusValid)
+      throw new ValidateFailException("Topic status could not be found");
+    const topicStatus = request.status as TopicStatus;
+
+    // Get topic
+    const topic = await Topic.findByPk(request.id);
+    if (_.isNull(topic))
+      throw new ValidateFailException("Topic could not be found");
+
+    // Handle if topic is not approved
+    if (!_.isEqual(topic.status, TopicStatus.APPROVED)) {
+      topic.status = topicStatus;
+      await topic.save();
+      logger.info("Topic: ", topic.dataValues);
+
+      const approvalHistory = await ApprovalHistory.create({
+        reason: request.reason,
+        topicId: request.id,
+        status: request.status,
+      });
+      logger.info("Approval history: ", approvalHistory.dataValues);
+    }
+
+    return new ResponseModelBuilder<void>()
+      .withStatusCode(StatusCodes.OK)
+      .withMessage("Topic has been updated successfully")
+      .build();
+  }
+
+  public async getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor(
+    typeRequest: string,
+    statusRequest: string,
+    email: string
+  ): Promise<IResponseModel<IListTopicResponse>> {
+    // Validate
+    if (
+      _.isNull(typeRequest) ||
+      _.isUndefined(typeRequest) ||
+      _.isEmpty(typeRequest)
+    )
+      throw new ValidateFailException("Topic type is not valid");
+    if (
+      _.isNull(statusRequest) ||
+      _.isUndefined(statusRequest) ||
+      _.isEmpty(statusRequest)
+    )
+      throw new ValidateFailException("Topic status is not valid");
+    const isTypeValid = Object.values(TopicType).some((item) =>
+      _.isEqual(item, typeRequest)
+    );
+    if (!isTypeValid)
+      throw new ValidateFailException("Topic type could not be found");
+
+    const isStatusValid = Object.values(TopicStatus).some((item) =>
+      _.isEqual(item, statusRequest)
+    );
+    if (!isStatusValid)
+      throw new ValidateFailException("Topic status could not be found");
+
+    // Get activated semester
+    const semester = await Semester.findOne({
+      where: {
+        status: SemesterStatus.ACTIVATED,
+      },
+    });
+    if (_.isNull(semester))
+      throw new ValidateFailException("Current semester is not activated");
+
+    // Get head
+    const head = await User.findOne({
+      where: { email },
+    });
+    if (_.isNull(head))
+      throw new ValidateFailException("User could not be found");
+
+    // Query
+    const topics = await Topic.findAll({
+      where: {
+        semesterId: semester.id,
+        type: typeRequest,
+        status: statusRequest,
+        majorId: head.majorId,
+      },
+    });
+    // Build data
+    const data: IListTopicResponse = { topics };
+    return new ResponseModelBuilder<IListTopicResponse>()
+      .withStatusCode(StatusCodes.OK)
+      .withMessage("Topics have been successfully retrieved")
+      .withData(data)
+      .build();
+  }
 }
 
 export default new TopicService();

@@ -48,6 +48,13 @@ class UserRoutes implements IRoutes {
       ]),
       userController.getStudentsNotEnrolledInTopic
     );
+
+    // [GET] /api/v1/user/lecture
+    this.router.get(
+      `${this.path}/lecture`,
+      preAuthorizeFilter([RoleCode.ROLE_LECTURE]),
+      userController.getLecturesByMajor
+    );
   }
 }
 

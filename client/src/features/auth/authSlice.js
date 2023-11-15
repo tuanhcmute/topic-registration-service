@@ -9,7 +9,7 @@ const initialState = {
   loading: false,
 };
 
-const namespace = "auth";
+export const namespace = "auth";
 
 export const userLogin = createAsyncThunk(
   `${namespace}/userLogin`,

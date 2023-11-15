@@ -7,6 +7,7 @@ import { plainToInstance } from "class-transformer";
 import { userService } from "@services";
 import { ResponseModelBuilder, UpdatedBio } from "@interfaces";
 import { ValidateFailException } from "@exceptions";
+import { logger } from "@configs";
 
 class UserController {
   public getUserProfile = async (
@@ -38,6 +39,31 @@ class UserController {
       next(error);
     }
   };
+
+  public async getLecturesByMajor(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    // Get and validate Major code
+    const majorCodeRequest = req.query["majorCode"] as string;
+    if (
+      _.isNull(majorCodeRequest) ||
+      _.isUndefined(majorCodeRequest) ||
+      _.isEmpty(majorCodeRequest)
+    )
+      throw new ValidateFailException("Major code is not valid");
+
+    // Reponse
+    res
+      .status(StatusCodes.OK)
+      .json(await userService.getLecturesByMajor(majorCodeRequest));
+    try {
+    } catch (error) {
+      logger.error("Error: ", error);
+      next(error);
+    }
+  }
 
   public updateUserBio = async (
     req: Request,

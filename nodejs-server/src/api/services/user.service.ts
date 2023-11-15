@@ -14,6 +14,7 @@ import {
   ValidateFailException,
 } from "@exceptions";
 import {
+  IListLecture,
   IListStudent,
   IResponseModel,
   IUserProfile,
@@ -153,6 +154,68 @@ class UserService {
       throw error;
     }
   };
+
+  public async getLecturesByMajor(
+    majorCodeRequest: string
+  ): Promise<IResponseModel<IListLecture>> {
+    // Validate Major code
+    if (
+      _.isNull(majorCodeRequest) ||
+      _.isUndefined(majorCodeRequest) ||
+      _.isEmpty(majorCodeRequest)
+    )
+      throw new ValidateFailException("Major code is not valid");
+
+    // Validate major
+    const major = await Major.findOne({ where: { code: majorCodeRequest } });
+    if (_.isNull(major))
+      throw new ValidateFailException("Major could not be found");
+    // Get and validate role
+    const lectureRole = await Role.findOne({
+      where: {
+        code: RoleCode.ROLE_LECTURE,
+      },
+    });
+    if (_.isNull(lectureRole))
+      throw new ValidateFailException("Student role could not be found");
+
+    // Get lectures
+    const userRoles = await UserRole.findAll({
+      where: {
+        roleId: lectureRole.id,
+      },
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["ntid", "name"],
+        },
+      ],
+      attributes: ["userId"],
+      raw: true,
+      nest: true,
+    });
+
+    //  Filter lecture with major from client(NOT performance)
+    let filterLectures: UserRoleInstance[] = [];
+    for (const item of userRoles) {
+      const user = await User.findOne({
+        where: {
+          id: item.userId,
+          majorId: major.id,
+        },
+      });
+      if (!_.isNull(user)) filterLectures.push(item);
+    }
+
+    // Build response
+    const data: IListLecture = { lectures: filterLectures };
+    return new ResponseModelBuilder<IListLecture>()
+      .withStatusCode(StatusCodes.OK)
+      .withMessage("The list of lectures has been successfully retrieved")
+      .withData(data)
+      .build();
+  }
 }
 
 export default new UserService();

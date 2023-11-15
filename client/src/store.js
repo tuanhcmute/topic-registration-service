@@ -3,22 +3,24 @@ import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import thunk from "redux-thunk";
 
-import authSlice from "./features/auth/authSlice";
-import themeSlice from "./features/theme/themeSlice";
-import topicSlice from "./features/topic/topicSlice";
-import userSlice from "./features/user/userSlice";
-import divisionSlice from "./features/division/divisionSlice";
+import { authReducer } from "./features/auth";
+import { themeReducer } from "./features/theme";
+import { divisionReducer } from "./features/division";
+import { enrollmentPeriodReducer } from "./features/enrollmentPeriod";
+import { topicReducer } from "./features/topic";
+import { userReducer } from "./features/user";
 
 const persistConfig = {
   key: "root",
   storage,
 };
 const rootReducer = combineReducers({
-  auth: authSlice,
-  theme: themeSlice,
-  topic: topicSlice,
-  user: userSlice,
-  division: divisionSlice,
+  auth: authReducer,
+  theme: themeReducer,
+  topic: topicReducer,
+  user: userReducer,
+  division: divisionReducer,
+  enrollmentPeriod: enrollmentPeriodReducer,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 export const store = configureStore({

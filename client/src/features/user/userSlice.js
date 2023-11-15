@@ -8,6 +8,7 @@ const initialState = {
   statusCode: null,
   message: "",
   loading: false,
+  studentsNotEnrolledInTopic: [],
 };
 const namespace = "user";
 
@@ -37,6 +38,16 @@ export const fetchLecturesByMajor = createAsyncThunk(
     if (response.data?.statusCode === HttpStatusCode.BadRequest)
       return rejectWithValue(response?.data);
     return response.data;
+  }
+);
+
+export const fetchStudentsNotEnrolledInTopic = createAsyncThunk(
+  `${namespace}/fetchStudentsNotEnrolledInTopic`,
+  async (data, { rejectWithValue }) => {
+    const response = await userService.getStudentsNotEnrolledInTopic();
+    if (response.data?.statusCode !== HttpStatusCode.Ok)
+      return rejectWithValue(response?.data);
+    return response?.data;
   }
 );
 
@@ -120,6 +131,44 @@ export const userSlice = createSlice({
       return {
         ...state,
         lectures: [],
+        message: "",
+        statusCode: null,
+        loading: true,
+      };
+    });
+    // fetchStudentsNotEnrolledInTopic
+    builder.addCase(
+      fetchStudentsNotEnrolledInTopic.fulfilled,
+      (state, action) => {
+        const data = action.payload?.data?.students?.map((item) => ({
+          value: item?.ntid,
+          label: item?.name,
+        }));
+        return {
+          ...state,
+          studentsNotEnrolledInTopic: data,
+          message: action.payload?.data?.message,
+          statusCode: action.payload?.data?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    builder.addCase(
+      fetchStudentsNotEnrolledInTopic.rejected,
+      (state, action) => {
+        return {
+          ...state,
+          studentsNotEnrolledInTopic: [],
+          message: action.payload?.data?.message,
+          statusCode: action.payload?.data?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    builder.addCase(fetchStudentsNotEnrolledInTopic.pending, (state) => {
+      return {
+        ...state,
+        studentsNotEnrolledInTopic: [],
         message: "",
         statusCode: null,
         loading: true,

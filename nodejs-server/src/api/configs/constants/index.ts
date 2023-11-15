@@ -1,3 +1,4 @@
+export { default as EnrollmentPeriodCode } from "./enrollmentPeriodCode.enum";
 export { default as RoleCode } from "./role.enum";
 export { default as HttpMethod } from "./httpMethod.enum";
 export { default as TopicType } from "./type.enum";

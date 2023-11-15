@@ -9,6 +9,10 @@ export interface IListStudent {
   students?: UserRoleInstance[];
 }
 
+export interface IListLecture {
+  lectures?: UserRoleInstance[];
+}
+
 export class UpdatedBio {
   @Length(0, 100, {
     message:

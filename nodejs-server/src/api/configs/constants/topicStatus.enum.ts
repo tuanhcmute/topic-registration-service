@@ -3,6 +3,7 @@ enum TopicStatus {
   REJECTED = "REJECTED",
   UPDATED = "UPDATED",
   PENDING = "PENDING",
+  ASSIGNED = "ASSIGNED",
 }
 
 export default TopicStatus;
