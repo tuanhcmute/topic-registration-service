@@ -4,7 +4,7 @@ import passport from "passport";
 
 import { createJwtToken } from "@utils/jwt.util";
 
-export default class AuthController {
+class AuthController {
   public handleGoogleLogin = async (
     req: Request,
     res: Response,
@@ -49,3 +49,5 @@ export default class AuthController {
     }
   };
 }
+
+export default new AuthController();

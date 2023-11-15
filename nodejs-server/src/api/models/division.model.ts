@@ -8,9 +8,9 @@ interface DivisionAttributes {
   id?: string;
   place?: string;
   startDate?: Date;
-  specifiedTime?: Date;
-  topicId: string;
-  lectureId: string;
+  specifiedTime?: string;
+  topicId?: string;
+  lectureId?: string;
   createdBy?: string;
   createdDate?: Date;
   updatedDate?: Date;

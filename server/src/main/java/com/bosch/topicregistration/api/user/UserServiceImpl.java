@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
 //        Validate major code
         if(StringUtils.isBlank(majorCode)) throw new BadRequestException("Major code is not valid");
         Optional<Major> majorOptional = majorRepository.findByCode(majorCode);
-        if(!majorOptional.isPresent()) throw new BadRequestException("major could not be found");
+        if(!majorOptional.isPresent()) throw new BadRequestException("Major could not be found");
         Major major = majorOptional.get();
 
         List<User> users = userRepository.findByMajor(major)
@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
         Map<String, List<LectureDTO>> data = new HashMap<>();
         data.put("lectures", lectures);
         return Response.<List<LectureDTO>>builder()
-                .message("the list of lectures has been successfully retrieved")
+                .message("The list of lectures has been successfully retrieved")
                 .statusCode(HttpStatus.OK.value())
                 .data(data)
                 .build();
