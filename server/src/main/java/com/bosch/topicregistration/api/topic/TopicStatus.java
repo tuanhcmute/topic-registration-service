@@ -5,5 +5,5 @@ public enum TopicStatus {
     REJECTED,
     UPDATED,
     PENDING,
-
+    CREATED
 }
