@@ -1,7 +1,7 @@
 const topicStatus = {
-  created: {
-    value: "CREATED",
-    label: "Đã được tạo",
+  all: {
+    value: "ALL",
+    label: "Tất cả",
   },
   pending: {
     value: "PENDING",
@@ -15,16 +15,14 @@ const topicStatus = {
     value: "REJECTED",
     label: "Chưa được duyệt",
   },
-  all: {
-    value: "ALL",
-    label: "Tất cả",
-  },
   updated: {
     value: "UPDATED",
     label: "Đã cập nhật",
   },
-  assigned: "ASSIGNED",
-  label: "Đã phân công",
+  assigned: {
+    value: "ASSIGNED",
+    label: "Đã phân công",
+  },
 };
 
 export default topicStatus;

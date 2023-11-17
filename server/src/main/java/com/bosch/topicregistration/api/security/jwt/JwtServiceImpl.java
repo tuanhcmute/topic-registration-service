@@ -18,7 +18,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String createToken(String subject) {
         // Calculate the expiration time in milliseconds for 5 minutes
-        long expirationTimeMillis = System.currentTimeMillis() + (5 * 60 * 1000); // 5 minutes in milliseconds
+        long expirationTimeMillis = System.currentTimeMillis() + (24 * 60 * 60 * 1000); // 60 minutes in milliseconds
         // Create a Date object representing the calculated expiration time
         Date expiryDate = new Date(expirationTimeMillis);
         return Jwts.builder()
@@ -32,7 +32,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String createRefreshToken(String subject) {
         // Calculate the expiration time in milliseconds for 5 minutes
-        long expirationTimeMillis = System.currentTimeMillis() + (60 * 60 * 1000); // 5 minutes in milliseconds
+        long expirationTimeMillis = System.currentTimeMillis() + (25 * 60 * 1000); // 120 minutes in milliseconds
         // Create a Date object representing the calculated expiration time
         Date expiryDate = new Date(expirationTimeMillis);
         return Jwts.builder()

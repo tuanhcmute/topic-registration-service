@@ -1,12 +1,22 @@
 import axios, { HttpStatusCode } from "axios";
+import axiosRetry from "axios-retry";
 import queryString from "query-string";
 import { toast } from "react-toastify";
 import { refreshToken } from "../features/auth";
-import { API_BASE_URL, headers as headersConstants } from "../utils/constants";
+import {
+  ACCESS_TOKEN,
+  API_BASE_URL,
+  headers as headersConstants,
+  REFRESH_TOKEN,
+} from "../utils/constants";
 
 let store;
+let isRefreshToken = false;
 export const injectStore = (_store) => {
   store = _store;
+};
+export const setRefreshToken = (_isRefreshToken) => {
+  isRefreshToken = _isRefreshToken;
 };
 
 // Config axiosClient
@@ -19,9 +29,16 @@ const axiosClient = axios.create({
   paramsSerializer: (param) => queryString.stringify(param),
 });
 
+// axiosRetry(axiosClient, {
+//   retries: 1,
+//   retryCondition: (error) => {
+//     console.log({ error });
+//     return error.response.status === HttpStatusCode.Unauthorized;
+//   },
+// });
+
 // Config Authorization header
 axiosClient.interceptors.request.use(async (config) => {
-  console.log({ store });
   const accessToken = store.getState()?.auth?.accessToken;
   config.headers.Authorization = `Bearer ${accessToken}`;
   return config;
@@ -39,12 +56,21 @@ axiosClient.interceptors.response.use(
       return Promise.reject(error);
     }
     const { status, data, statusText } = error.response;
-    const originalRequest = error.config;
+    const originalConfig = error.config;
+    console.log({ originalConfig });
     // Handle token expired
     if (status === HttpStatusCode.Unauthorized) {
-      originalRequest._retry = true;
-      store?.dispatch(refreshToken());
-      return axiosClient(originalRequest);
+      if (!isRefreshToken) {
+        setRefreshToken(true);
+        store?.dispatch(
+          refreshToken({
+            [ACCESS_TOKEN]: store.getState()?.auth?.accessToken,
+            [REFRESH_TOKEN]: store.getState()?.auth?.refreshToken,
+            setRefreshToken,
+          })
+        );
+        return axiosClient(originalConfig);
+      }
     }
     // Handle not found
     if (status === HttpStatusCode.NotFound) {

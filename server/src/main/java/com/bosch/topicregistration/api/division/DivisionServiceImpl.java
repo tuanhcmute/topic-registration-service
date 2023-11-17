@@ -8,6 +8,7 @@ import com.bosch.topicregistration.api.semester.SemesterRepository;
 import com.bosch.topicregistration.api.semester.SemesterStatus;
 import com.bosch.topicregistration.api.topic.Topic;
 import com.bosch.topicregistration.api.topic.TopicRepository;
+import com.bosch.topicregistration.api.topic.TopicStatus;
 import com.bosch.topicregistration.api.topic.TopicType;
 import com.bosch.topicregistration.api.user.RoleCode;
 import com.bosch.topicregistration.api.user.User;
@@ -97,6 +98,10 @@ public class DivisionServiceImpl implements DivisionService {
         if(!topicOptional.isPresent()) throw new BadRequestException("Topic could not be found");
         Topic currentTopic = topicOptional.get();
 
+        if(currentTopic.getStatus().equals(TopicStatus.ASSIGNED))
+            throw new BadRequestException("Topic has been assigned");
+        if(!currentTopic.getStatus().equals(TopicStatus.APPROVED))
+            throw new BadRequestException("Topic has been approved");
 //        Build Division
         Division division = Division.builder()
                 .lecture(currentUser)
@@ -108,6 +113,10 @@ public class DivisionServiceImpl implements DivisionService {
                 .build();
         divisionRepository.save(division);
         log.info("Division: {}", division.getId());
+
+//        Update topic status
+        currentTopic.setStatus(TopicStatus.ASSIGNED);
+        topicRepository.save(currentTopic);
 
         return Response.<Void>builder()
                 .statusCode(HttpStatus.CREATED.value())

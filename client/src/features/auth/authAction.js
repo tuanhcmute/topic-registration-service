@@ -33,12 +33,19 @@ export const userLogout = createAsyncThunk(
 
 export const refreshToken = createAsyncThunk(
   `${namespace}/refreshToken`,
-  async (refreshToken, { dispatch, rejectWithValue }) => {
-    const response = await authService.refreshToken({ refreshToken });
+  async (
+    { accessToken, refreshToken, setRefreshToken },
+    { dispatch, rejectWithValue }
+  ) => {
+    const response = await authService.refreshToken({
+      refreshToken,
+      accessToken,
+    });
+    setRefreshToken(false);
     if (_.isEqual(response.data?.statusCode, HttpStatusCode.Ok))
       return response.data;
-    if (_.isEqual(response.data?.statusCode, HttpStatusCode.Unauthorized))
-      dispatch(userLogout());
+    // if (_.isEqual(response.data?.statusCode, HttpStatusCode.Unauthorized))
+    //   dispatch(userLogout());
     return rejectWithValue(response.data);
   }
 );
