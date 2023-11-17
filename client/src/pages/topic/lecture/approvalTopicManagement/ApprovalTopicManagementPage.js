@@ -1,20 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
-import _ from "lodash";
 
-import {
-  enrollmentPeriodCodes,
-  topicStatus,
-  topicType,
-} from "../../../../utils/constants";
+import { topicStatus, topicType } from "../../../../utils/constants";
 import ApprovalTopicModal from "./components/ApprovalTopicModal";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchStudentsNotEnrolledInTopic } from "../../../../features/user";
 import {
   approveTopicInLectureEnrollmentPeriod,
-  fetchAllTopicsInLectureEnrollmentPeriod,
+  fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod,
 } from "../../../../features/topic";
-import { fetchEnrollmentPeriodByTopicTypeAndPeriodCode } from "../../../../features/enrollmentPeriod";
 
 function ApprovalTopicManagementPage() {
   const [openEditTopicModal, setOpenEditTopicModal] = useState(undefined);
@@ -26,7 +19,7 @@ function ApprovalTopicManagementPage() {
   const enrollmentPeriod = useSelector(
     (state) => state?.enrollmentPeriod?.enrollmentPeriod
   );
-  const topics = useSelector((state) => state.topic?.topics);
+  const topics = useSelector((state) => state.topic?.notApprovedTopics);
 
   function handleUpdateTopicInLectureEnrollmentPeriod(data) {
     dispatch(
@@ -38,21 +31,11 @@ function ApprovalTopicManagementPage() {
   }
 
   useEffect(() => {
-    dispatch(fetchAllTopicsInLectureEnrollmentPeriod(topicType.TLCN));
-    dispatch(fetchStudentsNotEnrolledInTopic());
-    // Fetch enrollment period
-    if (
-      _.isEmpty(enrollmentPeriod) ||
-      _.isNull(enrollmentPeriod) ||
-      _.isUndefined(enrollmentPeriod)
-    ) {
-      dispatch(
-        fetchEnrollmentPeriodByTopicTypeAndPeriodCode({
-          topicType: topicType.TLCN,
-          periodCode: enrollmentPeriodCodes.LECTURE_ENROLLMENT_PERIOD,
-        })
-      );
-    }
+    dispatch(
+      fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod({
+        type: topicType.TLCN,
+      })
+    );
   }, []);
 
   return (

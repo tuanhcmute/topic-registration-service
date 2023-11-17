@@ -5,6 +5,7 @@ import {
   fetchStudentsNotEnrolledInTopic,
   fetchUserInfo,
   removeUserInfo,
+  updateBiographyInUserProfile,
 } from "./userAction";
 
 const initialState = {
@@ -137,6 +138,31 @@ export const userSlice = createSlice({
         message: "",
         statusCode: null,
         loading: true,
+      };
+    });
+    // updateBiographyInUserProfile
+    builder.addCase(updateBiographyInUserProfile.fulfilled, (state, action) => {
+      return {
+        ...state,
+        message: action.payload?.data?.message,
+        statusCode: action.payload?.data?.statusCode,
+        loading: false,
+      };
+    });
+    builder.addCase(updateBiographyInUserProfile.pending, (state) => {
+      return {
+        ...state,
+        loading: true,
+        statusCode: null,
+        message: "",
+      };
+    });
+    builder.addCase(updateBiographyInUserProfile.rejected, (state, action) => {
+      return {
+        ...state,
+        message: action.payload?.data?.message,
+        statusCode: action.payload?.data?.statusCode,
+        loading: false,
       };
     });
   },

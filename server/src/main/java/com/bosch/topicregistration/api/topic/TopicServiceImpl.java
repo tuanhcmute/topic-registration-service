@@ -165,6 +165,14 @@ public class TopicServiceImpl implements TopicService {
         topic.setStatus(TopicStatus.UPDATED);
         topicRepository.save(topic);
 
+//        Store approval history
+        ApprovalHistory approvalHistory = ApprovalHistory.builder()
+                .status(TopicStatus.UPDATED)
+                .reason("Updated")
+                .topic(topic)
+                .build();
+        approvalHistoryRepository.save(approvalHistory);
+
 //        Return data
         return Response.<Void>builder()
                 .statusCode(HttpStatus.OK.value())
@@ -208,18 +216,15 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     @LoggerAround
-    public Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor(String type, String status, Integer pageNumber, Integer pageSize, String sortBy) {
+    public Response<List<TopicDTO>> getAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod(String type, Integer pageNumber, Integer pageSize, String sortBy) {
 //                Validate type
         boolean hasType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
         if (!hasType) throw new BadRequestException("Topic type is not valid");
         TopicType topicType = TopicType.valueOf(type);
 
-//        Validate status
-        boolean hasStatus = Arrays.stream(TopicStatus.values()).anyMatch(item -> item.name().equals(status));
-        if (!hasStatus) throw new BadRequestException("Topic status is not valid");
-        TopicStatus currentStatus = TopicStatus.valueOf(status);
-
-        //        Get current semester
+//        Exclude status
+        List<TopicStatus> statuses = Arrays.asList(TopicStatus.APPROVED, TopicStatus.ASSIGNED);
+//        Get current semester
         Semester currentSemester = semesterService.getActivatedSemester();
 
 //        Get current user
@@ -228,7 +233,27 @@ public class TopicServiceImpl implements TopicService {
 //        Define paging
         Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
 
-        Page<Topic> topicPage = topicRepository.findBySemesterAndTypeAndStatusAndMajor(currentSemester, topicType, currentStatus, currentHead.getMajor(), paging);
+        Page<Topic> topicPage = topicRepository.findBySemesterAndTypeAndMajorAndStatusNotIn(currentSemester, topicType,  currentHead.getMajor(), statuses, paging);
+        return buildResponse(topicPage);
+    }
+
+    @Override
+    public Response<List<TopicDTO>> getAllTopicsApprovedDuringTheLectureEnrollmentPeriod(String type, Integer pageNumber, Integer pageSize, String sortBy) {
+//      Validate type
+        boolean hasType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
+        if (!hasType) throw new BadRequestException("Topic type is not valid");
+        TopicType topicType = TopicType.valueOf(type);
+
+//        Get current semester
+        Semester currentSemester = semesterService.getActivatedSemester();
+
+//        Get current user
+        User currentHead = userCommon.getCurrentUserByCurrentAuditor();
+
+//        Define paging
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
+
+        Page<Topic> topicPage = topicRepository.findBySemesterAndTypeAndMajorAndStatus(currentSemester, topicType, currentHead.getMajor(), TopicStatus.APPROVED, paging);
         return buildResponse(topicPage);
     }
 

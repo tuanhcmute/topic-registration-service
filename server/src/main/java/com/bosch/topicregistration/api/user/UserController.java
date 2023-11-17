@@ -38,9 +38,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_HEAD')")
     @LoggerAround
-    public Response<UserDTO> updateBiographyInUserProfile(@RequestParam MultiValueMap<String, String> paramMap) {
+    public Response<Void> updateBiographyInUserProfile(@RequestParam MultiValueMap<String, String> paramMap) {
         try {
-            String biography = paramMap.get("profile").get(0);
+            String biography = paramMap.get("biography").get(0);
+            log.info("biography: {}", biography);
             return userService.updateBiographyInUserProfile(biography);
         } catch (Exception e) {
             log.info("Update biography exception: {}", e.getMessage());
@@ -57,6 +58,7 @@ public class UserController {
         return userService.getStudentsNotEnrolledInTopic();
     }
 
+//    [GET] /api/v1/user/lecture
     @GetMapping("/lecture")
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
@@ -65,5 +67,4 @@ public class UserController {
         if(StringUtils.isBlank(majorCode)) throw new BadRequestException("Major code is not valid");
         return userService.getLecturesByMajor(majorCode);
     }
-
 }

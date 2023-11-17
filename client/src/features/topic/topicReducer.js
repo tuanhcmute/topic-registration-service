@@ -1,18 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { HttpStatusCode } from "axios";
 import { toast } from "react-toastify";
-import { namespace } from "../division";
 import {
+  namespace,
   approveTopicInLectureEnrollmentPeriod,
   createNewTopicInLectureEnrollmentPeriod,
+  fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod,
   fetchAllTopicsInLectureEnrollmentPeriod,
-  fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor,
+  fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod,
   resetTopicState,
   updateTopicInLectureEnrollmentPeriod,
 } from "./topicAction";
 
 const initialState = {
   approvedTopics: [],
+  notApprovedTopics: [],
   topics: [],
   statusCode: null,
   message: "",
@@ -160,9 +162,46 @@ export const topicSlide = createSlice({
         };
       }
     );
-    // fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor
+    // fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod
     builder.addCase(
-      fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor.pending,
+      fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod.pending,
+      (state) => {
+        return {
+          ...state,
+          notApprovedTopics: [],
+          message: "",
+          statusCode: null,
+          loading: false,
+        };
+      }
+    );
+    builder.addCase(
+      fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod.fulfilled,
+      (state, action) => {
+        return {
+          ...state,
+          notApprovedTopics: action.payload?.data?.topics,
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    builder.addCase(
+      fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod.rejected,
+      (state, action) => {
+        return {
+          ...state,
+          notApprovedTopics: [],
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    // fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod
+    builder.addCase(
+      fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod.pending,
       (state) => {
         return {
           ...state,
@@ -174,7 +213,7 @@ export const topicSlide = createSlice({
       }
     );
     builder.addCase(
-      fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor.fulfilled,
+      fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod.fulfilled,
       (state, action) => {
         return {
           ...state,
@@ -186,7 +225,7 @@ export const topicSlide = createSlice({
       }
     );
     builder.addCase(
-      fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor.rejected,
+      fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod.rejected,
       (state, action) => {
         return {
           ...state,

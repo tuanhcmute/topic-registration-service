@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { HttpStatusCode } from "axios";
 import { toast } from "react-toastify";
 import { topicService } from "../../services";
+import { topicType } from "../../utils/constants";
 
 export const namespace = "topic";
 
@@ -9,7 +10,7 @@ export const fetchAllTopicsInLectureEnrollmentPeriod = createAsyncThunk(
   `${namespace}/fetchAllTopicsInLectureEnrollmentPeriod`,
   async (type) => {
     const response =
-      await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
+      await topicService.fetchAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
         type
       );
     if (response?.data?.statusCode === HttpStatusCode.Ok) {
@@ -47,14 +48,13 @@ export const updateTopicInLectureEnrollmentPeriod = createAsyncThunk(
   }
 );
 
-export const fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor =
+export const fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod =
   createAsyncThunk(
-    `${namespace}/fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor`,
-    async ({ type, status }, { rejectWithValue }) => {
+    `${namespace}/fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod`,
+    async ({ type }, { rejectWithValue }) => {
       const response =
-        await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor(
-          type,
-          status
+        await topicService.fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod(
+          type
         );
       if (response?.data?.statusCode === HttpStatusCode.BadRequest)
         return rejectWithValue(response.data);
@@ -64,18 +64,37 @@ export const fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor =
 
 export const approveTopicInLectureEnrollmentPeriod = createAsyncThunk(
   `${namespace}/approveTopicInLectureEnrollmentPeriod`,
-  async ({ values, setOpenEditTopicModal }, { rejectWithValue }) => {
+  async ({ values, setOpenEditTopicModal }, { rejectWithValue, dispatch }) => {
     const response = await topicService.approveTopicInLectureEnrollmentPeriod(
       values
     );
-    console.log(response);
     if (response?.data?.statusCode === HttpStatusCode.BadRequest)
       return rejectWithValue(response.data);
+    dispatch(
+      fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod({
+        type: topicType.TLCN,
+      })
+    );
+    dispatch(fetchAllTopicsInLectureEnrollmentPeriod(topicType.TLCN));
     toast.success("Xét duyệt đề tài thành công");
     if (setOpenEditTopicModal) setOpenEditTopicModal(undefined);
     return response?.data;
   }
 );
+
+export const fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod =
+  createAsyncThunk(
+    `${namespace}/fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod`,
+    async ({ type }, { rejectWithValue }) => {
+      const response =
+        await topicService.fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod(
+          type
+        );
+      if (response?.data?.statusCode === HttpStatusCode.BadRequest)
+        return rejectWithValue(response.data);
+      return response?.data;
+    }
+  );
 
 export const resetTopicState = createAsyncThunk(
   `${namespace}/resetTopicState`,

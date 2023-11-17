@@ -15,6 +15,9 @@ const validationSchema = Yup.object().shape({
 });
 
 function ApprovalTopicModal(props) {
+  const enrollmentPeriod = useSelector(
+    (state) => state.enrollmentPeriod?.enrollmentPeriod
+  );
   const { openModal, setOpenModal, data, options, handleUpdateTopic } = props;
   const currentUser = useSelector((state) => state.user?.currentUser);
   const formik = useFormik({
@@ -48,7 +51,7 @@ function ApprovalTopicModal(props) {
             placeholder='enrollmentPeriod'
             required
             type='text'
-            value='Đợt đề xuất tiểu luận chuyên ngành học kỳ I/2023 (ĐK và duyệt: 01/10 - 20/10/2023)'
+            value={enrollmentPeriod?.name}
             disabled
           />
           {/* End EnrollmentPeriod */}

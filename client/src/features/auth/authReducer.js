@@ -46,6 +46,7 @@ export const authSlice = createSlice({
 
     // refreshToken
     builder.addCase(refreshToken.fulfilled, (state, action) => {
+      console.log(action);
       return {
         ...state,
         [ACCESS_TOKEN]: action.payload?.data?.token?.accessToken,
@@ -57,11 +58,17 @@ export const authSlice = createSlice({
     builder.addCase(refreshToken.pending, (state, action) => {
       return {
         ...state,
+        loading: true,
       };
     });
     builder.addCase(refreshToken.rejected, (state, action) => {
       return {
         ...state,
+        loading: false,
+        message: action.payload?.data?.message,
+        authenticated: false,
+        [ACCESS_TOKEN]: null,
+        [REFRESH_TOKEN]: null,
       };
     });
     // userLogout

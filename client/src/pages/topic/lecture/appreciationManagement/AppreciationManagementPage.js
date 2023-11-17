@@ -1,22 +1,15 @@
 import React, { useEffect } from "react";
 import { LiaEditSolid } from "react-icons/lia";
 import { Button } from "flowbite-react";
-import Select from "react-select";
 
 import { topicType } from "../../../../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDivisionByTopicType } from "../../../../features/division";
 
-const options = [
-  {
-    value: "e71e687d-d5a9-4178-8225-c4b29a9ffb0d",
-    label:
-      "Đợt phản biện tiểu luận chuyên ngành học kỳ I/2023 (ĐK và duyệt: 23/12 - 30/12/2023)",
-  },
-];
-
 function AppreciationManagementPage() {
-  // Get current user from redux
+  const enrollmentPeriod = useSelector(
+    (state) => state.enrollmentPeriod?.enrollmentPeriod
+  );
   const divisions = useSelector((state) => state.division?.divisions);
   const dispatch = useDispatch();
 
@@ -38,13 +31,8 @@ function AppreciationManagementPage() {
         </div>
         {/* End register topic */}
         {/* Select */}
-        <div className='p-3'>
-          <Select
-            className='w-full'
-            options={options}
-            isSearchable={false}
-            defaultValue={options[0]}
-          />
+        <div className='m-3 border border-gray-400 py-2 px-3 rounded text-sm truncate dark:text-gray-300'>
+          {enrollmentPeriod?.name}
         </div>
         {/* End select */}
         {/* Table */}

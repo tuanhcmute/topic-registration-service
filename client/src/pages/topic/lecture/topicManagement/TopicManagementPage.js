@@ -241,8 +241,8 @@ function TopicManagementPage() {
                                       setOpenEditTopicModal("default");
                                     }}
                                   />
-                                  {item?.status ===
-                                    topicStatus.rejected.value && (
+                                  {item?.status !==
+                                    topicStatus.pending.value && (
                                     <BiMessageRoundedError
                                       className='w-6 h-6 cursor-pointer'
                                       onClick={() => {

@@ -23,6 +23,9 @@ const validationSchema = Yup.object().shape({
 
 function EditTopicModal(props) {
   const { openModal, setOpenModal, data, options, handleUpdateTopic } = props;
+  const enrollmentPeriod = useSelector(
+    (state) => state.enrollmentPeriod?.enrollmentPeriod
+  );
   const currentUser = useSelector((state) => state.user?.currentUser);
   const [initialValues, setInitialValues] = useState({
     id: "",
@@ -70,7 +73,7 @@ function EditTopicModal(props) {
             placeholder='enrollmentPeriod'
             required
             type='text'
-            value='Đợt đề xuất tiểu luận chuyên ngành học kỳ I/2023 (ĐK và duyệt: 01/10 - 20/10/2023)'
+            value={enrollmentPeriod?.name}
             disabled
           />
           {/* End EnrollmentPeriod */}
@@ -103,22 +106,6 @@ function EditTopicModal(props) {
               />
             </div>
             {/* End major field */}
-            {/* Head field*/}
-            <div className='mb-2 block font-Roboto'>
-              <Label
-                htmlFor='head'
-                value='Trưởng bộ môn duyệt (*)'
-                className='mb-2 block'
-              />
-              <TextInput
-                placeholder='Nhập trưởng bộ môn'
-                required
-                type='text'
-                value='Huynh Xuan Phung'
-                disabled
-              />
-            </div>
-            {/* End head field */}
             {/* Max slot field*/}
             <div className='mb-2 block font-Roboto'>
               <Label
@@ -139,6 +126,21 @@ function EditTopicModal(props) {
               />
             </div>
             {/* End max slot field */}
+            {/* Head field*/}
+            <div className='mb-2 block font-Roboto'>
+              <Label value='SVTH' className='mb-2 block' />
+              <Select
+                isDisabled={data?.status === topicStatus.approved.value}
+                options={options}
+                isSearchable
+                isMulti
+                defaultValue={data?.students.map((item) => ({
+                  label: item?.name,
+                  value: item?.ntid,
+                }))}
+              />
+            </div>
+            {/* End head field */}
           </div>
           {/* Topic field */}
           <div className='mb-2 block font-Roboto'>
@@ -214,21 +216,6 @@ function EditTopicModal(props) {
               />
             )}
           </div>
-          <div className='grid grid-cols-1 gap-3'>
-            <div className='mb-2 block font-Roboto'>
-              <Label value='SVTH' className='mb-2 block' />
-              <Select
-                isDisabled={data?.status === "APPROVED"}
-                options={options}
-                isSearchable
-                isMulti
-                defaultValue={data?.students.map((item) => ({
-                  label: item?.name,
-                  value: item?.ntid,
-                }))}
-              />
-            </div>
-          </div>
         </div>
       </Modal.Body>
       {data?.status !== topicStatus.approved.value && (
@@ -246,7 +233,6 @@ function EditTopicModal(props) {
                 onSubmit={formik.handleSubmit}
                 className='p-0'
                 color='green'
-                // onClick={() => setOpenModal(undefined)}
                 type='submit'
               >
                 Lưu lại

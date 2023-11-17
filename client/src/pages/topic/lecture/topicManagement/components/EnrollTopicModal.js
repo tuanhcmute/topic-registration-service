@@ -24,6 +24,9 @@ const validationSchema = Yup.object().shape({
 });
 
 function EnrollTopicModal(props) {
+  const enrollmentPeriod = useSelector(
+    (state) => state.enrollmentPeriod?.enrollmentPeriod
+  );
   const { openModal, setOpenModal, handleNewTopic, options } = props;
   const currentUser = useSelector((state) => state.user?.currentUser);
   const formik = useFormik({
@@ -66,7 +69,7 @@ function EnrollTopicModal(props) {
             placeholder='Đợt đề xuất'
             required
             type='text'
-            value='Đợt đề xuất tiểu luận chuyên ngành học kỳ I/2023 (ĐK và duyệt: 01/10 - 20/10/2023)'
+            value={enrollmentPeriod?.name}
             disabled
           />
           {/* End EnrollmentPeriod */}
@@ -105,29 +108,12 @@ function EnrollTopicModal(props) {
               />
             </div>
             {/* End major field */}
-            {/* Head field*/}
-            <div className='mb-2 block font-Roboto'>
-              <Label
-                htmlFor='head'
-                value='Trưởng bộ môn duyệt (*)'
-                className='mb-2 block'
-              />
-              <TextInput
-                id='head'
-                placeholder='Nhập trưởng bộ môn'
-                required
-                type='text'
-                value='Huynh Xuan Phung'
-                disabled
-              />
-            </div>
-            {/* End head field */}
             {/* Max slot field*/}
             <div className='mb-2 block font-Roboto'>
               <Label
                 htmlFor='maxSlot'
                 value='Số lượng SVTH (*)'
-                className='mb-2 block'
+                className='mb-2 block dark:text-gray-100'
                 color={formik.errors.maxSlot ? "failure" : "gray"}
               />
               <TextInput
@@ -142,6 +128,18 @@ function EnrollTopicModal(props) {
               />
             </div>
             {/* End max slot field */}
+            {/* Select student field*/}
+            <div className='mb-2 block font-Roboto'>
+              <Label htmlFor='email1' value='SVTH' className='mb-2 block' />
+              <Select
+                placeholder='Lựa chọn SVTH'
+                options={options}
+                isSearchable={true}
+                isMulti={true}
+                onChange={(selectedOption) => changeSelect(selectedOption)}
+              />
+            </div>
+            {/* End select student field */}
           </div>
           {/* Topic field */}
           <div className='mb-2 block font-Roboto'>
@@ -195,18 +193,6 @@ function EnrollTopicModal(props) {
                 formik.values.requirement = data;
               }}
             />
-          </div>
-          <div className='grid grid-cols-1 gap-3'>
-            <div className='mb-2 block font-Roboto'>
-              <Label htmlFor='email1' value='SVTH' className='mb-2 block' />
-              <Select
-                placeholder='Lựa chọn SVTH'
-                options={options}
-                isSearchable={true}
-                isMulti={true}
-                onChange={(selectedOption) => changeSelect(selectedOption)}
-              />
-            </div>
           </div>
         </div>
       </Modal.Body>

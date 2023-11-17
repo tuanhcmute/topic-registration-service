@@ -42,16 +42,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @LoggerAround
-    public Response<UserDTO> updateBiographyInUserProfile(String biography) {
-        if (biography.isEmpty()) {
-            return Response.<UserDTO>builder()
-                    .message("User's biography has been updated unsuccessfully - Value is empty")
-                    .statusCode(HttpStatus.BAD_REQUEST.value())
-                    .build();
-        }
+    public Response<Void> updateBiographyInUserProfile(String biography) {
+        if (biography.isEmpty()) throw new BadRequestException("Biography is not valid");
         User user = userCommon.getCurrentUserByCurrentAuditor();
+        user.setBiography(biography);
         userRepository.save(user);
-        return Response.<UserDTO>builder()
+        return Response.<Void>builder()
                 .message("User's biography has been updated successfully")
                 .statusCode(HttpStatus.OK.value())
                 .build();

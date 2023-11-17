@@ -2,6 +2,10 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { HttpStatusCode } from "axios";
 import { toast } from "react-toastify";
 import { divisionService } from "../../services";
+import {
+  fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod,
+  fetchAllTopicsInLectureEnrollmentPeriod,
+} from "../topic";
 
 export const namespace = "division";
 export const createDivisionByTopicType = createAsyncThunk(
@@ -15,7 +19,10 @@ export const createDivisionByTopicType = createAsyncThunk(
       return rejectWithValue(response?.data);
     if (response?.data?.statusCode === HttpStatusCode.Created) {
       toast.success("Phân công phản biện thành công");
-      dispatch(fetchDivisionByTopicType(type));
+      dispatch(
+        fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod({ type: type })
+      );
+      dispatch(fetchAllTopicsInLectureEnrollmentPeriod(type));
       setOpenModal(undefined);
     }
     return response.data;

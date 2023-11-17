@@ -10,7 +10,7 @@ import {
   topicType,
 } from "../../../../utils/constants";
 import { Dropdown } from "../../../../components/dropdown1";
-import { fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor } from "../../../../features/topic";
+import { fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod } from "../../../../features/topic";
 import DivisionTopicModal from "./components/DivisionTopicModal";
 import { fetchLecturesByMajor } from "../../../../features/user";
 import _ from "lodash";
@@ -35,9 +35,8 @@ function DivisionTopicManagement() {
     // Fetch topics
     if (_.isEmpty(topics) || _.isNull(topics) || _.isUndefined(topics)) {
       dispatch(
-        fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor({
+        fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod({
           type: topicType.TLCN,
-          status: topicStatus.approved.value,
         })
       );
     }

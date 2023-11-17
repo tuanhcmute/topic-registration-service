@@ -1,6 +1,7 @@
 package com.bosch.topicregistration.api.auth;
 
 import com.bosch.topicregistration.api.exception.BadRequestException;
+import com.bosch.topicregistration.api.logging.LoggerAround;
 import com.bosch.topicregistration.api.response.Response;
 import com.bosch.topicregistration.api.security.jwt.JwtService;
 import com.bosch.topicregistration.api.user.User;
@@ -21,10 +22,11 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     @Override
+    @LoggerAround
     public Response<RefreshTokenDTO> refreshToken(RefreshTokenRequest request) {
 //        Validate expired access token from client
         boolean isAccessTokenValid = jwtService.validateToken(request.getAccessToken());
-        if(!isAccessTokenValid) throw new BadRequestException("Access token has not yet expired");
+        if(isAccessTokenValid) throw new BadRequestException("Access token has not yet expired");
 
 //        Validate refresh token
         boolean isRefreshTokenValid = jwtService.validateToken(request.getRefreshToken());
@@ -44,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken(refreshToken)
                 .build();
         Map<String, RefreshTokenDTO> data = new HashMap<>();
-        data.put("refreshToken", refreshTokenDTO);
+        data.put("token", refreshTokenDTO);
 
 //        Build response
         return Response.<RefreshTokenDTO>builder()
