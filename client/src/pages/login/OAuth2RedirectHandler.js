@@ -3,9 +3,9 @@ import { toast } from "react-toastify";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { userLogin } from "../../features/auth/authSlice";
-import { ACCESS_TOKEN, roles } from "../../utils/constants";
-import { fetchUserInfo } from "../../features/user/userSlice";
+import { userLogin } from "../../features/auth";
+import { ACCESS_TOKEN, REFRESH_TOKEN, roles } from "../../utils/constants";
+import { fetchUserInfo } from "../../features/user";
 
 // The task of this function is to get access token from URL and redirect to home page
 // This function isn't completed
@@ -38,8 +38,11 @@ function OAuth2RedirectHandler() {
       return searchParams.get(name);
     }
     const token = getUrlParameter(ACCESS_TOKEN);
-    if (token) {
-      dispatch(userLogin({ [ACCESS_TOKEN]: token }));
+    const refreshToken = getUrlParameter(REFRESH_TOKEN);
+    if (token && refreshToken) {
+      dispatch(
+        userLogin({ [ACCESS_TOKEN]: token, [REFRESH_TOKEN]: refreshToken })
+      );
     } else {
       dispatch(userLogin({ error: "Error" }));
     }

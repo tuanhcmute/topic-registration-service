@@ -5,7 +5,7 @@ import Select from "react-select";
 
 import { topicType } from "../../../../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchDivisionByTopicType } from "../../../../features/division/divisionSlice";
+import { fetchDivisionByTopicType } from "../../../../features/division";
 
 const options = [
   {

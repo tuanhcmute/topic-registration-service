@@ -1,2 +1,3 @@
-export * from "./userSlice";
-export { default as userReducer } from "./userSlice";
+export * from "./userAction";
+export * from "./userReducer";
+export { default as userReducer } from "./userReducer";

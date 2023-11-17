@@ -23,6 +23,8 @@ const topicStatus = {
     value: "UPDATED",
     label: "Đã cập nhật",
   },
+  assigned: "ASSIGNED",
+  label: "Đã phân công",
 };
 
 export default topicStatus;

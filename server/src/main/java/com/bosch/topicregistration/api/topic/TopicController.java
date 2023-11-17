@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class TopicController {
     @PreAuthorize("hasAuthority('ROLE_LECTURE')")
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
-    public Response<Void> createNewTopicInLectureEnrollmentPeriod(@RequestBody NewTopicRequest request) {
+    public Response<Void> createNewTopicInLectureEnrollmentPeriod(@RequestBody @Valid NewTopicRequest request) {
 //        Validate request
         TopicValidatorResult result = TopicRequestValidator.isMajorCodeValid()
                 .and(TopicRequestValidator.isGoalValid())
@@ -80,7 +81,7 @@ public class TopicController {
     @PreAuthorize("hasAnyAuthority('ROLE_LECTURE')")
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
-    public Response<Void> updateTopicInLectureEnrollmentPeriod(@RequestBody UpdateTopicRequest request) {
+    public Response<Void> updateTopicInLectureEnrollmentPeriod(@RequestBody @Valid UpdateTopicRequest request) {
         TopicValidatorResult result = UpdateTopicRequestValidator.isTopicNameValid()
                 .and(UpdateTopicRequestValidator.isGoalValid())
                 .and(UpdateTopicRequestValidator.isRequirementValid())
@@ -95,7 +96,7 @@ public class TopicController {
     @PreAuthorize("hasAnyAuthority('ROLE_HEAD')")
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
-    public Response<Void> approveTopicInLectureEnrollmentPeriod(@RequestBody ApprovalTopicRequest request) {
+    public Response<Void> approveTopicInLectureEnrollmentPeriod(@RequestBody @Valid ApprovalTopicRequest request) {
 //        TODO: Validate
 //        TODO: Handling
         return topicService.approveTopicInLectureEnrollmentPeriod(request);

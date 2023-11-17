@@ -16,3 +16,11 @@ export const fetchEnrollmentPeriodByTopicTypeAndPeriodCode = createAsyncThunk(
     return response.data;
   }
 );
+
+export const resetEnrollmentPeriodState = createAsyncThunk(
+  `${namespace}/resetEnrollmentPeriodState`,
+  async () => {
+    console.log("resetEnrollmentPeriodState");
+    return true;
+  }
+);

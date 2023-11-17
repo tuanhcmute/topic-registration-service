@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchEnrollmentPeriodByTopicTypeAndPeriodCode,
   namespace,
+  resetEnrollmentPeriodState,
 } from "./enrollmentPeriodAction";
 
 const initialState = {
@@ -52,6 +53,10 @@ export const enrollmentPeriodSlide = createSlice({
         };
       }
     );
+    // resetEnrollmentPeriodState
+    builder.addCase(resetEnrollmentPeriodState.fulfilled, () => {
+      return initialState;
+    });
   },
 });
 

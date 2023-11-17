@@ -8,7 +8,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 
 import { topicStatus } from "../../../../../utils/constants";
-import { topicService } from "../../../../../services";
 
 const validationSchema = Yup.object().shape({
   reason: Yup.string().required(),
@@ -16,7 +15,7 @@ const validationSchema = Yup.object().shape({
 });
 
 function ApprovalTopicModal(props) {
-  const { openModal, setOpenModal, data, options } = props;
+  const { openModal, setOpenModal, data, options, handleUpdateTopic } = props;
   const currentUser = useSelector((state) => state.user?.currentUser);
   const formik = useFormik({
     initialValues: {
@@ -27,18 +26,9 @@ function ApprovalTopicModal(props) {
     validationSchema,
     enableReinitialize: true,
     onSubmit: (values) => {
-      handleUpdateStatusTopic(values);
+      handleUpdateTopic(values);
     },
   });
-
-  async function handleUpdateStatusTopic(values) {
-    console.log(values);
-    // topicService;
-    const response = await topicService.approveTopicInLectureEnrollmentPeriod(
-      values
-    );
-    console.log(response);
-  }
 
   return (
     <Modal
@@ -202,25 +192,20 @@ function ApprovalTopicModal(props) {
             </div>
             <div className='w-full flex items-center justify-end gap-5'>
               <form onSubmit={formik.handleSubmit}>
-                <Button
-                  color='red'
-                  // onClick={() => setOpenModal(undefined)}
-                  className='p-0'
-                  type='submit'
-                >
+                <Button color='red' className='p-0' type='submit'>
                   Không duyệt
                 </Button>
               </form>
               <Button
                 className='p-0'
                 color='green'
-                onClick={() =>
-                  handleUpdateStatusTopic({
+                onClick={() => {
+                  handleUpdateTopic({
                     id: data?.id,
                     status: topicStatus.approved.value,
                     reason: topicStatus.approved.label,
-                  })
-                }
+                  });
+                }}
               >
                 Duyệt đề tài
               </Button>

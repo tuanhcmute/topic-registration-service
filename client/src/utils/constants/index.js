@@ -7,6 +7,7 @@ import topicStatus from "./topicStatus";
 export const API_BASE_URL = keys.apiBaseUrl;
 
 export const ACCESS_TOKEN = "accessToken";
+export const REFRESH_TOKEN = "refreshToken";
 
 export const OAUTH2_REDIRECT_URI = keys.redirectUri;
 

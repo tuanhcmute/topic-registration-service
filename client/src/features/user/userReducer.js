@@ -1,6 +1,11 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { HttpStatusCode } from "axios";
-import { userService } from "../../services";
+import { createSlice } from "@reduxjs/toolkit";
+import { namespace } from "../division";
+import {
+  fetchLecturesByMajor,
+  fetchStudentsNotEnrolledInTopic,
+  fetchUserInfo,
+  removeUserInfo,
+} from "./userAction";
 
 const initialState = {
   lectures: [],
@@ -10,46 +15,6 @@ const initialState = {
   loading: false,
   studentsNotEnrolledInTopic: [],
 };
-const namespace = "user";
-
-export const fetchUserInfo = createAsyncThunk(
-  `${namespace}/fetchUserInfo`,
-  async (data, { rejectWithValue }) => {
-    console.log({ rejectWithValue });
-    const response = await userService.fetchUserInfo();
-    if (response?.data?.statusCode === HttpStatusCode.Unauthorized) {
-      return rejectWithValue(response.data);
-    }
-    return response.data;
-  }
-);
-
-export const removeUserInfo = createAsyncThunk(
-  `${namespace}/removeUserInfo`,
-  async () => {
-    return "Remove user info";
-  }
-);
-
-export const fetchLecturesByMajor = createAsyncThunk(
-  `${namespace}/fetchLecturesByMajor`,
-  async (majorCode, { rejectWithValue }) => {
-    const response = await userService.fetchLecturesByMajor(majorCode);
-    if (response.data?.statusCode === HttpStatusCode.BadRequest)
-      return rejectWithValue(response?.data);
-    return response.data;
-  }
-);
-
-export const fetchStudentsNotEnrolledInTopic = createAsyncThunk(
-  `${namespace}/fetchStudentsNotEnrolledInTopic`,
-  async (data, { rejectWithValue }) => {
-    const response = await userService.getStudentsNotEnrolledInTopic();
-    if (response.data?.statusCode !== HttpStatusCode.Ok)
-      return rejectWithValue(response?.data);
-    return response?.data;
-  }
-);
 
 export const userSlice = createSlice({
   name: namespace,

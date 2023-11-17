@@ -1,0 +1,41 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { HttpStatusCode } from "axios";
+import { toast } from "react-toastify";
+import { divisionService } from "../../services";
+
+export const namespace = "division";
+export const createDivisionByTopicType = createAsyncThunk(
+  `${namespace}/createDivisionByTopicType`,
+  async ({ type, data, setOpenModal }, { dispatch, rejectWithValue }) => {
+    const response = await divisionService.createDivisionByTopicType(
+      type,
+      data
+    );
+    if (response?.data?.statusCode === HttpStatusCode.BadRequest)
+      return rejectWithValue(response?.data);
+    if (response?.data?.statusCode === HttpStatusCode.Created) {
+      toast.success("Phân công phản biện thành công");
+      dispatch(fetchDivisionByTopicType(type));
+      setOpenModal(undefined);
+    }
+    return response.data;
+  }
+);
+
+export const fetchDivisionByTopicType = createAsyncThunk(
+  `${namespace}/fetchDivisionByTopicType`,
+  async (type, { rejectWithValue }) => {
+    const response = await divisionService.fetchDivisionByTopicType(type);
+    if (response?.data?.statusCode === HttpStatusCode.BadRequest)
+      return rejectWithValue(response?.data);
+    return response.data;
+  }
+);
+
+export const resetDivisionState = createAsyncThunk(
+  `${namespace}/resetDivisionState`,
+  async () => {
+    console.log("resetDivisionState");
+    return true;
+  }
+);

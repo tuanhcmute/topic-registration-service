@@ -1,7 +1,15 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { HttpStatusCode } from "axios";
 import { toast } from "react-toastify";
-import topicService from "../../services/topicService";
+import { namespace } from "../division";
+import {
+  approveTopicInLectureEnrollmentPeriod,
+  createNewTopicInLectureEnrollmentPeriod,
+  fetchAllTopicsInLectureEnrollmentPeriod,
+  fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor,
+  resetTopicState,
+  updateTopicInLectureEnrollmentPeriod,
+} from "./topicAction";
 
 const initialState = {
   approvedTopics: [],
@@ -10,62 +18,6 @@ const initialState = {
   message: "",
   loading: false,
 };
-const namespace = "topic";
-
-export const fetchAllTopicsInLectureEnrollmentPeriod = createAsyncThunk(
-  `${namespace}/fetchAllTopicsInLectureEnrollmentPeriod`,
-  async (type) => {
-    const response =
-      await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
-        type
-      );
-    if (response?.data?.statusCode === HttpStatusCode.Ok) {
-      return response.data;
-    }
-  }
-);
-
-export const createNewTopicInLectureEnrollmentPeriod = createAsyncThunk(
-  `${namespace}/createNewTopicInLectureEnrollmentPeriod`,
-  async ({ data, type, setOpenModal }, { dispatch }) => {
-    const response = await topicService.createNewTopicInLectureEnrollmentPeriod(
-      data
-    );
-    if (response.data?.statusCode === HttpStatusCode.Created) {
-      dispatch(fetchAllTopicsInLectureEnrollmentPeriod(type));
-      setOpenModal(undefined);
-    }
-    return response.data;
-  }
-);
-
-export const updateTopicInLectureEnrollmentPeriod = createAsyncThunk(
-  `${namespace}/updateTopicInLectureEnrollmentPeriod`,
-  async ({ data, type, setOpenEditTopicModal }, { dispatch }) => {
-    const response = await topicService.updateTopicInLectureEnrollmentPeriod(
-      data
-    );
-    if (response?.data?.statusCode === HttpStatusCode.Ok) {
-      setOpenEditTopicModal(undefined);
-      dispatch(fetchAllTopicsInLectureEnrollmentPeriod(type));
-    }
-  }
-);
-
-export const fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor =
-  createAsyncThunk(
-    `${namespace}/fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor`,
-    async ({ type, status }, { rejectWithValue }) => {
-      const response =
-        await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor(
-          type,
-          status
-        );
-      if (response?.data?.statusCode === HttpStatusCode.BadRequest)
-        return rejectWithValue(response.data);
-      return response?.data;
-    }
-  );
 
 export const topicSlide = createSlice({
   name: namespace,
@@ -177,6 +129,37 @@ export const topicSlide = createSlice({
         };
       }
     );
+    // approveTopicInLectureEnrollmentPeriod
+    builder.addCase(
+      approveTopicInLectureEnrollmentPeriod.fulfilled,
+      (state, action) => {
+        return {
+          ...state,
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    builder.addCase(approveTopicInLectureEnrollmentPeriod.pending, (state) => {
+      return {
+        ...state,
+        message: "",
+        statusCode: null,
+        loading: false,
+      };
+    });
+    builder.addCase(
+      approveTopicInLectureEnrollmentPeriod.rejected,
+      (state, action) => {
+        return {
+          ...state,
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
     // fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor
     builder.addCase(
       fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor.pending,
@@ -214,6 +197,9 @@ export const topicSlide = createSlice({
         };
       }
     );
+    builder.addCase(resetTopicState.fulfilled, () => {
+      return initialState;
+    });
   },
 });
 

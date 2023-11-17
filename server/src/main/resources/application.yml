@@ -21,7 +21,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -30,10 +30,10 @@ app:
     secretKey: 
   security:
     permitAll:
-      antPattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status
+      antPattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status, /auth/refresh-token
     cors:
-      allowedOrigin: '*'
-      allowedMethods: '*'
-      allowedHeaders: '*'
+      allowedOrigin: "*"
+      allowedMethods: "*"
+      allowedHeaders: "*"
       allowedCredentials: false
-      corsConfiguration: '/**'
+      corsConfiguration: "/**"

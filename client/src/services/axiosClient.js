@@ -1,6 +1,7 @@
 import axios, { HttpStatusCode } from "axios";
 import queryString from "query-string";
 import { toast } from "react-toastify";
+import { refreshToken } from "../features/auth";
 import { API_BASE_URL, headers as headersConstants } from "../utils/constants";
 
 let store;
@@ -20,6 +21,7 @@ const axiosClient = axios.create({
 
 // Config Authorization header
 axiosClient.interceptors.request.use(async (config) => {
+  console.log({ store });
   const accessToken = store.getState()?.auth?.accessToken;
   config.headers.Authorization = `Bearer ${accessToken}`;
   return config;
@@ -37,27 +39,28 @@ axiosClient.interceptors.response.use(
       return Promise.reject(error);
     }
     const { status, data, statusText } = error.response;
+    const originalRequest = error.config;
     // Handle token expired
     if (status === HttpStatusCode.Unauthorized) {
-      // originalRequest._retry = true;
-      // Dispatch logout => return login
-      console.log("Unauthorized");
+      originalRequest._retry = true;
+      store?.dispatch(refreshToken());
+      return axiosClient(originalRequest);
     }
     // Handle not found
     if (status === HttpStatusCode.NotFound) {
-      console.log("Not found");
+      toast.warn("Không tìm thấy tài nguyên");
     }
     // Handle error server
     if (status === HttpStatusCode.InternalServerError) {
-      console.log("Internal server error");
+      toast.warn("Đã có lỗi xảy ra");
     }
     // Handle bad request
     if (status === HttpStatusCode.BadRequest) {
-      console.log("Bad request");
+      toast.warn("Yêu cầu không hợp lệ");
     }
     // Handle access is denied
     if (status === HttpStatusCode.Forbidden) {
-      console.log("Access is denied");
+      toast.warn("Không có quyền truy câp");
     }
     return { status, data, statusText };
   }

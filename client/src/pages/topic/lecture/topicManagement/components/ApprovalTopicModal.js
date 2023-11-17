@@ -1,32 +1,20 @@
 import PropTypes from "prop-types";
 import { Modal } from "flowbite-react";
-import { approvalHistoryService } from "../../../../../services";
-import { useEffect, useState } from "react";
-import { HttpStatusCode } from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 import { topicStatus } from "../../../../../utils/constants";
+import { fetchApprovalHistoryByTopicId } from "../../../../../features/approvalHistory/approvalHistoryAction";
 
 function ApprovalTopicModal(props) {
+  const dispatch = useDispatch();
   const { openModal, setOpenModal, data } = props;
-  const [approvalHistories, setApprovalHistories] = useState([]);
-
-  async function fetchApprovalHistoryByTopicId(topicId) {
-    try {
-      const response = await approvalHistoryService.getApprovalHistoryByTopicId(
-        topicId
-      );
-      console.log(response);
-      if (response?.data?.statusCode === HttpStatusCode.Ok) {
-        // setEnrollmentPeriod(response?.data?.data?.enrollmentPeriod);
-        setApprovalHistories(response.data?.data?.approvalHistories);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  const approvalHistories = useSelector(
+    (state) => state?.approvalHistory?.approvalHistories
+  );
 
   useEffect(() => {
-    fetchApprovalHistoryByTopicId(data?.id);
-  }, [data]);
+    if (data) dispatch(fetchApprovalHistoryByTopicId(data?.id));
+  }, [data, dispatch]);
 
   return (
     <Modal
