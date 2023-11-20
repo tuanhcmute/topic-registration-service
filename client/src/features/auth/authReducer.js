@@ -1,37 +1,17 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { ACCESS_TOKEN } from "../../utils/constants";
-import { removeUserInfo } from "../user/userSlice";
+import { createSlice } from "@reduxjs/toolkit";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../utils/constants";
+import { namespace, refreshToken, userLogin, userLogout } from "./authAction";
 
 const initialState = {
   authenticated: false,
   [ACCESS_TOKEN]: "",
+  [REFRESH_TOKEN]: "",
   message: "",
   loading: false,
 };
 
-export const namespace = "auth";
-
-export const userLogin = createAsyncThunk(
-  `${namespace}/userLogin`,
-  async ({ accessToken, error }, { rejectWithValue }) => {
-    if (accessToken) {
-      return { accessToken };
-    }
-    if (error) {
-      return rejectWithValue(error);
-    }
-  }
-);
-
-export const userLogout = createAsyncThunk(
-  `${namespace}/userLogout`,
-  async (data, { dispatch }) => {
-    dispatch(removeUserInfo());
-  }
-);
-
 export const authSlice = createSlice({
-  name: "auth",
+  name: namespace,
   initialState: initialState,
   extraReducers: (builder) => {
     // userLogin
@@ -40,6 +20,7 @@ export const authSlice = createSlice({
         ...state,
         authenticated: true,
         [ACCESS_TOKEN]: action.payload?.accessToken,
+        [REFRESH_TOKEN]: action.payload?.refreshToken,
         message: "Đăng nhập thành công",
         loading: false,
       };
@@ -62,12 +43,41 @@ export const authSlice = createSlice({
         loading: false,
       };
     });
+
+    // refreshToken
+    builder.addCase(refreshToken.fulfilled, (state, action) => {
+      console.log(action);
+      return {
+        ...state,
+        [ACCESS_TOKEN]: action.payload?.data?.token?.accessToken,
+        [REFRESH_TOKEN]: action.payload?.data?.token?.refreshToken,
+        message: action.payload?.data?.message,
+        loading: false,
+      };
+    });
+    builder.addCase(refreshToken.pending, (state, action) => {
+      return {
+        ...state,
+        loading: true,
+      };
+    });
+    builder.addCase(refreshToken.rejected, (state, action) => {
+      return {
+        ...state,
+        loading: false,
+        message: action.payload?.data?.message,
+        authenticated: false,
+        [ACCESS_TOKEN]: null,
+        [REFRESH_TOKEN]: null,
+      };
+    });
     // userLogout
     builder.addCase(userLogout.fulfilled, (state) => {
       return {
         ...state,
         authenticated: false,
         [ACCESS_TOKEN]: null,
+        [REFRESH_TOKEN]: null,
         message: "Đăng xuất thành công",
         loading: false,
       };

@@ -10,5 +10,10 @@ import lombok.*;
 @Builder
 public class ApprovalHistoryDTO {
     private String reason;
+
     private TopicStatus status;
+
+    private String createdDate;
+
+    private String updatedDate;
 }

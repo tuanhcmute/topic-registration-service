@@ -1,6 +1,10 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { HttpStatusCode } from "axios";
-import { divisionService } from "../../services";
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  createDivisionByTopicType,
+  fetchDivisionByTopicType,
+  namespace,
+  resetDivisionState,
+} from "./divisionAction";
 
 const initialState = {
   divisions: [],
@@ -8,35 +12,6 @@ const initialState = {
   message: "",
   loading: false,
 };
-const namespace = "division";
-
-export const createDivisionByTopicType = createAsyncThunk(
-  `${namespace}/createDivisionByTopicType`,
-  async ({ type, data, setOpenModal }, { dispatch, rejectWithValue }) => {
-    const response = await divisionService.createDivisionByTopicType(
-      type,
-      data
-    );
-    console.log(response);
-    if (response?.data?.statusCode === HttpStatusCode.BadRequest)
-      return rejectWithValue(response?.data);
-    if (response?.data?.statusCode === HttpStatusCode.Ok) {
-      dispatch(fetchDivisionByTopicType(type));
-      setOpenModal(undefined);
-    }
-    return response.data;
-  }
-);
-
-export const fetchDivisionByTopicType = createAsyncThunk(
-  `${namespace}/fetchDivisionByTopicType`,
-  async (type, { rejectWithValue }) => {
-    const response = await divisionService.fetchDivisionByTopicType(type);
-    if (response?.data?.statusCode === HttpStatusCode.BadRequest)
-      return rejectWithValue(response?.data);
-    return response.data;
-  }
-);
 
 export const divisionSlice = createSlice({
   name: namespace,
@@ -94,6 +69,10 @@ export const divisionSlice = createSlice({
         statusCode: action.payload?.data?.statusCode,
         loading: false,
       };
+    });
+    // resetDivisionState
+    builder.addCase(resetDivisionState.fulfilled, () => {
+      return initialState;
     });
   },
 });

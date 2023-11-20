@@ -1,5 +1,6 @@
 import React from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import { App as AppLayout } from "../app";
 import { ErrorPage } from "../pages/error";
@@ -8,20 +9,20 @@ import ProtectedRoutes from "./ProtectedRoutes";
 import { HomePage as HomeRoute } from "../pages/home";
 import { ProfilePage as ProfileRoute } from "../pages/profile";
 import { TopicPageWrapper as TopicPageWrapperRoutes } from "../pages/topic";
-import { TopicManagementPage as TopicManagementRoute } from "../pages/topic/lecture/topicManagement";
+import { TopicManagementPage as LectureTopicManagementRoute } from "../pages/topic/lecture/topicManagement";
 import { AppreciationManagementPage as AppreciationManagementPageRoute } from "../pages/topic/lecture/appreciationManagement";
 import { ApprovalTopicManagementPage as ApprovalTopicManagementPageRoute } from "../pages/topic/lecture/approvalTopicManagement";
 import { LecturePage as LectureRoute } from "../pages/lecture";
 import { LoginPage as LoginRoute } from "../pages/login";
+import { ProgressionManagement } from "../pages/topic/lecture/progressionManagement";
+import { DivisionTopicManagement } from "../pages/topic/lecture/divisionTopicManagement";
+import { TopicManagementPage as StudentTopicManagementRoute } from "../pages/topic/student/topicManagement";
 
 import { paths, roles, topicType } from "../utils/constants";
 import AppLectureHeader from "../app/AppLectureHeader";
 import AppStudentHeader from "../app/AppStudentHeader";
-import { useSelector } from "react-redux";
-import { DivisionTopicManagement } from "../pages/topic/lecture/divisionTopicManagement";
 import Sidebar from "../pages/topic/lecture/Sidebar";
 import StudentSidebar from "../pages/topic/student/StudentSidebar";
-import { ProgressionManagement } from "../pages/topic/lecture/progressionManagement";
 
 const RedirectRoute = () => {
   const isAuthenticated = useSelector((state) => state.auth.authenticated);
@@ -64,7 +65,7 @@ const router = createBrowserRouter([
             children: [
               {
                 path: topicType.TLCN.toLowerCase(),
-                element: <TopicManagementRoute />,
+                element: <StudentTopicManagementRoute />,
               },
               {
                 path: `${topicType.TLCN.toLowerCase()}/progression`,
@@ -102,7 +103,7 @@ const router = createBrowserRouter([
             children: [
               {
                 path: topicType.TLCN.toLowerCase(),
-                element: <TopicManagementRoute />,
+                element: <LectureTopicManagementRoute />,
               },
               {
                 path: `${topicType.TLCN.toLowerCase()}/appreciation`,

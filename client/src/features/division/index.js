@@ -1,2 +1,3 @@
-export * from "./divisionSlice";
-export { default as divisionReducer } from "./divisionSlice";
+export * from "./divisionReducer";
+export * from "./divisionAction";
+export { default as divisionReducer } from "./divisionReducer";

@@ -10,49 +10,56 @@ import {
   topicType,
 } from "../../../../utils/constants";
 import { Dropdown } from "../../../../components/dropdown1";
-import { fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor } from "../../../../features/topic/topicSlice";
-import { enrollmentPeriodService } from "../../../../services";
-import { HttpStatusCode } from "axios";
+import { fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod } from "../../../../features/topic";
 import DivisionTopicModal from "./components/DivisionTopicModal";
-import { fetchLecturesByMajor } from "../../../../features/user/userSlice";
+import { fetchLecturesByMajor } from "../../../../features/user";
+import _ from "lodash";
+import { fetchEnrollmentPeriodByTopicTypeAndPeriodCode } from "../../../../features/enrollmentPeriod";
 
 function DivisionTopicManagement() {
   const [openModal, setOpenModal] = useState(undefined);
   const [selectedTopic, setSelectedTopic] = useState(null);
-  const [enrollmentPeriod, setEnrollmentPeriod] = useState(undefined);
   const [topicStatusFilter, setTopicStatusFilter] = useState(
     topicStatus.all.value
   );
   // Get current user from redux
   const currentUser = useSelector((state) => state.user?.currentUser);
   const topics = useSelector((state) => state.topic?.approvedTopics);
+  const enrollmentPeriod = useSelector(
+    (state) => state?.enrollmentPeriod?.enrollmentPeriod
+  );
+  const lectures = useSelector((state) => state?.user?.lectures);
   const dispatch = useDispatch();
 
-  async function fetchEnrollmentPeriodByTopicTypeAndPeriodCode() {
-    try {
-      const response =
-        await enrollmentPeriodService.getEnrollmentPeriodByTopicTypeAndPeriodCode(
-          topicType.TLCN,
-          enrollmentPeriodCodes.LECTURE_ENROLLMENT_PERIOD
-        );
-      if (response?.data?.statusCode === HttpStatusCode.Ok) {
-        setEnrollmentPeriod(response?.data?.data?.enrollmentPeriod);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   useEffect(() => {
-    dispatch(
-      fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor({
-        type: topicType.TLCN,
-        status: topicStatus.approved.value,
-      })
-    );
-    dispatch(fetchLecturesByMajor(currentUser?.major?.code));
-    fetchEnrollmentPeriodByTopicTypeAndPeriodCode();
-  }, [dispatch, currentUser]);
+    // Fetch topics
+    if (_.isEmpty(topics) || _.isNull(topics) || _.isUndefined(topics)) {
+      dispatch(
+        fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod({
+          type: topicType.TLCN,
+        })
+      );
+    }
+
+    // Fetch lectures
+    if (_.isEmpty(lectures) || _.isNull(lectures) || _.isUndefined(lectures)) {
+      dispatch(fetchLecturesByMajor(currentUser?.major?.code));
+    }
+
+    // Fetch enrollment period
+    if (
+      _.isEmpty(enrollmentPeriod) ||
+      _.isNull(enrollmentPeriod) ||
+      _.isUndefined(enrollmentPeriod)
+    ) {
+      dispatch(
+        fetchEnrollmentPeriodByTopicTypeAndPeriodCode({
+          topicType: topicType.TLCN,
+          periodCode: enrollmentPeriodCodes.LECTURE_ENROLLMENT_PERIOD,
+        })
+      );
+    }
+  }, []);
 
   return (
     <React.Fragment>

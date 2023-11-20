@@ -2,8 +2,8 @@ package com.bosch.topicregistration.api.topic;
 
 import com.bosch.topicregistration.api.approvalhistory.ApprovalHistory;
 import com.bosch.topicregistration.api.division.Division;
-import com.bosch.topicregistration.api.topicenrollment.TopicEnrollment;
 import com.bosch.topicregistration.api.semester.Semester;
+import com.bosch.topicregistration.api.topicenrollment.TopicEnrollment;
 import com.bosch.topicregistration.api.user.Major;
 import com.bosch.topicregistration.api.user.User;
 import lombok.*;

@@ -30,6 +30,10 @@ public class TopicEnrollment {
     @JoinColumn
     private User student;
 
+    @Column(name = "is_leader_column")
+    @Builder.Default
+    private Boolean isLeader = false;
+
     @ManyToOne
     @JoinColumn
     private Topic topic;

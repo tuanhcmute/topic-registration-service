@@ -20,7 +20,13 @@ spring:
       ddl-auto: update
 app:
   jwt:
-    secret-key: ${SECRET_KEY}
+    secretKey: ${SECRET_KEY}
   security:
-    permit-all:
-      ant-pattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status
+    permitAll:
+      antPattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status, /auth/refresh-token
+    cors:
+      allowedOrigin: "*"
+      allowedMethods: "*"
+      allowedHeaders: "*"
+      allowedCredentials: false
+      corsConfiguration: "/**"

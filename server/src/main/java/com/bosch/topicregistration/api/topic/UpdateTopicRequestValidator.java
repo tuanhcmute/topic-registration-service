@@ -23,11 +23,11 @@ public interface UpdateTopicRequestValidator extends Function<UpdateTopicRequest
     }
 
     static UpdateTopicRequestValidator isMaxSlotValid() {
-        final int minSlot = 0;
-        final  int maxSlot = 2;
+        final int minSlot = 1;
+        final int maxSlot = 2;
         return request -> {
-            if(Objects.nonNull(request.getMaxSlot()) && request.getMaxSlot() >= minSlot && request.getMaxSlot() <= maxSlot) {
-                    return TopicValidatorResult.VALID;
+            if (Objects.nonNull(request.getMaxSlot()) && request.getMaxSlot() >= minSlot && request.getMaxSlot() <= maxSlot) {
+                return TopicValidatorResult.VALID;
             }
             return TopicValidatorResult.MAX_SLOT_INVALID;
         };

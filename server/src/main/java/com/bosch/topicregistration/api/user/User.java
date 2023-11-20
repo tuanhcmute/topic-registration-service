@@ -1,8 +1,8 @@
 package com.bosch.topicregistration.api.user;
 
 import com.bosch.topicregistration.api.division.Division;
-import com.bosch.topicregistration.api.topic.Topic;
 import com.bosch.topicregistration.api.security.oauth2.OAuth2Provider;
+import com.bosch.topicregistration.api.topic.Topic;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;

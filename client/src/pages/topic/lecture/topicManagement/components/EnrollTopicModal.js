@@ -8,6 +8,8 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 import * as toipcType from "../../../../../utils/constants/topicType";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const validationSchema = Yup.object().shape({
   type: Yup.string().required(),
@@ -24,6 +26,10 @@ const validationSchema = Yup.object().shape({
 });
 
 function EnrollTopicModal(props) {
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const enrollmentPeriod = useSelector(
+    (state) => state.enrollmentPeriod?.enrollmentPeriod
+  );
   const { openModal, setOpenModal, handleNewTopic, options } = props;
   const currentUser = useSelector((state) => state.user?.currentUser);
   const formik = useFormik({
@@ -43,17 +49,29 @@ function EnrollTopicModal(props) {
     validationSchema,
   });
 
-  function changeSelect(selectedOption) {
-    const studentCodes = selectedOption?.map((item) => item.value);
-    formik.setFieldValue("students", studentCodes);
+  function changeSelect(...props) {
+    // Props[] => [Array(0), {action: "", data}]
+    if (props.length < 2) return;
+    if (props[0]?.length > formik.values.maxSlot) {
+      toast.warning(`SVTH không vượt quá ${formik.values.maxSlot}`);
+      return;
+    }
+    setSelectedOptions(props[0]);
   }
 
+  function setCloseModal() {
+    setOpenModal(undefined);
+    setSelectedOptions([]);
+    formik.setValues(formik.initialValues);
+  }
+
+  useEffect(() => {
+    const studentCodes = selectedOptions.map((item) => item.value);
+    formik.setFieldValue("students", studentCodes);
+  }, [selectedOptions]);
+
   return (
-    <Modal
-      size='5xl'
-      show={openModal === "default"}
-      onClose={() => setOpenModal(undefined)}
-    >
+    <Modal size='5xl' show={openModal === "default"} onClose={setCloseModal}>
       <Modal.Header className='pt-4 pb-3 bg-primary'>
         <p className='font-Roboto text-base font-bold uppercase text-white'>
           TIỂU LUẬN CHUYÊN NGÀNH
@@ -66,7 +84,7 @@ function EnrollTopicModal(props) {
             placeholder='Đợt đề xuất'
             required
             type='text'
-            value='Đợt đề xuất tiểu luận chuyên ngành học kỳ I/2023 (ĐK và duyệt: 01/10 - 20/10/2023)'
+            value={enrollmentPeriod?.name}
             disabled
           />
           {/* End EnrollmentPeriod */}
@@ -105,44 +123,20 @@ function EnrollTopicModal(props) {
               />
             </div>
             {/* End major field */}
-            {/* Head field*/}
-            <div className='mb-2 block font-Roboto'>
-              <Label
-                htmlFor='head'
-                value='Trưởng bộ môn duyệt (*)'
-                className='mb-2 block'
-              />
-              <TextInput
-                id='head'
-                placeholder='Nhập trưởng bộ môn'
-                required
-                type='text'
-                value='Huynh Xuan Phung'
-                disabled
-              />
-            </div>
-            {/* End head field */}
-            {/* Max slot field*/}
-            <div className='mb-2 block font-Roboto'>
-              <Label
-                htmlFor='maxSlot'
-                value='Số lượng SVTH (*)'
-                className='mb-2 block'
-                color={formik.errors.maxSlot ? "failure" : "gray"}
-              />
-              <TextInput
-                id='maxSlot'
-                color={formik.errors.maxSlot ? "failure" : "gray"}
-                helperText={formik.errors.maxSlot}
-                placeholder='Nhập số lượng sinh viên...'
-                required
-                type='number'
-                onChange={formik.handleChange}
-                value={formik.values.maxSlot}
-              />
-            </div>
-            {/* End max slot field */}
           </div>
+          {/* Select student field*/}
+          <div className='mb-2 block font-Roboto'>
+            <Label htmlFor='email1' value='SVTH' className='mb-2 block' />
+            <Select
+              placeholder='Lựa chọn SVTH'
+              options={options}
+              isSearchable={true}
+              isMulti={true}
+              onChange={changeSelect}
+              value={selectedOptions}
+            />
+          </div>
+          {/* End select student field */}
           {/* Topic field */}
           <div className='mb-2 block font-Roboto'>
             <Label
@@ -175,7 +169,6 @@ function EnrollTopicModal(props) {
               editor={ClassicEditor}
               onChange={(event, editor) => {
                 const data = editor.getData();
-                console.log({ event, editor, data });
                 formik.values.goal = data;
               }}
             />
@@ -196,27 +189,11 @@ function EnrollTopicModal(props) {
               }}
             />
           </div>
-          <div className='grid grid-cols-1 gap-3'>
-            <div className='mb-2 block font-Roboto'>
-              <Label htmlFor='email1' value='SVTH' className='mb-2 block' />
-              <Select
-                placeholder='Lựa chọn SVTH'
-                options={options}
-                isSearchable={true}
-                isMulti={true}
-                onChange={(selectedOption) => changeSelect(selectedOption)}
-              />
-            </div>
-          </div>
         </div>
       </Modal.Body>
       <Modal.Footer>
         <div className='w-full flex items-center justify-end gap-5'>
-          <Button
-            color='red'
-            onClick={() => setOpenModal(undefined)}
-            className='p-0'
-          >
+          <Button color='red' onClick={setCloseModal} className='p-0'>
             Hủy bỏ
           </Button>
           <form onSubmit={formik.handleSubmit}>
@@ -224,7 +201,6 @@ function EnrollTopicModal(props) {
               onSubmit={formik.handleSubmit}
               className='p-0'
               color='green'
-              // onClick={() => setOpenModal(undefined)}
               type='submit'
             >
               Lưu lại

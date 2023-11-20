@@ -1,32 +1,20 @@
 import PropTypes from "prop-types";
 import { Modal } from "flowbite-react";
-import { approvalHistoryService } from "../../../../../services";
-import { useEffect, useState } from "react";
-import { HttpStatusCode } from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 import { topicStatus } from "../../../../../utils/constants";
+import { fetchApprovalHistoryByTopicId } from "../../../../../features/approvalHistory/approvalHistoryAction";
 
 function ApprovalTopicModal(props) {
+  const dispatch = useDispatch();
   const { openModal, setOpenModal, data } = props;
-  const [approvalHistories, setApprovalHistories] = useState([]);
-
-  async function fetchApprovalHistoryByTopicId(topicId) {
-    try {
-      const response = await approvalHistoryService.getApprovalHistoryByTopicId(
-        topicId
-      );
-      console.log(response);
-      if (response?.data?.statusCode === HttpStatusCode.Ok) {
-        // setEnrollmentPeriod(response?.data?.data?.enrollmentPeriod);
-        setApprovalHistories(response.data?.data?.approvalHistories);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  const approvalHistories = useSelector(
+    (state) => state?.approvalHistory?.approvalHistories
+  );
 
   useEffect(() => {
-    fetchApprovalHistoryByTopicId(data?.id);
-  }, [data]);
+    if (data) dispatch(fetchApprovalHistoryByTopicId(data?.id));
+  }, [data, dispatch]);
 
   return (
     <Modal
@@ -63,7 +51,10 @@ function ApprovalTopicModal(props) {
                     <tbody className='text-gray-600 text-sm font-light'>
                       {approvalHistories?.map((item, index) => {
                         return (
-                          <tr className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'>
+                          <tr
+                            className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'
+                            key={index}
+                          >
                             <td className='p-3 text-center whitespace-nowrap border'>
                               {index + 1}
                             </td>
@@ -84,10 +75,10 @@ function ApprovalTopicModal(props) {
                               </div>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey bg-'>
-                              <div className=''>20/11/2023</div>
+                              <div className=''>{item?.createdDate}</div>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey'>
-                              <div className=''>20/11/2023</div>
+                              <div className=''>{item?.updatedDate}</div>
                             </td>
                           </tr>
                         );

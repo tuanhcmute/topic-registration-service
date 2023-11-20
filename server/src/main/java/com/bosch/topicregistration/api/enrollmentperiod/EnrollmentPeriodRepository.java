@@ -10,5 +10,6 @@ import java.util.Optional;
 
 public interface EnrollmentPeriodRepository extends JpaRepository<EnrollmentPeriod, String> {
     List<EnrollmentPeriod> findBySemester(Semester semester);
+
     Optional<EnrollmentPeriod> findByTypeAndCodeAndStatus(TopicType type, EnrollmentPeriodCode code, SemesterStatus status);
 }

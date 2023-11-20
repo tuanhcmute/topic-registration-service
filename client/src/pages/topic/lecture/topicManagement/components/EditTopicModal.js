@@ -4,11 +4,14 @@ import Select from "react-select";
 import { Modal, Button, TextInput, Label } from "flowbite-react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 import { topicStatus } from "../../../../../utils/constants";
+import { toast } from "react-toastify";
+import { deleteTopicEnrollment } from "../../../../../features/topicEnrollment/topicEnrollmentAction";
+import _ from "lodash";
 
 const validationSchema = Yup.object().shape({
   id: Yup.string().required(),
@@ -22,7 +25,13 @@ const validationSchema = Yup.object().shape({
 });
 
 function EditTopicModal(props) {
+  const dispatch = useDispatch();
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [isDisabled, setDisabled] = useState(false);
   const { openModal, setOpenModal, data, options, handleUpdateTopic } = props;
+  const enrollmentPeriod = useSelector(
+    (state) => state.enrollmentPeriod?.enrollmentPeriod
+  );
   const currentUser = useSelector((state) => state.user?.currentUser);
   const [initialValues, setInitialValues] = useState({
     id: "",
@@ -37,10 +46,26 @@ function EditTopicModal(props) {
     enableReinitialize: true,
     onSubmit: (values) => {
       handleUpdateTopic(values);
-      alert(JSON.stringify(values, null, 2));
     },
     validationSchema,
   });
+
+  function handleChange(...props) {
+    if (props.length < 2) return;
+    const option = props[1];
+    if (option?.action === "remove-value") {
+      const isExist = data?.students?.some((item) =>
+        _.isEqual(item?.ntid, option?.removedValue?.value)
+      );
+      console.log(isExist);
+      if (isExist) dispatch(deleteTopicEnrollment(option?.removedValue?.value));
+    }
+    if (props[0]?.length > formik.values.maxSlot) {
+      toast.warning(`SVTH không vượt quá ${formik.values.maxSlot}`);
+      return;
+    }
+    setSelectedOptions(props[0]);
+  }
 
   useEffect(() => {
     setInitialValues({
@@ -50,7 +75,22 @@ function EditTopicModal(props) {
       requirement: data?.requirement,
       maxSlot: data?.maxSlot,
     });
+    setSelectedOptions(
+      data?.students?.map((item) => ({
+        label: item?.name,
+        value: item?.ntid,
+      }))
+    );
+    setDisabled(
+      data?.status === topicStatus.approved.value ||
+        data?.status === topicStatus.assigned.value
+    );
   }, [data]);
+
+  useEffect(() => {
+    const studentCodes = selectedOptions?.map((item) => item.value);
+    formik.setFieldValue("students", studentCodes);
+  }, [selectedOptions]);
 
   return (
     <Modal
@@ -70,7 +110,7 @@ function EditTopicModal(props) {
             placeholder='enrollmentPeriod'
             required
             type='text'
-            value='Đợt đề xuất tiểu luận chuyên ngành học kỳ I/2023 (ĐK và duyệt: 01/10 - 20/10/2023)'
+            value={enrollmentPeriod?.name}
             disabled
           />
           {/* End EnrollmentPeriod */}
@@ -103,43 +143,20 @@ function EditTopicModal(props) {
               />
             </div>
             {/* End major field */}
-            {/* Head field*/}
-            <div className='mb-2 block font-Roboto'>
-              <Label
-                htmlFor='head'
-                value='Trưởng bộ môn duyệt (*)'
-                className='mb-2 block'
-              />
-              <TextInput
-                placeholder='Nhập trưởng bộ môn'
-                required
-                type='text'
-                value='Huynh Xuan Phung'
-                disabled
-              />
-            </div>
-            {/* End head field */}
-            {/* Max slot field*/}
-            <div className='mb-2 block font-Roboto'>
-              <Label
-                htmlFor='maxSlot'
-                value='Số lượng SVTH (*)'
-                className='mb-2 block'
-              />
-              <TextInput
-                id='maxSlot'
-                color={formik.errors.maxSlot ? "failure" : "gray"}
-                helperText={formik.errors.maxSlot}
-                placeholder='Nhập số lượng sinh viên...'
-                required
-                type='number'
-                onChange={formik.handleChange}
-                value={formik.values.maxSlot}
-                disabled={data?.status === topicStatus.approved.value}
-              />
-            </div>
-            {/* End max slot field */}
           </div>
+          {/* Select field*/}
+          <div className='mb-2 block font-Roboto'>
+            <Label value='SVTH' className='mb-2 block' />
+            <Select
+              isDisabled={isDisabled}
+              options={options}
+              isSearchable
+              isMulti
+              value={selectedOptions}
+              onChange={handleChange}
+            />
+          </div>
+          {/* End select field */}
           {/* Topic field */}
           <div className='mb-2 block font-Roboto'>
             <Label
@@ -157,7 +174,7 @@ function EditTopicModal(props) {
               id='topicName'
               onChange={formik.handleChange}
               value={formik.values.topicName}
-              disabled={data?.status === topicStatus.approved.value}
+              disabled={isDisabled}
             />
           </div>
           {/* End topic field */}
@@ -169,7 +186,8 @@ function EditTopicModal(props) {
               value='Yêu cầu đề tài (*)'
               className='mb-2 block'
             />
-            {data?.status === topicStatus.approved.value ? (
+            {data?.status === topicStatus.approved.value ||
+            data?.status === topicStatus.assigned.value ? (
               <div
                 dangerouslySetInnerHTML={{ __html: data?.goal }}
                 className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500'
@@ -195,7 +213,8 @@ function EditTopicModal(props) {
               value='Kiến thức cần có (*)'
               className='mb-2 block'
             />
-            {data?.status === topicStatus.approved.value ? (
+            {data?.status === topicStatus.approved.value ||
+            data?.status === topicStatus.assigned.value ? (
               <div
                 dangerouslySetInnerHTML={{ __html: data?.requirement }}
                 className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500'
@@ -214,24 +233,9 @@ function EditTopicModal(props) {
               />
             )}
           </div>
-          <div className='grid grid-cols-1 gap-3'>
-            <div className='mb-2 block font-Roboto'>
-              <Label value='SVTH' className='mb-2 block' />
-              <Select
-                isDisabled={data?.status === "APPROVED"}
-                options={options}
-                isSearchable
-                isMulti
-                defaultValue={data?.students.map((item) => ({
-                  label: item?.name,
-                  value: item?.ntid,
-                }))}
-              />
-            </div>
-          </div>
         </div>
       </Modal.Body>
-      {data?.status !== topicStatus.approved.value && (
+      {!isDisabled && (
         <Modal.Footer>
           <div className='w-full flex items-center justify-end gap-5'>
             <Button
@@ -246,7 +250,6 @@ function EditTopicModal(props) {
                 onSubmit={formik.handleSubmit}
                 className='p-0'
                 color='green'
-                // onClick={() => setOpenModal(undefined)}
                 type='submit'
               >
                 Lưu lại

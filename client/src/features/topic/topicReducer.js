@@ -1,71 +1,26 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { HttpStatusCode } from "axios";
 import { toast } from "react-toastify";
-import topicService from "../../services/topicService";
+import {
+  namespace,
+  approveTopicInLectureEnrollmentPeriod,
+  createNewTopicInLectureEnrollmentPeriod,
+  fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod,
+  fetchAllTopicsInLectureEnrollmentPeriod,
+  fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod,
+  resetTopicState,
+  updateTopicInLectureEnrollmentPeriod,
+  fetchAllApprovedTopicsInStudentEnrollmentPeriod,
+} from "./topicAction";
 
 const initialState = {
   approvedTopics: [],
+  notApprovedTopics: [],
   topics: [],
   statusCode: null,
   message: "",
   loading: false,
 };
-const namespace = "topic";
-
-export const fetchAllTopicsInLectureEnrollmentPeriod = createAsyncThunk(
-  `${namespace}/fetchAllTopicsInLectureEnrollmentPeriod`,
-  async (type) => {
-    const response =
-      await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
-        type
-      );
-    if (response?.data?.statusCode === HttpStatusCode.Ok) {
-      return response.data;
-    }
-  }
-);
-
-export const createNewTopicInLectureEnrollmentPeriod = createAsyncThunk(
-  `${namespace}/createNewTopicInLectureEnrollmentPeriod`,
-  async ({ data, type, setOpenModal }, { dispatch }) => {
-    const response = await topicService.createNewTopicInLectureEnrollmentPeriod(
-      data
-    );
-    if (response.data?.statusCode === HttpStatusCode.Created) {
-      dispatch(fetchAllTopicsInLectureEnrollmentPeriod(type));
-      setOpenModal(undefined);
-    }
-    return response.data;
-  }
-);
-
-export const updateTopicInLectureEnrollmentPeriod = createAsyncThunk(
-  `${namespace}/updateTopicInLectureEnrollmentPeriod`,
-  async ({ data, type, setOpenEditTopicModal }, { dispatch }) => {
-    const response = await topicService.updateTopicInLectureEnrollmentPeriod(
-      data
-    );
-    if (response?.data?.statusCode === HttpStatusCode.Ok) {
-      setOpenEditTopicModal(undefined);
-      dispatch(fetchAllTopicsInLectureEnrollmentPeriod(type));
-    }
-  }
-);
-
-export const fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor =
-  createAsyncThunk(
-    `${namespace}/fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor`,
-    async ({ type, status }, { rejectWithValue }) => {
-      const response =
-        await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor(
-          type,
-          status
-        );
-      if (response?.data?.statusCode === HttpStatusCode.BadRequest)
-        return rejectWithValue(response.data);
-      return response?.data;
-    }
-  );
 
 export const topicSlide = createSlice({
   name: namespace,
@@ -177,13 +132,44 @@ export const topicSlide = createSlice({
         };
       }
     );
-    // fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor
+    // approveTopicInLectureEnrollmentPeriod
     builder.addCase(
-      fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor.pending,
+      approveTopicInLectureEnrollmentPeriod.fulfilled,
+      (state, action) => {
+        return {
+          ...state,
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    builder.addCase(approveTopicInLectureEnrollmentPeriod.pending, (state) => {
+      return {
+        ...state,
+        message: "",
+        statusCode: null,
+        loading: false,
+      };
+    });
+    builder.addCase(
+      approveTopicInLectureEnrollmentPeriod.rejected,
+      (state, action) => {
+        return {
+          ...state,
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    // fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod
+    builder.addCase(
+      fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod.pending,
       (state) => {
         return {
           ...state,
-          approvedTopics: [],
+          notApprovedTopics: [],
           message: "",
           statusCode: null,
           loading: false,
@@ -191,7 +177,44 @@ export const topicSlide = createSlice({
       }
     );
     builder.addCase(
-      fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor.fulfilled,
+      fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod.fulfilled,
+      (state, action) => {
+        return {
+          ...state,
+          notApprovedTopics: action.payload?.data?.topics,
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    builder.addCase(
+      fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod.rejected,
+      (state, action) => {
+        return {
+          ...state,
+          notApprovedTopics: [],
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    // fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod
+    builder.addCase(
+      fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod.pending,
+      (state) => {
+        return {
+          ...state,
+          approvedTopics: [],
+          message: "",
+          statusCode: null,
+          loading: true,
+        };
+      }
+    );
+    builder.addCase(
+      fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod.fulfilled,
       (state, action) => {
         return {
           ...state,
@@ -203,7 +226,47 @@ export const topicSlide = createSlice({
       }
     );
     builder.addCase(
-      fetchTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor.rejected,
+      fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod.rejected,
+      (state, action) => {
+        return {
+          ...state,
+          approvedTopics: [],
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    builder.addCase(resetTopicState.fulfilled, () => {
+      return initialState;
+    });
+    // fetchAllApprovedTopicsInStudentEnrollmentPeriod
+    builder.addCase(
+      fetchAllApprovedTopicsInStudentEnrollmentPeriod.pending,
+      (state) => {
+        return {
+          ...state,
+          approvedTopics: [],
+          message: "",
+          statusCode: null,
+          loading: true,
+        };
+      }
+    );
+    builder.addCase(
+      fetchAllApprovedTopicsInStudentEnrollmentPeriod.fulfilled,
+      (state, action) => {
+        return {
+          ...state,
+          approvedTopics: action.payload?.data?.topics,
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    builder.addCase(
+      fetchAllApprovedTopicsInStudentEnrollmentPeriod.rejected,
       (state, action) => {
         return {
           ...state,

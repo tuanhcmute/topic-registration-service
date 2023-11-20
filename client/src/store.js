@@ -9,6 +9,8 @@ import { divisionReducer } from "./features/division";
 import { enrollmentPeriodReducer } from "./features/enrollmentPeriod";
 import { topicReducer } from "./features/topic";
 import { userReducer } from "./features/user";
+import { approvalHistoryReducer } from "./features/approvalHistory";
+import { topicEnrollmentReducer } from "./features/topicEnrollment";
 
 const persistConfig = {
   key: "root",
@@ -21,7 +23,10 @@ const rootReducer = combineReducers({
   user: userReducer,
   division: divisionReducer,
   enrollmentPeriod: enrollmentPeriodReducer,
+  approvalHistory: approvalHistoryReducer,
+  topicEnrollment: topicEnrollmentReducer,
 });
+
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 export const store = configureStore({
   reducer: persistedReducer,

@@ -42,16 +42,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @LoggerAround
-    public Response<UserDTO> updateBiographyInUserProfile(String biography) {
-        if (biography.isEmpty()) {
-            return Response.<UserDTO>builder()
-                    .message("User's biography has been updated unsuccessfully - Value is empty")
-                    .statusCode(HttpStatus.BAD_REQUEST.value())
-                    .build();
-        }
+    public Response<Void> updateBiographyInUserProfile(String biography) {
+        if (biography.isEmpty()) throw new BadRequestException("Biography is not valid");
         User user = userCommon.getCurrentUserByCurrentAuditor();
+        user.setBiography(biography);
         userRepository.save(user);
-        return Response.<UserDTO>builder()
+        return Response.<Void>builder()
                 .message("User's biography has been updated successfully")
                 .statusCode(HttpStatus.OK.value())
                 .build();
@@ -88,9 +84,9 @@ public class UserServiceImpl implements UserService {
     @LoggerAround
     public Response<List<LectureDTO>> getLecturesByMajor(String majorCode) {
 //        Validate major code
-        if(StringUtils.isBlank(majorCode)) throw new BadRequestException("Major code is not valid");
+        if (StringUtils.isBlank(majorCode)) throw new BadRequestException("Major code is not valid");
         Optional<Major> majorOptional = majorRepository.findByCode(majorCode);
-        if(!majorOptional.isPresent()) throw new BadRequestException("Major could not be found");
+        if (!majorOptional.isPresent()) throw new BadRequestException("Major could not be found");
         Major major = majorOptional.get();
 
         List<User> users = userRepository.findByMajor(major)

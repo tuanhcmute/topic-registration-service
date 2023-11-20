@@ -7,9 +7,10 @@ import java.util.List;
 public interface UserService {
     Response<UserDTO> getUserProfile();
 
-    Response<UserDTO> updateBiographyInUserProfile(String biography);
+    Response<Void> updateBiographyInUserProfile(String biography);
 
     Response<List<StudentDTO>> getStudentsNotEnrolledInTopic();
 
     Response<List<LectureDTO>> getLecturesByMajor(String majorCode);
+
 }

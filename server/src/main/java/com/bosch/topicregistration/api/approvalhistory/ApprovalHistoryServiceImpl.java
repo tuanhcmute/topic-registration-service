@@ -8,6 +8,10 @@ import com.bosch.topicregistration.api.topic.TopicRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -27,18 +31,21 @@ public class ApprovalHistoryServiceImpl implements ApprovalHistoryService {
 
     @Override
     @LoggerAround
-    public Response<List<ApprovalHistoryDTO>> getApprovalHistoryByTopicId(String topicId) {
+    public Response<List<ApprovalHistoryDTO>> getApprovalHistoryByTopicId(String topicId, Integer pageNumber, Integer pageSize, String sortBy) {
 //        Validate
-        if(StringUtils.isEmpty(topicId)) throw new BadRequestException("Topic id is not valid");
+        if (StringUtils.isEmpty(topicId)) throw new BadRequestException("Topic id is not valid");
 //        Get topic
         Optional<Topic> topicOptional = topicRepository.findById(topicId);
-        if(!topicOptional.isPresent()) throw new BadRequestException("Topic could not be found");
+        if (!topicOptional.isPresent()) throw new BadRequestException("Topic could not be found");
         Topic topic = topicOptional.get();
 
+        //        Define paging
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
+
 //        Get list of approval history
-        List<ApprovalHistory> approvalHistories = approvalHistoryRepository.findByTopic(topic);
-        log.info("Size of approval histories: {}", approvalHistories.size());
-        List<ApprovalHistoryDTO> approvalHistoryDTOList = approvalHistoryMapper.toListDTO(approvalHistories);
+        Page<ApprovalHistory> approvalHistories = approvalHistoryRepository.findByTopic(topic, paging);
+        log.info("Size of approval histories: {}", approvalHistories.getContent().size());
+        List<ApprovalHistoryDTO> approvalHistoryDTOList = approvalHistoryMapper.toListDTO(approvalHistories.getContent());
         log.info("Size of approval histories DTO: {}", approvalHistoryDTOList.size());
 
 //        Build response
@@ -46,7 +53,7 @@ public class ApprovalHistoryServiceImpl implements ApprovalHistoryService {
         data.put("approvalHistories", approvalHistoryDTOList);
 
 //        Return response
-        return  Response.<List<ApprovalHistoryDTO>>builder()
+        return Response.<List<ApprovalHistoryDTO>>builder()
                 .message("Approval histories have been successfully retrieved")
                 .statusCode(HttpStatus.OK.value())
                 .data(data)
