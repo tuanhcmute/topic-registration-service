@@ -51,7 +51,7 @@ function AppreciationManagementPage() {
                           Đề tài phản biện
                         </th>
                         <th className='p-3 text-center border'>GVHD</th>
-                        <th className='p-3 text-center border'>Thời gian</th>
+                        <th className='p-3 text-center'>Thời gian</th>
                         <th className='p-3 text-center border'>Phòng</th>
                         <th className='py-3 px-6 text-center border'></th>
                       </tr>
@@ -67,28 +67,28 @@ function AppreciationManagementPage() {
                               {index + 1}
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey w-[300px]'>
-                              <p className='font-normal'>Thiếu data</p>
+                              <p className='font-normal'>{item?.topic?.name}</p>
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey'>
-                              <div className=''>
-                                <span className='bg-orange-400 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
-                                  Thiếu data
+                              <span className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
+                                {item?.topic?.lecture?.ntid}
+                              </span>
+                              <span className='block mt-2 font-normal'>
+                                {item?.topic?.lecture?.name}
+                              </span>
+                            </td>
+                            <td className='p-3 border border-collapse border-lightGrey'>
+                              <div className='flex flex-col gap-2'>
+                                <span className='bg-green-200 py-1 px-3 text-sm font-medium rounded dark:text-black-pearl block w-fit'>
+                                  {item?.specifiedTime}
                                 </span>
-                                <span className='block mt-2 font-normal'>
-                                  Thiếu data
+                                <span className='bg-red-300 py-1 px-3 text-sm font-medium rounded dark:text-black-pearl w-fit'>
+                                  {item?.startDate}
                                 </span>
                               </div>
                             </td>
-                            <td className='p-3 text-center border border-collapse border-lightGrey flex flex-col gap-2'>
-                              <span className='bg-orange-400 py-1 px-3 text-sm font-medium rounded dark:text-black-pearl'>
-                                {item?.specifiedTime}
-                              </span>
-                              <span className='bg-orange-400 py-1 px-3 text-sm font-medium rounded dark:text-black-pearl'>
-                                {item?.startDate}
-                              </span>
-                            </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey'>
-                              <span className='bg-orange-400 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
+                              <span className='bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
                                 {item?.place}
                               </span>
                             </td>

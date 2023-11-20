@@ -16,6 +16,7 @@ import javax.validation.Valid;
 public class AuthController {
 
     private final AuthService authService;
+
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround

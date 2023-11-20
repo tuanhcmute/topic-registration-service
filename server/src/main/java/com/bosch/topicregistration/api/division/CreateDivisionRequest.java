@@ -2,7 +2,6 @@ package com.bosch.topicregistration.api.division;
 
 import lombok.*;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 @Getter

@@ -28,9 +28,9 @@ public class TopicController {
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
     public Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(@RequestParam("type") String type,
-                                                                          @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
-                                                                          @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
-                                                                          @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
+                                                                                          @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+                                                                                          @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                                                                          @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
 //        Validate type
         boolean isMatch = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
         if (!isMatch) throw new BadRequestException("Topic type is not valid");
@@ -42,10 +42,10 @@ public class TopicController {
     @PreAuthorize("hasAuthority('ROLE_HEAD')")
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
-    public  Response<List<TopicDTO>> getAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod(@RequestParam("type") String type,
-                                                                                               @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
-                                                                                               @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
-                                                                                               @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
+    public Response<List<TopicDTO>> getAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod(@RequestParam("type") String type,
+                                                                                              @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+                                                                                              @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                                                                              @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
 //                Validate type
         log.info("Type: {}", type);
         boolean hasType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
@@ -58,10 +58,10 @@ public class TopicController {
     @PreAuthorize("hasAuthority('ROLE_HEAD')")
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
-    public  Response<List<TopicDTO>> getAllTopicsApprovedDuringTheLectureEnrollmentPeriod(@RequestParam("type") String type,
-                                                                                               @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
-                                                                                               @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
-                                                                                               @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
+    public Response<List<TopicDTO>> getAllTopicsApprovedDuringTheLectureEnrollmentPeriod(@RequestParam("type") String type,
+                                                                                         @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+                                                                                         @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                                                                         @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
 //                Validate type
         log.info("Type: {}", type);
         boolean hasType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
@@ -101,7 +101,7 @@ public class TopicController {
                 .and(UpdateTopicRequestValidator.isRequirementValid())
                 .and(UpdateTopicRequestValidator.isMaxSlotValid())
                 .apply(request);
-        if(!result.equals(TopicValidatorResult.VALID)) throw new BadRequestException(result.getMessage());
+        if (!result.equals(TopicValidatorResult.VALID)) throw new BadRequestException(result.getMessage());
         return topicService.updateTopicInLectureEnrollmentPeriod(request);
     }
 
@@ -111,11 +111,10 @@ public class TopicController {
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
     public Response<Void> approveTopicInLectureEnrollmentPeriod(@RequestBody @Valid ApprovalTopicRequest request) {
-//        TODO: Validate
-//        TODO: Handling
         return topicService.approveTopicInLectureEnrollmentPeriod(request);
     }
 
+    //    [GET] /api/v1/topic/student
     @GetMapping("/student")
     @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     @ResponseStatus(HttpStatus.OK)

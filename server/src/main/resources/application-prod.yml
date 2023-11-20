@@ -20,7 +20,7 @@ spring:
       ddl-auto: update
 app:
   jwt:
-    secret-key: ${SECRET_KEY}
+    secretKey: ${SECRET_KEY}
   security:
     permitAll:
       antPattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status, /auth/refresh-token

@@ -15,6 +15,7 @@ public interface UserMapper {
             @Mapping(target = "updatedDate", source = "user.updatedDate", dateFormat = "dd-MM-yyyy HH:mm:ss")
     })
     UserDTO toDTO(User user);
+
     Set<String> map(Set<UserRole> userRoles);
 
     default String map(UserRole userRole) {
@@ -24,8 +25,10 @@ public interface UserMapper {
     List<UserDTO> toListDTO(List<User> users);
 
     LectureDTO toLectureDTO(User user);
+
     List<LectureDTO> toListLectureDTO(List<User> users);
 
     StudentDTO toStudentDTO(User user);
+
     List<StudentDTO> toListStudentDTO(List<User> users);
 }

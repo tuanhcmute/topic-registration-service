@@ -51,7 +51,10 @@ function ApprovalTopicModal(props) {
                     <tbody className='text-gray-600 text-sm font-light'>
                       {approvalHistories?.map((item, index) => {
                         return (
-                          <tr className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'>
+                          <tr
+                            className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'
+                            key={index}
+                          >
                             <td className='p-3 text-center whitespace-nowrap border'>
                               {index + 1}
                             </td>
@@ -72,10 +75,10 @@ function ApprovalTopicModal(props) {
                               </div>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey bg-'>
-                              <div className=''>20/11/2023</div>
+                              <div className=''>{item?.createdDate}</div>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey'>
-                              <div className=''>20/11/2023</div>
+                              <div className=''>{item?.updatedDate}</div>
                             </td>
                           </tr>
                         );

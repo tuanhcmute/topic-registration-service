@@ -87,7 +87,7 @@ function ApprovalTopicManagementPage() {
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey'>
                               <div className=''>
-                                <span className='bg-orange-400 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
+                                <span className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
                                   {item?.lecture?.ntid}
                                 </span>
                                 <span className='block mt-2 font-normal'>
@@ -96,12 +96,12 @@ function ApprovalTopicManagementPage() {
                               </div>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey'>
-                              <span className='bg-orange-400 py-1 px-3 text-sm font-medium rounded dark:text-black-pearl'>
+                              <span className='bg-green-200 py-1 px-3 text-sm font-medium rounded dark:text-black-pearl block w-fit'>
                                 {topicStatus[item?.status.toLowerCase()].label}
                               </span>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey'>
-                              <span className='bg-orange-400 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
+                              <span className='bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
                                 {item.maxSlot}
                               </span>
                             </td>

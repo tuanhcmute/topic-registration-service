@@ -10,6 +10,7 @@ import {
   fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod,
   resetTopicState,
   updateTopicInLectureEnrollmentPeriod,
+  fetchAllApprovedTopicsInStudentEnrollmentPeriod,
 } from "./topicAction";
 
 const initialState = {
@@ -208,7 +209,7 @@ export const topicSlide = createSlice({
           approvedTopics: [],
           message: "",
           statusCode: null,
-          loading: false,
+          loading: true,
         };
       }
     );
@@ -239,6 +240,43 @@ export const topicSlide = createSlice({
     builder.addCase(resetTopicState.fulfilled, () => {
       return initialState;
     });
+    // fetchAllApprovedTopicsInStudentEnrollmentPeriod
+    builder.addCase(
+      fetchAllApprovedTopicsInStudentEnrollmentPeriod.pending,
+      (state) => {
+        return {
+          ...state,
+          approvedTopics: [],
+          message: "",
+          statusCode: null,
+          loading: true,
+        };
+      }
+    );
+    builder.addCase(
+      fetchAllApprovedTopicsInStudentEnrollmentPeriod.fulfilled,
+      (state, action) => {
+        return {
+          ...state,
+          approvedTopics: action.payload?.data?.topics,
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    builder.addCase(
+      fetchAllApprovedTopicsInStudentEnrollmentPeriod.rejected,
+      (state, action) => {
+        return {
+          ...state,
+          approvedTopics: [],
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
   },
 });
 

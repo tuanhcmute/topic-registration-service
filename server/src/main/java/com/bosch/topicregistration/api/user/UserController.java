@@ -58,13 +58,13 @@ public class UserController {
         return userService.getStudentsNotEnrolledInTopic();
     }
 
-//    [GET] /api/v1/user/lecture
+    //    [GET] /api/v1/user/lecture
     @GetMapping("/lecture")
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ROLE_LECTURE')")
     public Response<List<LectureDTO>> getLecturesByMajor(@RequestParam("majorCode") String majorCode) {
-        if(StringUtils.isBlank(majorCode)) throw new BadRequestException("Major code is not valid");
+        if (StringUtils.isBlank(majorCode)) throw new BadRequestException("Major code is not valid");
         return userService.getLecturesByMajor(majorCode);
     }
 }

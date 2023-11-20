@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -62,10 +61,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         });
         Map<String, Map<String, String>> data = new HashMap<>();
         data.put("errors", errors);
-        return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Response.<Map<String, String>>builder()
-                        .statusCode(HttpStatus.BAD_REQUEST.value())
-                        .message("Request is not valid")
-                        .data(data)
-                        .build());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Response.<Map<String, String>>builder()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .message("Request is not valid")
+                .data(data)
+                .build());
     }
 }

@@ -2,10 +2,10 @@ package com.bosch.topicregistration.api.schedule;
 
 import com.bosch.topicregistration.api.enrollmentperiod.EnrollmentPeriod;
 import com.bosch.topicregistration.api.enrollmentperiod.EnrollmentPeriodRepository;
+import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.semester.Semester;
 import com.bosch.topicregistration.api.semester.SemesterRepository;
 import com.bosch.topicregistration.api.semester.SemesterStatus;
-import com.bosch.topicregistration.api.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

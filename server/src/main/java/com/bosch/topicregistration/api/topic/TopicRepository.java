@@ -13,5 +13,6 @@ public interface TopicRepository extends JpaRepository<Topic, String> {
     Page<Topic> findBySemesterAndTypeAndLecture(Semester semester, TopicType type, User lecture, Pageable pageable);
 
     Page<Topic> findBySemesterAndTypeAndMajorAndStatusNotIn(Semester semester, TopicType type, Major major, List<TopicStatus> statuses, Pageable pageable);
-    Page<Topic> findBySemesterAndTypeAndMajorAndStatus(Semester semester, TopicType type, Major major, TopicStatus statuses, Pageable pageable);
+
+    Page<Topic> findBySemesterAndTypeAndMajorAndStatusIn(Semester semester, TopicType type, Major major, List<TopicStatus> statuses, Pageable pageable);
 }

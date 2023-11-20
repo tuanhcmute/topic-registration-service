@@ -26,6 +26,10 @@ const topicService = {
     const requestUrl = `${baseUrl}/head/division?type=${type}`;
     return axiosClient.get(requestUrl);
   },
+  fetchAllApprovedTopicsInStudentEnrollmentPeriod: (type) => {
+    const requestUrl = `${baseUrl}/student?type=${type}`;
+    return axiosClient.get(requestUrl);
+  },
 };
 
 export default topicService;

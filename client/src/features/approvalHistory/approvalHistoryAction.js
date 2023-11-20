@@ -10,6 +10,7 @@ export const fetchApprovalHistoryByTopicId = createAsyncThunk(
     const response = await approvalHistoryService.getApprovalHistoryByTopicId(
       topicId
     );
+    console.log(response);
     if (response?.data?.statusCode === HttpStatusCode.BadRequest)
       return rejectWithValue(response?.data);
     return response.data;

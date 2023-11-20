@@ -84,9 +84,9 @@ public class UserServiceImpl implements UserService {
     @LoggerAround
     public Response<List<LectureDTO>> getLecturesByMajor(String majorCode) {
 //        Validate major code
-        if(StringUtils.isBlank(majorCode)) throw new BadRequestException("Major code is not valid");
+        if (StringUtils.isBlank(majorCode)) throw new BadRequestException("Major code is not valid");
         Optional<Major> majorOptional = majorRepository.findByCode(majorCode);
-        if(!majorOptional.isPresent()) throw new BadRequestException("Major could not be found");
+        if (!majorOptional.isPresent()) throw new BadRequestException("Major could not be found");
         Major major = majorOptional.get();
 
         List<User> users = userRepository.findByMajor(major)

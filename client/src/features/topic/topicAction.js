@@ -96,6 +96,17 @@ export const fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod =
     }
   );
 
+export const fetchAllApprovedTopicsInStudentEnrollmentPeriod = createAsyncThunk(
+  `${namespace}/fetchAllApprovedTopicsInStudentEnrollmentPeriod`,
+  async ({ type }, { rejectWithValue }) => {
+    const response =
+      await topicService.fetchAllApprovedTopicsInStudentEnrollmentPeriod(type);
+    if (response?.data?.statusCode === HttpStatusCode.BadRequest)
+      return rejectWithValue(response.data);
+    return response?.data;
+  }
+);
+
 export const resetTopicState = createAsyncThunk(
   `${namespace}/resetTopicState`,
   async () => {

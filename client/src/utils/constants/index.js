@@ -18,4 +18,5 @@ export const GOOGLE_AUTH_URL =
 
 export { default as headers } from "./headers";
 export { default as paths } from "./paths";
+export { default as positionType } from "./positionType";
 export { topicType, roles, topicStatus, enrollmentPeriodCodes };

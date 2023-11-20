@@ -1,8 +1,8 @@
 package com.bosch.topicregistration.api.enrollmentperiod;
 
-import java.util.function.Function;
-
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.function.Function;
 
 public interface TopicRegistrationValidator extends Function<NewTopicRegistration, TopicRegistrationValidatorResult> {
     static TopicRegistrationValidator isTopicCodeValid() {
@@ -27,14 +27,14 @@ public interface TopicRegistrationValidator extends Function<NewTopicRegistratio
         };
     }
 
-    default TopicRegistrationValidator and (TopicRegistrationValidator other) {
+    default TopicRegistrationValidator and(TopicRegistrationValidator other) {
         return topicRegistration -> {
             TopicRegistrationValidatorResult result = this.apply(topicRegistration);
             return result.equals(TopicRegistrationValidatorResult.VALID) ? other.apply(topicRegistration) : result;
         };
     }
 
-    default TopicRegistrationValidator or (TopicRegistrationValidator other) {
+    default TopicRegistrationValidator or(TopicRegistrationValidator other) {
         return topicRegistration -> {
             TopicRegistrationValidatorResult result = this.apply(topicRegistration);
             return !result.equals(TopicRegistrationValidatorResult.VALID) ? other.apply(topicRegistration) : result;

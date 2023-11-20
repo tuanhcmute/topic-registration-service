@@ -16,7 +16,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Role findByCode(RoleCode roleCode) {
         Optional<Role> roleOptional = roleRepository.findByCode(roleCode);
-        if(!roleOptional.isPresent()) throw new BadRequestException("Role could not be found");
-        return  roleOptional.get();
+        if (!roleOptional.isPresent()) throw new BadRequestException("Role could not be found");
+        return roleOptional.get();
     }
 }

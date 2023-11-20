@@ -217,7 +217,7 @@ function TopicManagementPage() {
                                   </span>
                                 </div>
                               </td>
-                              <td className='p-3 text-center border border-collapse border-lightGrey bg-'>
+                              <td className='p-3 text-center border border-collapse border-lightGrey'>
                                 <span
                                   className={`${statusColor} py-1 px-3 text-sm font-medium rounded dark:text-black-pearl`}
                                 >

@@ -21,21 +21,22 @@ import java.util.Optional;
 public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
+
     @Override
     @LoggerAround
     public Response<RefreshTokenDTO> refreshToken(RefreshTokenRequest request) {
 //        Validate expired access token from client
         boolean isAccessTokenValid = jwtService.validateToken(request.getAccessToken());
-        if(isAccessTokenValid) throw new BadRequestException("Access token has not yet expired");
+        if (isAccessTokenValid) throw new BadRequestException("Access token has not yet expired");
 
 //        Validate refresh token
         boolean isRefreshTokenValid = jwtService.validateToken(request.getRefreshToken());
-        if(!isRefreshTokenValid) throw new BadRequestException("Refresh token is not valid");
+        if (!isRefreshTokenValid) throw new BadRequestException("Refresh token is not valid");
 
 //        Validate user
         final String userId = jwtService.getUsernameFromToken(request.getRefreshToken());
         final Optional<User> userOptional = userRepository.findById(userId);
-        if(!userOptional.isPresent()) throw new BadRequestException("User could not be found");
+        if (!userOptional.isPresent()) throw new BadRequestException("User could not be found");
         final User user = userOptional.get();
 
 //        Generate new accessToken, refreshToken
