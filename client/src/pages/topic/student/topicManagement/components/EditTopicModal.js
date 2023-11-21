@@ -7,8 +7,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
-import { topicStatus } from "../../../../../utils/constants";
+import { topicStatus, topicType } from "../../../../../utils/constants";
 import { createTopicEnrollment } from "../../../../../features/topicEnrollment/topicEnrollmentAction";
+import UnavailableEnrollmentTopicModal from "./UnavailableEnrollmentTopicModal";
+import { fetchAllApprovedTopicsInStudentEnrollmentPeriod } from "../../../../../features/topic";
 
 const validationSchema = Yup.object().shape({
   id: Yup.string().required(),
@@ -25,6 +27,10 @@ function EditTopicModal(props) {
   const dispatch = useDispatch();
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [isDisabled, setDisabled] = useState(false);
+  const [
+    openUnavailableEnrollmentTopicModal,
+    setOpenUnavailableEnrollmentTopicModal,
+  ] = useState(undefined);
   const { openModal, setOpenModal, data, handleUpdateTopic } = props;
   const enrollmentPeriod = useSelector(
     (state) => state.enrollmentPeriod?.enrollmentPeriod
@@ -53,6 +59,9 @@ function EditTopicModal(props) {
       topicId: data?.id,
     };
     dispatch(createTopicEnrollment({ data: request, setOpenModal }));
+    dispatch(
+      fetchAllApprovedTopicsInStudentEnrollmentPeriod({ type: topicType.TLCN })
+    );
   }
 
   useEffect(() => {
@@ -138,10 +147,8 @@ function EditTopicModal(props) {
               htmlFor='topicName'
               value='Tên đề tài (*)'
               className='mb-2 block'
-              color={formik.errors.topicName && "failure"}
             />
             <TextInput
-              color={formik.errors.topicName && "failure"}
               helperText={formik.errors.topicName}
               placeholder='Tên đề tài...'
               required
@@ -156,7 +163,6 @@ function EditTopicModal(props) {
           {/* Goal field */}
           <div className='mb-2 block font-Roboto'>
             <Label
-              color={formik.errors.goal && "failure"}
               htmlFor='goal'
               value='Yêu cầu đề tài (*)'
               className='mb-2 block'
@@ -183,7 +189,6 @@ function EditTopicModal(props) {
           {/* End goal field */}
           <div className='mb-2 block font-Roboto'>
             <Label
-              color={formik.errors.requirement && "failure"}
               htmlFor='requirement'
               value='Kiến thức cần có (*)'
               className='mb-2 block'
@@ -223,12 +228,19 @@ function EditTopicModal(props) {
           <Button
             className='p-0'
             color='green'
-            onClick={handleCreateTopicEnrollment}
+            onClick={() => {
+              if (data?.availableSlot > 0) handleCreateTopicEnrollment();
+              else setOpenUnavailableEnrollmentTopicModal("default");
+            }}
           >
             Đăng ký
           </Button>
           {/* </form> */}
         </div>
+        <UnavailableEnrollmentTopicModal
+          openModal={openUnavailableEnrollmentTopicModal}
+          setOpenModal={setOpenUnavailableEnrollmentTopicModal}
+        />
       </Modal.Footer>
     </Modal>
   );
