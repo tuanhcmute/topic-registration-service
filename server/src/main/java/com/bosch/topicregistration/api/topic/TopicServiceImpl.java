@@ -151,13 +151,13 @@ public class TopicServiceImpl implements TopicService {
 
 //        Get current topic enrollment to compare with student request
         boolean isAllMatch = false;
-        List<TopicEnrollment> currentTopicEnrollments = topicEnrollmentRepository.findByTopic(topic);
+        List<TopicEnrollment> currentTopicEnrollments = topicEnrollmentRepository.findByTopicOrderByIsLeaderDesc(topic);
         if (!currentTopicEnrollments.isEmpty()) {
-            isAllMatch = currentTopicEnrollments.stream().allMatch(topicEnrollment -> {
-                boolean isAnyMatch = request.getStudents().stream().anyMatch(ntid -> StringUtils.equals(topicEnrollment.getStudent().getNtid(), ntid));
-                if (isAnyMatch) request.getStudents().remove(topicEnrollment.getStudent().getNtid());
-                return isAnyMatch;
-            });
+            currentTopicEnrollments.forEach(topicEnrollment -> request.getStudents().forEach(item -> {
+                if(topicEnrollment.getStudent().getNtid().equals(item)) request.getStudents().remove(item);
+            }));
+            if(request.getStudents().isEmpty()) isAllMatch = true;
+            log.info(request.getStudents().toString());
         }
         log.info("Is all match: {}", isAllMatch);
 
