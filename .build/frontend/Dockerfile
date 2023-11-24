@@ -1,7 +1,7 @@
 FROM node:18-alpine AS BUILD
 WORKDIR /app
 COPY client/package.json ./client/package.json
-RUN cd client && npm install  --network-timeout 6000000
+RUN cd client && npm i
 COPY client ./client
 RUN cd client && npm run build --network-timeout 6000000
 WORKDIR /app/client
@@ -10,6 +10,6 @@ WORKDIR /app/client
 FROM nginx:alpine
 COPY ./.build/frontend/nginx.conf /etc/nginx/nginx.conf
 RUN rm -rf /usr/share/nginx/html/*
-EXPOSE 3000
+EXPOSE 80
 COPY --from=BUILD /app/client/build /usr/share/nginx/html
 CMD ["nginx", "-g", "daemon off;"]
