@@ -10,10 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,14 +85,26 @@ public class UserServiceImpl implements UserService {
         Optional<Major> majorOptional = majorRepository.findByCode(majorCode);
         if (!majorOptional.isPresent()) throw new BadRequestException("Major could not be found");
         Major major = majorOptional.get();
-
-        List<User> users = userRepository.findByMajor(major)
-                .stream().filter(user -> user.getUserRoles()
-                        .stream().anyMatch(userRole -> userRole.getRole().getCode().equals(RoleCode.ROLE_LECTURE)))
-                .collect(Collectors.toList());
-        List<LectureDTO> lectures = userMapper.toListLectureDTO(users);
+//        Get lectures
+        List<User> users = userRepository.findByMajor(major);
+//        Filter lectures
+        List<User> filterLectures = new ArrayList<>();
+        for(User user : users) {
+            boolean isLecture = false;
+            for(UserRole userRole : user.getUserRoles()) {
+                if(userRole.getRole().getCode().equals(RoleCode.ROLE_LECTURE)) {
+                    isLecture = true;
+                    break;
+                }
+            }
+            if(isLecture) filterLectures.add(user);
+        }
+//        Mapper to DTO
+        List<LectureDTO> lectures = userMapper.toListLectureDTO(filterLectures);
+//        Build data
         Map<String, List<LectureDTO>> data = new HashMap<>();
         data.put("lectures", lectures);
+//        Build response
         return Response.<List<LectureDTO>>builder()
                 .message("The list of lectures has been successfully retrieved")
                 .statusCode(HttpStatus.OK.value())
