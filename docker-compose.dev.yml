@@ -1,16 +1,16 @@
 version: "3.8"
 
 services:
-  # backend:
-  #   build:
-  #     dockerfile: ./.build/backend/java/Dockerfile
-  #   healthcheck:
-  #     test:
-  #       ["CMD", "curl", "-f", "http://localhost:8080/api/v1/healthcheck/status"]
-  #     interval: 5s
-  #     timeout: 5s
-  #     retries: 10
-  #     start_period: 10s
+#  backend:
+#    build:
+#      dockerfile: ./.build/backend/java/Dockerfile
+#    healthcheck:
+#      test:
+#        ["CMD", "curl", "-f", "http://localhost:8080/api/v1/healthcheck/status"]
+#      interval: 5s
+#      timeout: 5s
+#      retries: 10
+      # start_period: 10s
 
   frontend:
     build:
