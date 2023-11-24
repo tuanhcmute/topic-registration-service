@@ -42,8 +42,22 @@ public class TopicEnrollmentServiceImpl implements TopicEnrollmentService {
         if (!topicEnrollmentOptional.isPresent()) throw new BadRequestException("Topic enrollment could not be found");
         TopicEnrollment topicEnrollment = topicEnrollmentOptional.get();
 
-//        Update available slot
+//        Get topic
         Topic topic = topicEnrollment.getTopic();
+
+//        Grant is leader to member
+        if(topicEnrollment.getIsLeader()) {
+            List<TopicEnrollment> topicEnrollments = topicEnrollmentRepository.findByTopicOrderByIsLeaderDesc(topic);
+            for (TopicEnrollment item : topicEnrollments) {
+                if (!item.getIsLeader()) {
+                    item.setIsLeader(true);
+                    topicEnrollmentRepository.save(item);
+                    break;
+                }
+            }
+        }
+
+//        Update available slot
         topic.setAvailableSlot(topic.getAvailableSlot() + 1);
         topicRepository.save(topic);
 
@@ -65,7 +79,7 @@ public class TopicEnrollmentServiceImpl implements TopicEnrollmentService {
         Topic topic = topicOptional.get();
 
 //        Get topic enrollment
-        List<TopicEnrollment> topicEnrollments = topicEnrollmentRepository.findByTopic(topic);
+        List<TopicEnrollment> topicEnrollments = topicEnrollmentRepository.findByTopicOrderByIsLeaderDesc(topic);
         if (!topicEnrollments.isEmpty()) {
            if(topic.getMaxSlot() == topicEnrollments.size() && topic.getAvailableSlot() == 0)
                throw new BadRequestException("Topic enrollment is full");
@@ -112,7 +126,8 @@ public class TopicEnrollmentServiceImpl implements TopicEnrollmentService {
         if(!topicEnrollmentOptional.isPresent()) throw new BadRequestException("Student has not enrolled yet");
 
 //        Get list
-        List<TopicEnrollment> topicEnrollments = topicEnrollmentRepository.findByTopic(topicEnrollmentOptional.get().getTopic());
+        List<TopicEnrollment> topicEnrollments = topicEnrollmentRepository
+                .findByTopicOrderByIsLeaderDesc(topicEnrollmentOptional.get().getTopic());
 
 //        Build response
         List<TopicEnrollmentDTO> topicEnrollmentDTOs = topicEnrollmentMapper.toListDTO(topicEnrollments);

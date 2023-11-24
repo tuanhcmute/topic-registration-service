@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class TopicEnrollmentDTO {
+    private String id;
     private StudentDTO student;
     private TopicDTO topic;
     boolean isLeader;

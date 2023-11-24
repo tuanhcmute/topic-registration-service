@@ -3,6 +3,7 @@ import { LiaEditSolid } from "react-icons/lia";
 import { Button } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import { AiOutlineFilter } from "react-icons/ai";
+import { IoMdCloseCircleOutline, IoMdPersonAdd } from "react-icons/io";
 import _ from "lodash";
 
 import EditTopicModal from "./components/EditTopicModal";
@@ -20,10 +21,19 @@ import {
 import { fetchStudentsNotEnrolledInTopic } from "../../../../features/user";
 import { fetchEnrollmentPeriodByTopicTypeAndPeriodCode } from "../../../../features/enrollmentPeriod";
 import { fetchTopicEnrollmentsByNtid } from "../../../../features/topicEnrollment/topicEnrollmentAction";
+import CancelEnrollmentTopicModal from "./components/CancelEnrollmentTopicModal";
+import AddMemberEnrollmentTopicModal from "./components/AddMemberEnrollmentTopicModal";
 
 function TopicManagementPage() {
   const [openEditTopicModal, setOpenEditTopicModal] = useState(undefined);
+  const [openCancelEnrollmentTopicModal, setOpenCancelEnrollmentTopicModal] =
+    useState(undefined);
+  const [
+    openAddMemberEnrollmentTopicModal,
+    setOpenAddMemberEnrollmentTopicModal,
+  ] = useState(undefined);
   const [selectedTopic, setSelectedTopic] = useState(null);
+  const [selectedTopicEnrollment, setSelectedTopicEnrollment] = useState(null);
   const [topicStatusFilter, setTopicStatusFilter] = useState(
     topicStatus.all.value
   );
@@ -87,8 +97,8 @@ function TopicManagementPage() {
   }, []);
 
   return (
-    <div className='flex flex-col w-full gap-10'>
-      <div className='w-full border border-lightGrey bg-white h-fit rounded-md dark:bg-sambuca dark:border-gray-500'>
+    <div className='flex flex-col gap-10 w-full'>
+      <div className=' border border-lightGrey bg-white h-fit rounded-md dark:bg-sambuca dark:border-gray-500'>
         {/* Register topic */}
         <div className='flex items-center justify-between p-3 border-b border-lightGrey'>
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
@@ -223,7 +233,7 @@ function TopicManagementPage() {
         </div>
         {/* End table */}
       </div>
-      <div className='w-full border border-lightGrey bg-white h-fit rounded-md dark:bg-sambuca dark:border-gray-500'>
+      <div className=' border border-lightGrey bg-white h-fit rounded-md dark:bg-sambuca dark:border-gray-500'>
         {/* Register topic */}
         <div className='flex items-center justify-between p-3 border-b border-lightGrey'>
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
@@ -294,12 +304,52 @@ function TopicManagementPage() {
                               </span>
                             </td>
                             <td className='border border-collapse border-lightGrey'>
-                              <div className='flex justify-center flex-wrap gap-1 items-center m-2'>
-                                <LiaEditSolid
-                                  className='w-6 h-6 cursor-pointer'
-                                  onClick={() => {}}
-                                />
-                              </div>
+                              {(currentUser?.ntid === item?.student?.ntid ||
+                                !item?.leader) && (
+                                <>
+                                  <div className='flex justify-center flex-wrap gap-1 items-center m-2'>
+                                    <LiaEditSolid
+                                      className='w-6 h-6 cursor-pointer'
+                                      id={`_${item?.id}`}
+                                    />
+                                  </div>
+                                  <Dropdown
+                                    place='right-right'
+                                    className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
+                                    anchorSelect={`#_${item?.id}`}
+                                  >
+                                    <div className='flex flex-col gap-2 p-3'>
+                                      {item?.leader && (
+                                        <div
+                                          className='text-sm px-2 py-1 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer flex items-center gap-2'
+                                          onClick={() => {
+                                            setSelectedTopicEnrollment(item);
+                                            setOpenAddMemberEnrollmentTopicModal(
+                                              "default"
+                                            );
+                                          }}
+                                        >
+                                          <IoMdPersonAdd />
+                                          <span>Thêm thành viên</span>
+                                        </div>
+                                      )}
+
+                                      <div
+                                        className='text-sm px-2 py-1 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer flex items-center gap-2'
+                                        onClick={() => {
+                                          setSelectedTopicEnrollment(item);
+                                          setOpenCancelEnrollmentTopicModal(
+                                            "default"
+                                          );
+                                        }}
+                                      >
+                                        <IoMdCloseCircleOutline />
+                                        Hủy đăng ký
+                                      </div>
+                                    </div>
+                                  </Dropdown>
+                                </>
+                              )}
                             </td>
                           </tr>
                         );
@@ -321,6 +371,16 @@ function TopicManagementPage() {
         data={selectedTopic}
         openModal={openEditTopicModal}
         setOpenModal={setOpenEditTopicModal}
+      />
+      <CancelEnrollmentTopicModal
+        openModal={openCancelEnrollmentTopicModal}
+        setOpenModal={setOpenCancelEnrollmentTopicModal}
+        data={selectedTopicEnrollment}
+      />
+      <AddMemberEnrollmentTopicModal
+        openModal={openAddMemberEnrollmentTopicModal}
+        setOpenModal={setOpenAddMemberEnrollmentTopicModal}
+        data={selectedTopicEnrollment}
       />
       {/* End content */}
     </div>
