@@ -1,6 +1,7 @@
 package com.bosch.topicregistration.api.user;
 
 import com.bosch.topicregistration.api.exception.BadRequestException;
+import com.bosch.topicregistration.api.firebase.FirebaseService;
 import com.bosch.topicregistration.api.logging.LoggerAround;
 import com.bosch.topicregistration.api.response.Response;
 import com.bosch.topicregistration.api.topicenrollment.TopicEnrollmentRepository;
@@ -9,7 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final TopicEnrollmentRepository topicEnrollmentRepository;
     private final MajorRepository majorRepository;
+    private final FirebaseService firebaseService;
 
     @Override
     @LoggerAround
@@ -110,5 +114,33 @@ public class UserServiceImpl implements UserService {
                 .statusCode(HttpStatus.OK.value())
                 .data(data)
                 .build();
+    }
+
+    @Override
+    @LoggerAround
+    public Response<Void> updateAvatarInUserProfile(MultipartFile imageFile) {
+        try {
+//            Validate image file
+            if(Objects.isNull(imageFile.getContentType()) || !imageFile.getContentType().startsWith("image/"))
+                throw new BadRequestException("File is not valid");
+
+//            Save file
+            String imageUrl = firebaseService.save(imageFile);
+            log.info("Image url: {}", imageUrl);
+
+//            Update user
+            User user = userCommon.getCurrentUserByCurrentAuditor();
+            user.setImageUrl(imageUrl);
+            userRepository.save(user);
+
+            return Response.<Void>builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message("User's avatar has been updated successfully")
+                    .build();
+
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new BadRequestException(e.getMessage());
+        }
     }
 }

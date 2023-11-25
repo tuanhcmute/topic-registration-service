@@ -53,3 +53,6 @@ build/
 /nodejs-server/node_modules
 /nodejs-server/dist
 *.pem
+
+# java server
+/server/src/main/resources/*.json

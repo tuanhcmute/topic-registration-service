@@ -3,6 +3,7 @@ package com.bosch.topicregistration.api.user;
 import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
 import com.bosch.topicregistration.api.response.Response;
+import com.google.api.Http;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -66,5 +68,14 @@ public class UserController {
     public Response<List<LectureDTO>> getLecturesByMajor(@RequestParam("majorCode") String majorCode) {
         if (StringUtils.isBlank(majorCode)) throw new BadRequestException("Major code is not valid");
         return userService.getLecturesByMajor(majorCode);
+    }
+
+    @PutMapping(path = "/profile/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @LoggerAround
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_LECTURE')")
+    public  Response<Void> updateAvatarInUserProfile(@RequestParam("image") MultipartFile imageFile) {
+
+        return userService.updateAvatarInUserProfile(imageFile);
     }
 }
