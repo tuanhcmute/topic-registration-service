@@ -1,8 +1,11 @@
 server:
-  port: 90001
+  port: 8082
   servlet:
     context-path: /api/v1
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_SCHEMA}
@@ -18,6 +21,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 app:
   jwt:
     secretKey: ${SECRET_KEY}
@@ -30,3 +37,7 @@ app:
       allowedHeaders: "*"
       allowedCredentials: false
       corsConfiguration: "/**"
+firebase:
+  serviceAccount:
+  bucketName: ${BUCKET_NAME}
+  imageUrl: https://firebasestorage.googleapis.com/v0/b/${firebase.bucketName}/o/%s?alt=media

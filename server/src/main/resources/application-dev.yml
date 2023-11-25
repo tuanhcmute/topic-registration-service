@@ -1,8 +1,11 @@
 server:
-  port: 90000
+  port: 8081
   servlet:
     context-path: /api/v1
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_SCHEMA}
@@ -34,3 +37,7 @@ app:
       allowedHeaders: "*"
       allowedCredentials: false
       corsConfiguration: "/**"
+firebase:
+  serviceAccount:
+  bucketName: ${BUCKET_NAME}
+  imageUrl: https://firebasestorage.googleapis.com/v0/b/${firebase.bucketName}/o/%s?alt=media
