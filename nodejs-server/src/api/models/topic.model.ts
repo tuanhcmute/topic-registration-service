@@ -4,6 +4,7 @@ import { User, UserInstance } from "./user.model";
 import { POSTFIX } from "@configs/constants";
 import { Semester } from "./semester.model";
 import { Major } from "./major.model";
+import { TopicEnrollmentInstance } from "./topicEnrollment.model";
 
 interface TopicAttributes {
   id?: string;
@@ -25,6 +26,7 @@ interface TopicAttributes {
 
 interface TopicInstance extends Model<TopicAttributes>, TopicAttributes {
   students?: UserInstance[];
+  topicEnrollments?: TopicEnrollmentInstance[];
 }
 
 const modelName: string = "topic";

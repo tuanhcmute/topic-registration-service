@@ -1,6 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import db from "@configs/db.config";
-import { User, Topic } from "@models";
+import { User, Topic, UserInstance } from "@models";
 import { POSTFIX } from "@configs/constants";
 
 interface TopicEnrollmentAttributes {
@@ -14,7 +14,9 @@ interface TopicEnrollmentAttributes {
 
 interface TopicEnrollmentInstance
   extends Model<TopicEnrollmentAttributes>,
-    TopicEnrollmentAttributes {}
+    TopicEnrollmentAttributes {
+  students?: UserInstance[];
+}
 
 const modelName: string = "topicEnrollment";
 const TopicEnrollment = db.define<TopicEnrollmentInstance>(

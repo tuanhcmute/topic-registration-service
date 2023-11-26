@@ -1,22 +1,13 @@
-import _ from "lodash";
+import _, { forEach } from "lodash";
 
 import { SemesterStatus, TopicType } from "@configs/constants";
 import ValidateException from "@exceptions/ValidateFailException";
-import {
-  Topic,
-  TopicInstance,
-  User,
-  Semester,
-  TopicEnrollment,
-  UserInstance,
-} from "@models";
+import { Topic, TopicInstance, User, Semester, TopicEnrollment } from "@models";
 import { CreateReqTopic, Data, UpdateTopic } from "@interfaces/topic.interface";
 import { db } from "@configs";
 import { IResponseModel, ResponseModelBuilder } from "@interfaces";
 import { StatusCodes } from "http-status-codes";
-import { Enrollment, EnrollmentAttributes } from "@models/enrollment.model";
-import { Transaction } from "sequelize";
-import { v4 as uuidv4 } from "uuid";
+
 export default class TopicService {
   // Class implementation goes here
   public getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture = async (
@@ -104,14 +95,16 @@ export default class TopicService {
           requirement: newTopic.requirement,
           type: newTopic.type,
           maxSlot: newTopic.maxSlot,
+          lectureId: user?.id || "",
         },
         { transaction }
       );
 
       for (const id of newTopic.students) {
-        const enrollment = new Enrollment();
+        const enrollment = new TopicEnrollment();
         enrollment.topicId = topic.id || "";
         enrollment.studentId = id;
+        enrollment.createdBy = user?.id || "";
         await enrollment.save({ transaction });
       }
 
@@ -128,60 +121,82 @@ export default class TopicService {
     }
   };
 
-  public updateTeacherTopic = async (
+  private updateTopicStudent = async (
+    topic: TopicInstance,
     updateTopic: UpdateTopic
-  ): Promise<void> => {
-    let transaction: Transaction | null = null;
+  ) => {
+    const newStudents: string[] = updateTopic.students;
+    const enrollments = await TopicEnrollment.findAll({
+      where: {
+        topicId: topic.id,
+      },
+    });
+
+    const existingStudentIds = enrollments.map(
+      (enrollment) => enrollment.studentId
+    );
+    console.log(existingStudentIds);
+    const enrollmentsToDelete = existingStudentIds.filter(
+      (id) => !newStudents.includes(id)
+    );
+    console.log(enrollmentsToDelete);
+
+    const enrollmentsToCreateOrUpdate = newStudents.filter(
+      (studentId) => !existingStudentIds.includes(studentId)
+    );
+
+    console.log(enrollmentsToCreateOrUpdate);
+
+    const transaction = await db.transaction(); // Begin a transaction
 
     try {
-      // Start a database transaction to ensure data consistency
-      transaction = await db.transaction();
-
-      // Update the Topic
-      const [topicUpdatedCount, [updatedTopics]] = await Topic.update(
-        updateTopic,
-        {
-          where: { id: updateTopic.id },
-          returning: true,
-          transaction,
-        }
-      );
-
-      // Check if the Topic was found and updated
-      if (topicUpdatedCount === 0 || !updatedTopics) {
-        throw new Error("Topic not found or not updated");
-      }
-
-      // Remove existing enrollments for the Topic
-      await Enrollment.destroy({
-        where: { topicId: updateTopic.id },
-        transaction,
-      });
-
-      // Add new enrollments based on the updatedEnrollmentData.students list
-      const enrollmentCreates = updateTopic.students.map(async (studentId) => {
-        await Enrollment.create(
-          {
-            topicId: updateTopic.id,
+      // Delete enrollments not present in newStudents within the transaction
+      for (const studentId of enrollmentsToDelete) {
+        await TopicEnrollment.destroy({
+          where: {
+            topicId: topic.id,
             studentId: studentId,
           },
-          { transaction }
-        );
-      });
-
-      // Commit the transaction to save changes to the database
-      await transaction.commit();
-
-      // Wait for all enrollment creations to complete
-      await Promise.all(enrollmentCreates);
-    } catch (err) {
-      console.error("Error in updateTeacherTopic:", err);
-      throw err;
-    } finally {
-      // Roll back the transaction in case of an error
-      if (transaction) {
-        await transaction.rollback();
+          transaction: transaction,
+        });
       }
+
+      // Create or update enrollments for newStudents within the transaction
+      const bulkCreateData = enrollmentsToCreateOrUpdate.map((studentId) => ({
+        topicId: topic.id || "",
+        studentId,
+        createdBy: topic.lectureId,
+      }));
+      await TopicEnrollment.bulkCreate(bulkCreateData, { transaction });
+
+      // If everything went well, commit the transaction
+      await transaction.commit();
+      console.log("Transaction committed successfully.");
+    } catch (error) {
+      // If any operation fails, rollback the transaction
+      await transaction.rollback();
+      console.error(`Transaction rolled back due to error: ${error}`);
+      // Handle the error accordingly
+    }
+  };
+
+  public updateTeacherTopic = async (
+    updateTopic: UpdateTopic,
+    topic: TopicInstance
+  ): Promise<void> => {
+    try {
+      if (_.isNull(topic) || _.isEmpty(topic))
+        throw new ValidateException("Topic could not be found");
+
+      topic.name = updateTopic.topicName;
+      topic.goal = updateTopic.goal;
+      topic.requirement = updateTopic.requirement;
+      topic.maxSlot = updateTopic.maxSlot;
+      this.updateTopicStudent(topic, updateTopic);
+      await topic.save();
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
   };
 }

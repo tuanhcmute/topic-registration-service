@@ -5,6 +5,7 @@ import { StatusCodes } from "http-status-codes";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { CreateReqTopic, Data, UpdateTopic } from "@interfaces/topic.interface";
+import { Topic, TopicEnrollment, User } from "@models";
 
 export default class TopicController {
   private topicService: TopicService = new TopicService();
@@ -81,6 +82,22 @@ export default class TopicController {
   ) => {
     try {
       const updatedTopic = plainToInstance(UpdateTopic, req.body);
+
+      const lecture = await User.findOne({
+        where: { email: res.locals.email },
+      });
+
+      console.log(lecture?.id);
+      const topic = await Topic.findOne({
+        where: {
+          id: updatedTopic.id,
+          lectureId: lecture?.id,
+        },
+        include: [{ model: TopicEnrollment, as: "topicEnrollments" }],
+      });
+
+      console.info(topic);
+
       const errors = await validate(updatedTopic);
 
       if (errors.length > 0) {
@@ -98,8 +115,17 @@ export default class TopicController {
               .withStatusCode(StatusCodes.BAD_REQUEST)
               .build()
           );
+      } else if (topic == null) {
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json(
+            new ResponseModelBuilder()
+              .withMessage("Topic not found")
+              .withStatusCode(StatusCodes.BAD_REQUEST)
+              .build()
+          );
       } else {
-        await this.topicService.updateTeacherTopic(updatedTopic);
+        await this.topicService.updateTeacherTopic(updatedTopic, topic);
         res
           .status(StatusCodes.OK)
           .json(
