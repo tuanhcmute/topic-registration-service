@@ -16,7 +16,7 @@ import { IResponseModel, ResponseModelBuilder } from "@interfaces";
 import { StatusCodes } from "http-status-codes";
 import { Enrollment, EnrollmentAttributes } from "@models/enrollment.model";
 import { Transaction } from "sequelize";
-
+import { v4 as uuidv4 } from "uuid";
 export default class TopicService {
   // Class implementation goes here
   public getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture = async (
@@ -86,11 +86,11 @@ export default class TopicService {
 
   public createTopic = async (
     newTopic: CreateReqTopic,
-    userId: string
+    email: string
   ): Promise<TopicInstance> => {
     let transaction;
 
-    const user = await User.findOne({ where: { id: userId } });
+    const user = await User.findOne({ where: { email: email } });
     try {
       // Start a database transaction to ensure data consistency
       transaction = await db.transaction();
@@ -108,10 +108,10 @@ export default class TopicService {
         { transaction }
       );
 
-      for (const code of newTopic.students) {
+      for (const id of newTopic.students) {
         const enrollment = new Enrollment();
         enrollment.topicId = topic.id || "";
-        enrollment.studentId = code;
+        enrollment.studentId = id;
         await enrollment.save({ transaction });
       }
 
@@ -124,7 +124,6 @@ export default class TopicService {
       if (transaction) {
         await transaction.rollback();
       }
-      console.error(err);
       throw err;
     }
   };

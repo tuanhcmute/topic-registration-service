@@ -33,9 +33,9 @@ const Topic = db.define<TopicInstance>(
   {
     id: {
       type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
       field: "id".concat(POSTFIX),
-      defaultValue: DataTypes.UUIDV4,
     },
     code: {
       type: DataTypes.STRING,

@@ -27,6 +27,7 @@ export const preAuthorizeFilter =
       try {
         decoded = await verifyToken(token);
       } catch (err: any) {
+        console.error(err.message);
         return res
           .status(StatusCodes.UNAUTHORIZED)
           .json(
@@ -39,6 +40,8 @@ export const preAuthorizeFilter =
 
       // Get user by email
       const email = decoded.email;
+      res.locals.email = email;
+      console.log("Extracted email: " + email);
       const currentUser = await User.findOne({
         where: {
           email: email,

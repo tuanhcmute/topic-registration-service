@@ -43,13 +43,13 @@ const UserRole = db.define<UserRoleInstance>(
       type: DataTypes.DATE,
       field: "created_date".concat(POSTFIX),
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: true,
     },
     updatedDate: {
       type: DataTypes.DATE,
       field: "updated_date".concat(POSTFIX),
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: true,
     },
   },
   { timestamps: false, tableName: "user_role_tbl" }

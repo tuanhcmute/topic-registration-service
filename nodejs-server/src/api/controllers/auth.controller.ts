@@ -34,7 +34,7 @@ export default class AuthController {
 
   public getGoogleLogin = (req: Request, res: Response, next: NextFunction) => {
     try {
-      let redirectUrl = req.query["redirect_url"];
+      let redirectUrl = req.query["redirect-url"];
       if (!redirectUrl) {
         redirectUrl = "http://localhost:3000";
       }

@@ -57,8 +57,8 @@ export default class TopicController {
               .build()
           );
       } else {
-        const userId = res.locals.userId;
-        await this.topicService.createTopic(newTopic, userId);
+        const email = res.locals.email;
+        await this.topicService.createTopic(newTopic, email);
         res
           .status(StatusCodes.CREATED)
           .json(
