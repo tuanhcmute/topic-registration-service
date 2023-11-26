@@ -1,8 +1,10 @@
 package com.bosch.topicregistration.api.security.oauth2;
 
+import com.bosch.topicregistration.api.logging.LoggerAround;
 import com.bosch.topicregistration.api.security.CookieUtils;
 import com.bosch.topicregistration.api.security.HttpCookieOAuth2AuthorizationRequestRepositoryImpl;
 import com.bosch.topicregistration.api.security.jwt.JwtService;
+import com.bosch.topicregistration.api.security.jwt.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -25,8 +27,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final JwtService jwtService;
 
     @Override
+    @LoggerAround
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-        log.info("On authentication success");
         String targetUrl = determineTargetUrl(request, response, authentication);
         log.info("Target url: {}", targetUrl);
         if (response.isCommitted()) {
@@ -37,20 +39,23 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.sendRedirect(targetUrl);
     }
 
+    @LoggerAround
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        log.info("Determine target url");
         String targetUrl = CookieUtils.getCookie(request, HttpCookieOAuth2AuthorizationRequestRepositoryImpl.REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue).orElse(getDefaultTargetUrl());
         log.info("Target url: {}", targetUrl);
-        String token = jwtService.createToken(authentication);
+        UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
+        final String token = jwtService.createToken(user.getUsername());
+        final String refreshToken = jwtService.createRefreshToken(user.getId());
         log.info("Token: {}", token);
         return UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("accessToken", token)
+                .queryParam(TokenType.ACCESS_TOKEN.getValue(), token)
+                .queryParam(TokenType.REFRESH_TOKEN.getValue(), refreshToken)
                 .build().toUriString();
     }
 
+    @LoggerAround
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
-        log.info("Clear authentication attributes");
         super.clearAuthenticationAttributes(request);
         httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
     }

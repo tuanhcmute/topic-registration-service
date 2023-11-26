@@ -1,32 +1,19 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { PiNewspaperClippingLight } from "react-icons/pi";
 import { Button, TextInput, Label } from "flowbite-react";
 
 import { Banner } from "../../components/banner";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { userService } from "../../services";
-import { toast } from "react-toastify";
-import { HttpStatusCode } from "axios";
+import { updateBiographyInUserProfile } from "../../features/user";
 
 function ProfilePage() {
+  const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user?.currentUser);
   const [biography, setBiography] = useState(
     (currentUser) => currentUser?.biography || ""
   );
-  console.log(biography);
-
-  async function updateBiographyInUserProfile() {
-    console.log(biography);
-    const response = await userService.updateBiographyInUserProfile({
-      biography,
-    });
-    if (response?.data?.statusCode === HttpStatusCode.Ok) {
-      toast.success("Cập nhật tiểu sử thành công");
-    }
-    console.log(response);
-  }
 
   return (
     <React.Fragment>
@@ -109,7 +96,7 @@ function ProfilePage() {
               <CKEditor
                 onReady={(editor) => {
                   // You can store the "editor" and use when it is needed.
-                  editor.setData(currentUser?.biography);
+                  editor.setData(currentUser?.biography || "");
                 }}
                 editor={ClassicEditor}
                 onChange={(event, editor) => {
@@ -119,7 +106,11 @@ function ProfilePage() {
               />
             </div>
           </div>
-          <Button color='gray' onClick={updateBiographyInUserProfile}>
+          <Button
+            color='gray'
+            type='button'
+            onClick={() => dispatch(updateBiographyInUserProfile(biography))}
+          >
             Lưu thay đổi
           </Button>
         </div>

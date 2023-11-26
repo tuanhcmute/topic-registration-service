@@ -13,4 +13,6 @@ public interface UserRepository extends JpaRepository<User, String> {
     List<User> findAllByNtids(Iterable<String> ntids);
 
     List<User> findByMajor(Major major);
+
+    Optional<User> findByNtid(String ntid);
 }

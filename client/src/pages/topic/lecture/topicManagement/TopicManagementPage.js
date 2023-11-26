@@ -3,24 +3,25 @@ import { LiaEditSolid } from "react-icons/lia";
 import { BiMessageRoundedError } from "react-icons/bi";
 import { Button } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
-import { HttpStatusCode } from "axios";
 import { AiOutlineFilter } from "react-icons/ai";
+import _ from "lodash";
 
 import EnrollTopicModal from "./components/EnrollTopicModal";
 import EditTopicModal from "./components/EditTopicModal";
-import { enrollmentPeriodService, userService } from "../../../../services";
 import {
   enrollmentPeriodCodes,
   topicStatus,
   topicType,
 } from "../../../../utils/constants";
-import { Dropdown } from "../../../../components/dropdown";
+import { Dropdown } from "../../../../components/dropdown1";
 import ApprovalTopicModal from "./components/ApprovalTopicModal";
 import {
   createNewTopicInLectureEnrollmentPeriod,
   fetchAllTopicsInLectureEnrollmentPeriod,
   updateTopicInLectureEnrollmentPeriod,
-} from "../../../../features/topic/topicSlice";
+} from "../../../../features/topic";
+import { fetchStudentsNotEnrolledInTopic } from "../../../../features/user";
+import { fetchEnrollmentPeriodByTopicTypeAndPeriodCode } from "../../../../features/enrollmentPeriod";
 
 function TopicManagementPage() {
   const [openModal, setOpenModal] = useState(undefined);
@@ -28,14 +29,18 @@ function TopicManagementPage() {
   const [openApprovalTopicModal, setOpenApprovalTopicModal] =
     useState(undefined);
   const [selectedTopic, setSelectedTopic] = useState(null);
-  const [enrollmentPeriod, setEnrollmentPeriod] = useState(undefined);
-  const [studentOptions, setStudentOptions] = useState([]);
   const [topicStatusFilter, setTopicStatusFilter] = useState(
     topicStatus.all.value
   );
   // Get current user from redux
   const currentUser = useSelector((state) => state.user?.currentUser);
   const topics = useSelector((state) => state.topic?.topics);
+  const studentOptions = useSelector(
+    (state) => state.user?.studentsNotEnrolledInTopic
+  );
+  const enrollmentPeriod = useSelector(
+    (state) => state.enrollmentPeriod?.enrollmentPeriod
+  );
   const dispatch = useDispatch();
 
   async function handleCreateNewTopicInLectureEnrollmentPeriod(data) {
@@ -56,40 +61,36 @@ function TopicManagementPage() {
       })
     );
   }
-  async function fetchStudentsNotEnrolledInTopic() {
-    try {
-      const response = await userService.getStudentsNotEnrolledInTopic();
-      if (response?.data?.statusCode === HttpStatusCode.Ok) {
-        const data = response.data?.data?.students?.map((item) => ({
-          value: item?.ntid,
-          label: item?.name,
-        }));
-        setStudentOptions(data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  async function fetchEnrollmentPeriodByTopicTypeAndPeriodCode() {
-    try {
-      const response =
-        await enrollmentPeriodService.getEnrollmentPeriodByTopicTypeAndPeriodCode(
-          topicType.TLCN,
-          enrollmentPeriodCodes.LECTURE_ENROLLMENT_PERIOD
-        );
-      if (response?.data?.statusCode === HttpStatusCode.Ok) {
-        setEnrollmentPeriod(response?.data?.data?.enrollmentPeriod);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   useEffect(() => {
-    dispatch(fetchAllTopicsInLectureEnrollmentPeriod(topicType.TLCN));
-    fetchStudentsNotEnrolledInTopic();
-    fetchEnrollmentPeriodByTopicTypeAndPeriodCode();
-  }, [dispatch]);
+    // Fetch topics
+    if (_.isEmpty(topics) || _.isNull(topics) || _.isUndefined(topics)) {
+      dispatch(fetchAllTopicsInLectureEnrollmentPeriod(topicType.TLCN));
+    }
+
+    // Fetch student options
+    if (
+      _.isEmpty(studentOptions) ||
+      _.isNull(studentOptions) ||
+      _.isUndefined(studentOptions)
+    ) {
+      dispatch(fetchStudentsNotEnrolledInTopic());
+    }
+
+    // Fetch enrollment period
+    if (
+      _.isEmpty(enrollmentPeriod) ||
+      _.isNull(enrollmentPeriod) ||
+      _.isUndefined(enrollmentPeriod)
+    ) {
+      dispatch(
+        fetchEnrollmentPeriodByTopicTypeAndPeriodCode({
+          topicType: topicType.TLCN,
+          periodCode: enrollmentPeriodCodes.LECTURE_ENROLLMENT_PERIOD,
+        })
+      );
+    }
+  }, []);
 
   return (
     <React.Fragment>
@@ -167,23 +168,34 @@ function TopicManagementPage() {
                     <tbody className='text-gray-600 text-sm font-light'>
                       {topics
                         ?.filter((item) => {
-                          if (topicStatusFilter === "ALL") return true;
+                          if (
+                            _.isEqual(topicStatusFilter, topicStatus.all.value)
+                          )
+                            return true;
                           return item?.status === topicStatusFilter;
                         })
                         ?.map((item, index) => {
                           let statusColor = "";
-                          if (item?.status === topicStatus.approved.value) {
+                          if (
+                            _.isEqual(item?.status, topicStatus.approved.value)
+                          ) {
                             statusColor = "bg-green-200";
                           }
-                          if (item?.status === topicStatus.rejected.value) {
+                          if (
+                            _.isEqual(item?.status, topicStatus.rejected.value)
+                          ) {
                             statusColor = "bg-red-300";
                           }
-                          if (item?.status === topicStatus.pending.value) {
+                          if (
+                            _.isEqual(item?.status, topicStatus.pending.value)
+                          ) {
                             statusColor = "bg-teal-200";
                           }
-                          if (item?.status === topicStatus.updated.value) {
+                          if (
+                            _.isEqual(item?.status, topicStatus.updated.value)
+                          ) {
                             statusColor = "bg-teal-200";
-                          }
+                          } else statusColor = "bg-teal-200";
                           return (
                             <tr
                               className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'
@@ -205,7 +217,7 @@ function TopicManagementPage() {
                                   </span>
                                 </div>
                               </td>
-                              <td className='p-3 text-center border border-collapse border-lightGrey bg-'>
+                              <td className='p-3 text-center border border-collapse border-lightGrey'>
                                 <span
                                   className={`${statusColor} py-1 px-3 text-sm font-medium rounded dark:text-black-pearl`}
                                 >
@@ -229,8 +241,8 @@ function TopicManagementPage() {
                                       setOpenEditTopicModal("default");
                                     }}
                                   />
-                                  {item?.status ===
-                                    topicStatus.rejected.value && (
+                                  {item?.status !==
+                                    topicStatus.pending.value && (
                                     <BiMessageRoundedError
                                       className='w-6 h-6 cursor-pointer'
                                       onClick={() => {

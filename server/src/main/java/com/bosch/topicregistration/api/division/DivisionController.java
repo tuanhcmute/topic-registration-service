@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -26,7 +27,7 @@ public class DivisionController {
     @PreAuthorize("hasAuthority('ROLE_LECTURE')")
     public Response<List<DivisionDTO>> getDivisionByTopicType(@RequestParam("topicType") String topicType) {
 //        Validate
-        if(StringUtils.isBlank(topicType)) throw new BadRequestException("Topic type is not valid");
+        if (StringUtils.isBlank(topicType)) throw new BadRequestException("Topic type is not valid");
         log.info("Topic type is not blank");
 //        Call service
         return divisionService.getDivisionByTopicType(topicType);
@@ -36,11 +37,10 @@ public class DivisionController {
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ROLE_HEAD')")
-    public Response<Void> createDivisionByTopicType(@RequestParam("topicType") String topicType, @RequestBody CreateDivisionRequest request) {
+    public Response<Void> createDivisionByTopicType(@RequestParam("topicType") String topicType, @RequestBody @Valid CreateDivisionRequest request) {
 //        Validate topicType
-        if(StringUtils.isBlank(topicType)) throw new BadRequestException("Topic type is not valid");
+        if (StringUtils.isBlank(topicType)) throw new BadRequestException("Topic type is not valid");
         log.info("Topic type is not blank");
-//        Validate request body
 //        Call service
         return divisionService.createDivisionByTopicType(topicType, request);
     }

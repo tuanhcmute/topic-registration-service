@@ -5,8 +5,8 @@ import { POSTFIX } from "@configs/constants";
 
 interface TopicEnrollmentAttributes {
   id?: string;
-  topicId: string;
-  studentId: string;
+  topicId?: string;
+  studentId?: string;
   createdDate?: Date;
   updatedDate?: Date;
   createdBy?: string;

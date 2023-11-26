@@ -2,7 +2,7 @@ import axiosClient from "./axiosClient";
 
 const baseUrl = "/topic";
 const topicService = {
-  getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture: (type) => {
+  fetchAllTopicsInLectureEnrollmentPeriodByTypeAndLecture: (type) => {
     const requestUrl = `${baseUrl}/lecture?type=${type}`;
     return axiosClient.get(requestUrl);
   },
@@ -18,11 +18,16 @@ const topicService = {
     const requestUrl = `${baseUrl}/lecture/approval`;
     return axiosClient.put(requestUrl, data);
   },
-  getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor: (
-    type,
-    status
-  ) => {
-    const requestUrl = `${baseUrl}/head?type=${type}&status=${status}`;
+  fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod: (type) => {
+    const requestUrl = `${baseUrl}/head?type=${type}`;
+    return axiosClient.get(requestUrl);
+  },
+  fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod: (type) => {
+    const requestUrl = `${baseUrl}/head/division?type=${type}`;
+    return axiosClient.get(requestUrl);
+  },
+  fetchAllApprovedTopicsInStudentEnrollmentPeriod: (type) => {
+    const requestUrl = `${baseUrl}/student?type=${type}`;
     return axiosClient.get(requestUrl);
   },
 };

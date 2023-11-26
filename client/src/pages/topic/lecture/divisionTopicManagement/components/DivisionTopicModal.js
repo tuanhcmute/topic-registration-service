@@ -4,7 +4,7 @@ import { Modal, Button, TextInput, Label } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { createDivisionByTopicType } from "../../../../../features/division/divisionSlice";
+import { createDivisionByTopicType } from "../../../../../features/division";
 import { topicType } from "../../../../../utils/constants";
 
 const validationSchema = Yup.object().shape({
@@ -283,6 +283,5 @@ export default DivisionTopicModal;
 DivisionTopicModal.propTypes = {
   openModal: PropTypes.any,
   setOpenModal: PropTypes.func.isRequired,
-  handleUpdateTopic: PropTypes.func.isRequired,
   data: PropTypes.object || undefined,
 };

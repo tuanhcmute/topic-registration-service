@@ -8,6 +8,7 @@ import com.bosch.topicregistration.api.semester.SemesterRepository;
 import com.bosch.topicregistration.api.semester.SemesterStatus;
 import com.bosch.topicregistration.api.topic.Topic;
 import com.bosch.topicregistration.api.topic.TopicRepository;
+import com.bosch.topicregistration.api.topic.TopicStatus;
 import com.bosch.topicregistration.api.topic.TopicType;
 import com.bosch.topicregistration.api.user.RoleCode;
 import com.bosch.topicregistration.api.user.User;
@@ -38,12 +39,12 @@ public class DivisionServiceImpl implements DivisionService {
     @LoggerAround
     public Response<List<DivisionDTO>> getDivisionByTopicType(String topicType) {
 //        Validate request
-        if(StringUtils.isBlank(topicType)) throw new BadRequestException("Topic type is not valid");
+        if (StringUtils.isBlank(topicType)) throw new BadRequestException("Topic type is not valid");
         log.info("Topic type is not blank");
 
 //        Validate value of request
         boolean isValid = Arrays.stream(TopicType.values()).anyMatch(item -> item.name().equals(topicType));
-        if(!isValid) throw new BadRequestException("Topic type could not be found");
+        if (!isValid) throw new BadRequestException("Topic type could not be found");
         TopicType currentType = TopicType.valueOf(topicType);
         log.info("Topic type: {}", currentType.name());
 
@@ -52,11 +53,12 @@ public class DivisionServiceImpl implements DivisionService {
 
 //        Validate role
         boolean hasLectureRole = currentUser.getUserRoles().stream().anyMatch(userRole -> userRole.getRole().getCode().equals(RoleCode.ROLE_LECTURE));
-        if(!hasLectureRole) throw new AccessDeniedException("User could not permission to access this resource. Access is denied");
+        if (!hasLectureRole)
+            throw new AccessDeniedException("User could not permission to access this resource. Access is denied");
 
 //        Get activated semester
         List<Semester> semesters = semesterRepository.findByStatus(SemesterStatus.ACTIVATED);
-        if(semesters.isEmpty()) throw new BadRequestException("Current semester could not be found");
+        if (semesters.isEmpty()) throw new BadRequestException("Current semester could not be found");
         Semester currentSemester = semesters.get(0);
 
         List<Division> divisions = divisionRepository.findByLecture(currentUser);
@@ -79,24 +81,29 @@ public class DivisionServiceImpl implements DivisionService {
     @Override
     public Response<Void> createDivisionByTopicType(String topicType, CreateDivisionRequest request) {
         //        Validate request
-        if(StringUtils.isBlank(topicType)) throw new BadRequestException("Topic type is not valid");
+        if (StringUtils.isBlank(topicType)) throw new BadRequestException("Topic type is not valid");
         log.info("Topic type is not blank");
 
 //        Validate request body
         boolean isValid = Arrays.stream(TopicType.values()).anyMatch(item -> item.name().equals(topicType));
-        if(!isValid) throw new BadRequestException("Topic type could not be found");
+        if (!isValid) throw new BadRequestException("Topic type could not be found");
         TopicType currentType = TopicType.valueOf(topicType);
         log.info("Topic type: {}", currentType.name());
 
         //        Validate user
         User currentUser = userCommon.getCurrentUserByCurrentAuditor();
         boolean hasHeadRole = currentUser.getUserRoles().stream().anyMatch(userRole -> userRole.getRole().getCode().equals(RoleCode.ROLE_HEAD));
-        if(!hasHeadRole) throw new AccessDeniedException("User could not permission to access this resource. Access is denied");
+        if (!hasHeadRole)
+            throw new AccessDeniedException("User could not permission to access this resource. Access is denied");
 
         Optional<Topic> topicOptional = topicRepository.findById(request.getTopicId());
-        if(!topicOptional.isPresent()) throw new BadRequestException("Topic could not be found");
+        if (!topicOptional.isPresent()) throw new BadRequestException("Topic could not be found");
         Topic currentTopic = topicOptional.get();
 
+        if (currentTopic.getStatus().equals(TopicStatus.ASSIGNED))
+            throw new BadRequestException("Topic has been assigned");
+        if (!currentTopic.getStatus().equals(TopicStatus.APPROVED))
+            throw new BadRequestException("Topic has been approved");
 //        Build Division
         Division division = Division.builder()
                 .lecture(currentUser)
@@ -108,6 +115,10 @@ public class DivisionServiceImpl implements DivisionService {
                 .build();
         divisionRepository.save(division);
         log.info("Division: {}", division.getId());
+
+//        Update topic status
+        currentTopic.setStatus(TopicStatus.ASSIGNED);
+        topicRepository.save(currentTopic);
 
         return Response.<Void>builder()
                 .statusCode(HttpStatus.CREATED.value())

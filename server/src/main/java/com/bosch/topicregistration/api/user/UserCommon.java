@@ -25,7 +25,7 @@ public class UserCommon {
         String email = userPrincipal.getUsername();
         log.info("User email: {}", email);
         Optional<User> userOptional = userRepository.findByEmail(email);
-        if(!userOptional.isPresent()) throw new BadRequestException("User could not be found");
+        if (!userOptional.isPresent()) throw new BadRequestException("User could not be found");
         return userOptional.get();
     }
 

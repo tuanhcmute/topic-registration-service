@@ -4,13 +4,12 @@ import { StatusCodes } from "http-status-codes";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
 
-import { UserService } from "@services";
+import { userService } from "@services";
 import { ResponseModelBuilder, UpdatedBio } from "@interfaces";
 import { ValidateFailException } from "@exceptions";
+import { logger } from "@configs";
 
-export default class UserController {
-  private userService = new UserService();
-
+class UserController {
   public getUserProfile = async (
     req: Request,
     res: Response,
@@ -20,13 +19,51 @@ export default class UserController {
       const email = res.locals.email;
       if (_.isNull(email))
         throw new ValidateFailException("Email could not be found");
-      res
-        .status(StatusCodes.OK)
-        .json(await this.userService.getUserProfile(email));
+      res.status(StatusCodes.OK).json(await userService.getUserProfile(email));
     } catch (error) {
       next(error);
     }
   };
+
+  public getStudentsNotEnrolledInTopic = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      res
+        .status(StatusCodes.OK)
+        .json(await userService.getStudentsNotEnrolledInTopic());
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  public async getLecturesByMajor(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    // Get and validate Major code
+    const majorCodeRequest = req.query["majorCode"] as string;
+    if (
+      _.isNull(majorCodeRequest) ||
+      _.isUndefined(majorCodeRequest) ||
+      _.isEmpty(majorCodeRequest)
+    )
+      throw new ValidateFailException("Major code is not valid");
+
+    // Reponse
+    res
+      .status(StatusCodes.OK)
+      .json(await userService.getLecturesByMajor(majorCodeRequest));
+    try {
+    } catch (error) {
+      logger.error("Error: ", error);
+      next(error);
+    }
+  }
 
   public updateUserBio = async (
     req: Request,
@@ -53,7 +90,7 @@ export default class UserController {
       }
 
       console.log(bio.biography.length);
-      const result: boolean = await this.userService.updateUserBio(
+      const result: boolean = await userService.updateUserBio(
         userId,
         bio.biography
       );
@@ -72,3 +109,5 @@ export default class UserController {
     }
   };
 }
+
+export default new UserController();

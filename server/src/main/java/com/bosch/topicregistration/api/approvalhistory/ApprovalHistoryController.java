@@ -24,8 +24,11 @@ public class ApprovalHistoryController {
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyAuthority('ROLE_LECTURE')")
-    public Response<List<ApprovalHistoryDTO>> getApprovalHistoryByTopicId(@RequestParam("topicId") String topicId) {
-        if(StringUtils.isEmpty(topicId)) throw new BadRequestException("Topic id is not valid");
-        return approvalHistoryService.getApprovalHistoryByTopicId(topicId);
+    public Response<List<ApprovalHistoryDTO>> getApprovalHistoryByTopicId(@RequestParam("topicId") String topicId,
+                                                                          @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+                                                                          @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                                                          @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
+        if (StringUtils.isEmpty(topicId)) throw new BadRequestException("Topic id is not valid");
+        return approvalHistoryService.getApprovalHistoryByTopicId(topicId, pageNumber, pageSize, sortBy);
     }
 }

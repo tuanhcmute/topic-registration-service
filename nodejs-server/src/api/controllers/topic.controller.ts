@@ -1,15 +1,23 @@
 import { NextFunction, Request, Response } from "express";
-import { TopicService } from "@services";
-import { IResponseModel, ResponseModelBuilder } from "@interfaces";
 import { StatusCodes } from "http-status-codes";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
-import { CreateReqTopic, Data, UpdateTopic } from "@interfaces/topic.interface";
+
+import { topicService } from "@services";
+import {
+  IResponseModel,
+  ResponseModelBuilder,
+  NewTopicRequest,
+  IListTopicResponse,
+  ApprovalTopicRequest,
+  UpdateTopic,
+} from "@interfaces";
+import { logger } from "@configs";
+import { ValidateFailException } from "@exceptions";
+import _ from "lodash";
 import { Topic, TopicEnrollment, User } from "@models";
 
-export default class TopicController {
-  private topicService: TopicService = new TopicService();
-
+class TopicController {
   public getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture = async (
     req: Request,
     res: Response,
@@ -18,8 +26,8 @@ export default class TopicController {
     try {
       const email = res.locals.email;
       const type = req.query.type as string;
-      const data: IResponseModel<Data> =
-        await this.topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
+      const data: IResponseModel<IListTopicResponse> =
+        await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
           type,
           email
         );
@@ -30,25 +38,27 @@ export default class TopicController {
     }
   };
 
-  public createTopic = async (
+  public async createNewTopicInLectureEnrollmentPeriod(
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<void> => {
+  ): Promise<void> {
     try {
-      const rawTopic = req.body;
-      console.log(rawTopic);
-      const newTopic = plainToInstance(CreateReqTopic, rawTopic);
-      console.info(newTopic);
+      // Get raw topic from client
+      const requestData = req.body;
+      logger.info("Request data: ", requestData);
 
+      // Convert raw to instance
+      const newTopic = plainToInstance(NewTopicRequest, requestData);
+
+      // Validate instance
       const errors = await validate(newTopic);
       if (errors.length > 0) {
         const firstError = errors[0];
-
         const errorMessage = firstError.constraints
           ? Object.values(firstError.constraints)[0]
           : "No error message available";
-
+        // Build response
         res
           .status(StatusCodes.BAD_REQUEST)
           .json(
@@ -57,23 +67,112 @@ export default class TopicController {
               .withStatusCode(StatusCodes.BAD_REQUEST)
               .build()
           );
-      } else {
-        const email = res.locals.email;
-        await this.topicService.createTopic(newTopic, email);
-        res
-          .status(StatusCodes.CREATED)
-          .json(
-            new ResponseModelBuilder()
-              .withMessage("Topic has been created successfully")
-              .withStatusCode(StatusCodes.CREATED)
-              .build()
-          );
+        return;
       }
+      logger.info("New topic request: ", newTopic);
+
+      // Handle call service
+      const email = res.locals.email;
+      res
+        .status(StatusCodes.OK)
+        .json(
+          await topicService.createNewTopicInLectureEnrollmentPeriod(
+            newTopic,
+            email
+          )
+        );
     } catch (err) {
       console.log(err);
       next(err);
     }
-  };
+  }
+
+  public async approveTopicInLectureEnrollmentPeriod(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      // Get request data
+      const requestData = req.body;
+      logger.info("Request data:", requestData);
+
+      // Convert raw to instance
+      const approvalTopicRequest = plainToInstance(
+        ApprovalTopicRequest,
+        requestData
+      );
+      // Validate instance
+      const errors = await validate(approvalTopicRequest);
+      if (errors.length > 0) {
+        const firstError = errors[0];
+        const errorMessage = firstError.constraints
+          ? Object.values(firstError.constraints)[0]
+          : "No error message available";
+        // Build response
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json(
+            new ResponseModelBuilder()
+              .withMessage(errorMessage)
+              .withStatusCode(StatusCodes.BAD_REQUEST)
+              .build()
+          );
+        return;
+      }
+      logger.info("Approval topic request:", approvalTopicRequest);
+
+      res
+        .status(StatusCodes.OK)
+        .json(
+          await topicService.approveTopicInLectureEnrollmentPeriod(
+            approvalTopicRequest
+          )
+        );
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  }
+
+  public async getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      // Get query
+      const typeRequest = req.query["type"] as string;
+      const statusRequest = req.query["status"] as string;
+      const email = res.locals.email;
+      if (
+        _.isNull(typeRequest) ||
+        _.isUndefined(typeRequest) ||
+        _.isEmpty(typeRequest)
+      )
+        throw new ValidateFailException("Topic type is not valid");
+      if (
+        _.isNull(statusRequest) ||
+        _.isUndefined(statusRequest) ||
+        _.isEmpty(statusRequest)
+      )
+        throw new ValidateFailException("Topic status is not valid");
+
+      // Response
+      res
+        .status(StatusCodes.OK)
+        .json(
+          await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor(
+            typeRequest,
+            statusRequest,
+            email
+          )
+        );
+    } catch (error) {
+      logger.error("Error: ", error);
+      next(error);
+    }
+  }
 
   public updateTeacherTopic = async (
     req: Request,
@@ -95,8 +194,6 @@ export default class TopicController {
         },
         include: [{ model: TopicEnrollment, as: "topicEnrollments" }],
       });
-
-      console.info(topic);
 
       const errors = await validate(updatedTopic);
 
@@ -125,7 +222,7 @@ export default class TopicController {
               .build()
           );
       } else {
-        await this.topicService.updateTeacherTopic(updatedTopic, topic);
+        await topicService.updateTeacherTopic(updatedTopic, topic);
         res
           .status(StatusCodes.OK)
           .json(
@@ -141,3 +238,5 @@ export default class TopicController {
     }
   };
 }
+
+export default new TopicController();
