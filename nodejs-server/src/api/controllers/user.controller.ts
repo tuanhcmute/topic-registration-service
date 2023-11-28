@@ -3,11 +3,14 @@ import _ from "lodash";
 import { StatusCodes } from "http-status-codes";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
+import multer, { Multer } from "multer";
 
 import { userService } from "@services";
 import { ResponseModelBuilder, UpdatedBio } from "@interfaces";
 import { ValidateFailException } from "@exceptions";
-import { logger } from "@configs";
+import { logger, storage } from "@configs";
+
+const upload: Multer = multer({ storage: storage });
 
 class UserController {
   public getUserProfile = async (
@@ -71,7 +74,7 @@ class UserController {
     next: NextFunction
   ) => {
     try {
-      const userId = res.locals.userId;
+      const email = res.locals.email;
       const bio = req.body;
 
       const updatedBio = plainToInstance(UpdatedBio, bio);
@@ -91,7 +94,7 @@ class UserController {
 
       console.log(bio.biography.length);
       const result: boolean = await userService.updateUserBio(
-        userId,
+        email,
         bio.biography
       );
       if (result) {
@@ -108,6 +111,21 @@ class UserController {
       next(error);
     }
   };
+
+  public async updateAvatarInUserProfile(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const file = req.file;
+      logger.info(file);
+      res.status(StatusCodes.OK).json("ok");
+    } catch (error) {
+      logger.error({ error });
+      next(error);
+    }
+  }
 }
 
 export default new UserController();

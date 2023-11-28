@@ -4,6 +4,7 @@ import com.bosch.topicregistration.api.topic.Topic;
 import com.bosch.topicregistration.api.topic.TopicStatus;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Nationalized;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -28,6 +29,7 @@ public class ApprovalHistory {
 
     @Lob
     @Column(name = "reason_column")
+    @Nationalized
     private String reason;
 
     @Column(name = "status_column")

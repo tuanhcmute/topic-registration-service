@@ -7,7 +7,6 @@ import cors from "cors";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 
 import * as apiRoutes from "@routes";
-
 import {
   errorHandler,
   tokenAuthenticationFilter,

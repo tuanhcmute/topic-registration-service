@@ -8,6 +8,7 @@ import com.bosch.topicregistration.api.user.Major;
 import com.bosch.topicregistration.api.user.User;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Nationalized;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -33,6 +34,8 @@ public class Topic implements Serializable {
     @Column(name = "id_column", updatable = false)
     private String id;
 
+    @Nationalized
+    @Lob
     @Column(name = "name_column", nullable = false)
     private String name;
 
@@ -42,10 +45,12 @@ public class Topic implements Serializable {
 
     @Lob
     @Column(name = "goal_column", nullable = false)
+    @Nationalized
     private String goal;
 
     @Lob
     @Column(name = "requirement_column", nullable = false)
+    @Nationalized
     private String requirement;
 
     @Enumerated(value = EnumType.STRING)
