@@ -3,6 +3,7 @@ package com.bosch.topicregistration.api.user;
 import com.bosch.topicregistration.api.topic.Topic;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Nationalized;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -31,6 +32,8 @@ public class Major implements Serializable {
     private String name;
 
     @Column(name = "description_column")
+    @Lob
+    @Nationalized
     private String description;
 
     @Column(name = "created_by_column", nullable = false)

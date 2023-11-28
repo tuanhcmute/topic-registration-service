@@ -5,6 +5,7 @@ import com.bosch.topicregistration.api.security.oauth2.OAuth2Provider;
 import com.bosch.topicregistration.api.topic.Topic;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Nationalized;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -40,6 +41,7 @@ public class User implements Serializable {
     private String imageUrl;
 
     @Column(name = "name_column", nullable = false)
+    @Nationalized
     private String name;
 
     @Column(name = "password_column", nullable = false)
@@ -58,7 +60,9 @@ public class User implements Serializable {
     @Column(name = "email_verified_column", nullable = false)
     private Boolean emailVerified;
 
+    @Lob
     @Column(name = "biography_column")
+    @Nationalized
     private String biography;
 
     @Column(name = "created_by_column")

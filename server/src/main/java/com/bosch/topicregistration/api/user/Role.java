@@ -2,6 +2,7 @@ package com.bosch.topicregistration.api.user;
 
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Nationalized;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -32,6 +33,8 @@ public class Role implements Serializable {
     private RoleCode code;
 
     @Column(name = "description_column")
+    @Lob
+    @Nationalized
     private String description;
 
     @CreatedDate

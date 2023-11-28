@@ -78,6 +78,9 @@ const User = db.define<UserInstance>(
     biography: {
       type: DataTypes.BLOB("long"),
       field: "biography".concat(POSTFIX),
+      get() {
+        return this.getDataValue("biography")?.toString();
+      },
     },
     schoolYear: {
       type: DataTypes.STRING,

@@ -1,4 +1,7 @@
 import { StatusCodes } from "http-status-codes";
+import _ from "lodash";
+import multer from "multer";
+
 import {
   User,
   Major,
@@ -21,7 +24,6 @@ import {
   ResponseModelBuilder,
 } from "@interfaces";
 import { RoleCode } from "@configs/constants";
-import _ from "lodash";
 
 class UserService {
   public getStudentsNotEnrolledInTopic = async (): Promise<
@@ -138,14 +140,16 @@ class UserService {
   };
 
   public updateUserBio = async (
-    userId: string,
+    email: string,
     bio: string
   ): Promise<boolean> => {
     try {
-      const foundUser = await User.findByPk(userId);
+      const foundUser = await User.findOne({
+        where: { email },
+      });
       if (!foundUser)
         throw new UserNotFoundException(
-          ErrorMessages.USER_NOT_FOUND + "with userId: " + userId
+          ErrorMessages.USER_NOT_FOUND + "with email: " + email
         );
       foundUser.biography = bio;
       await foundUser.save();

@@ -29,7 +29,7 @@ public class UserController {
     //    [GET] /api/v1/user/profile
     @GetMapping("/profile")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ROLE_ANONYMOUS') or hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_HEAD')")
+    @PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_LECTURE', 'ROLE_ADMIN', 'ROLE_HEAD', 'ROLE_ANONYMOUS')")
     @LoggerAround
     public Response<UserDTO> getUserProfile() {
         return userService.getUserProfile();
@@ -38,7 +38,7 @@ public class UserController {
     //    [PUT] /api/v1/user/profile
     @PutMapping(path = "/profile", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_HEAD')")
+    @PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_LECTURE', 'ROLE_ADMIN', 'ROLE_HEAD', 'ROLE_ANONYMOUS')")
     @LoggerAround
     public Response<Void> updateBiographyInUserProfile(@RequestParam MultiValueMap<String, String> paramMap) {
         try {
@@ -55,7 +55,7 @@ public class UserController {
     @GetMapping("/student")
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_HEAD')")
+    @PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_LECTURE', 'ROLE_ADMIN', 'ROLE_HEAD')")
     public Response<List<StudentDTO>> getStudentsNotEnrolledInTopic() {
         return userService.getStudentsNotEnrolledInTopic();
     }
@@ -73,7 +73,7 @@ public class UserController {
     @PutMapping(path = "/profile/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_LECTURE')")
+    @PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_LECTURE', 'ROLE_ADMIN', 'ROLE_HEAD', 'ROLE_ANONYMOUS')")
     public  Response<Void> updateAvatarInUserProfile(@RequestParam("image") MultipartFile imageFile) {
 
         return userService.updateAvatarInUserProfile(imageFile);

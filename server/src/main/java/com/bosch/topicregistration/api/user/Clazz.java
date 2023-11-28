@@ -2,6 +2,7 @@ package com.bosch.topicregistration.api.user;
 
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Nationalized;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -26,6 +27,8 @@ public class Clazz implements Serializable {
     private String code;
 
     @Column(name = "description_column")
+    @Lob
+    @Nationalized
     private String description;
 
     @Column(name = "created_by_column", nullable = false)

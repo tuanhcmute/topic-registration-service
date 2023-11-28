@@ -5,6 +5,7 @@ import com.bosch.topicregistration.api.semester.SemesterStatus;
 import com.bosch.topicregistration.api.topic.TopicType;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Nationalized;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -41,6 +42,8 @@ public class EnrollmentPeriod {
     private TopicType type;
 
     @Column(name = "name_column", nullable = false)
+    @Lob
+    @Nationalized
     private String name;
 
     @Column(name = "start_date_column", nullable = false, unique = true)
