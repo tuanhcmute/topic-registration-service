@@ -61,7 +61,7 @@ public class User implements Serializable {
     @Column(name = "biography_column")
     private String biography;
 
-    @Column(name = "created_by_column", nullable = false)
+    @Column(name = "created_by_column")
     private String createdBy;
 
     @CreatedDate
