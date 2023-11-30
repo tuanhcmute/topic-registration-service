@@ -4,3 +4,4 @@ export { default as userRoutes } from "./user.routes";
 export { default as topicRoutes } from "./topic.routes";
 export { default as approvalHistoryRoutes } from "./approvalHistory.routes";
 export { default as divisionRoutes } from "./division.routes";
+export { default as topicEnrollmentRoutes } from "./topicEnrollment.routes";

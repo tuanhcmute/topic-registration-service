@@ -11,6 +11,7 @@ interface UserRoleAttributes {
   createdBy?: string;
   createdDate?: string;
   updatedDate?: string;
+  description?: string;
 }
 
 interface UserRoleInstance
@@ -50,6 +51,10 @@ const UserRole = db.define<UserRoleInstance>(
       field: "updated_date".concat(POSTFIX),
       defaultValue: DataTypes.NOW,
       allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING,
+      field: "description".concat(POSTFIX),
     },
   },
   { timestamps: false, tableName: "user_role_tbl" }

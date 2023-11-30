@@ -1,6 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import db from "@configs/db.config";
-import { User, Topic } from "@models";
+import { User, Topic, UserInstance } from "@models";
 import { POSTFIX } from "@configs/constants";
 
 interface TopicEnrollmentAttributes {
@@ -10,11 +10,14 @@ interface TopicEnrollmentAttributes {
   createdDate?: Date;
   updatedDate?: Date;
   createdBy?: string;
+  isLeader?: boolean;
 }
 
 interface TopicEnrollmentInstance
   extends Model<TopicEnrollmentAttributes>,
-    TopicEnrollmentAttributes {}
+    TopicEnrollmentAttributes {
+  student?: UserInstance;
+}
 
 const modelName: string = "topicEnrollment";
 const TopicEnrollment = db.define<TopicEnrollmentInstance>(
@@ -49,6 +52,10 @@ const TopicEnrollment = db.define<TopicEnrollmentInstance>(
     createdBy: {
       type: DataTypes.STRING,
       field: "created_by".concat(POSTFIX),
+    },
+    isLeader: {
+      type: DataTypes.BOOLEAN,
+      field: "is_leader".concat(POSTFIX),
     },
   },
   {

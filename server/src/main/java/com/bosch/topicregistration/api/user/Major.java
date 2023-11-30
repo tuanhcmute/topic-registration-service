@@ -28,6 +28,8 @@ public class Major implements Serializable {
     @Column(name = "code_column", nullable = false, unique = true, updatable = false)
     private String code;
 
+    @Nationalized
+    @Lob
     @Column(name = "name_column", nullable = false, unique = true, updatable = false)
     private String name;
 

@@ -4,6 +4,7 @@ import com.bosch.topicregistration.api.topic.Topic;
 import com.bosch.topicregistration.api.user.User;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Nationalized;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -32,9 +33,11 @@ public class Division {
     @Column(name = "start_date_column", nullable = false)
     private LocalDateTime startDate;
 
+    @Nationalized
     @Column(name = "specified_time_column", nullable = false)
     private String specifiedTime;
 
+    @Nationalized
     @Column(name = "place_column", nullable = false)
     private String place;
 
