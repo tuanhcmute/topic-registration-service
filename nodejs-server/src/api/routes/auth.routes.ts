@@ -1,12 +1,11 @@
 import { Router } from "express";
 import passport from "passport";
 import { IRoutes } from "@interfaces";
-import { AuthController } from "@controllers";
+import { authController } from "@controllers";
 
-export default class AuthRoutes implements IRoutes {
+class AuthRoutes implements IRoutes {
   public path = "oauth2";
   public router = Router();
-  private authController = new AuthController();
 
   constructor() {
     this.initializeRoutes();
@@ -14,7 +13,7 @@ export default class AuthRoutes implements IRoutes {
   public initializeRoutes(): void {
     this.router.get(
       `/${this.path}/authorization/google`,
-      this.authController.getGoogleLogin
+      authController.getGoogleLogin
     );
     this.router.get(
       `/login/${this.path}/code/google`,
@@ -22,7 +21,9 @@ export default class AuthRoutes implements IRoutes {
         failureRedirect: "/error",
         session: false,
       }),
-      this.authController.handleGoogleLogin
+      authController.handleGoogleLogin
     );
   }
 }
+
+export default new AuthRoutes();

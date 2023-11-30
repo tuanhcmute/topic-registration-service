@@ -3,14 +3,16 @@ import _ from "lodash";
 import { StatusCodes } from "http-status-codes";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
+import multer, { Multer } from "multer";
 
-import { UserService } from "@services";
+import { userService } from "@services";
 import { ResponseModelBuilder, UpdatedBio } from "@interfaces";
 import { ValidateFailException } from "@exceptions";
+import { logger, storage } from "@configs";
 
-export default class UserController {
-  private userService = new UserService();
+const upload: Multer = multer({ storage: storage });
 
+class UserController {
   public getUserProfile = async (
     req: Request,
     res: Response,
@@ -20,13 +22,51 @@ export default class UserController {
       const email = res.locals.email;
       if (_.isNull(email))
         throw new ValidateFailException("Email could not be found");
-      res
-        .status(StatusCodes.OK)
-        .json(await this.userService.getUserProfile(email));
+      res.status(StatusCodes.OK).json(await userService.getUserProfile(email));
     } catch (error) {
       next(error);
     }
   };
+
+  public getStudentsNotEnrolledInTopic = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      res
+        .status(StatusCodes.OK)
+        .json(await userService.getStudentsNotEnrolledInTopic());
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
+
+  public async getLecturesByMajor(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    // Get and validate Major code
+    const majorCodeRequest = req.query["majorCode"] as string;
+    if (
+      _.isNull(majorCodeRequest) ||
+      _.isUndefined(majorCodeRequest) ||
+      _.isEmpty(majorCodeRequest)
+    )
+      throw new ValidateFailException("Major code is not valid");
+
+    // Reponse
+    res
+      .status(StatusCodes.OK)
+      .json(await userService.getLecturesByMajor(majorCodeRequest));
+    try {
+    } catch (error) {
+      logger.error("Error: ", error);
+      next(error);
+    }
+  }
 
   public updateUserBio = async (
     req: Request,
@@ -34,7 +74,7 @@ export default class UserController {
     next: NextFunction
   ) => {
     try {
-      const userId = res.locals.userId;
+      const email = res.locals.email;
       const bio = req.body;
 
       const updatedBio = plainToInstance(UpdatedBio, bio);
@@ -53,8 +93,8 @@ export default class UserController {
       }
 
       console.log(bio.biography.length);
-      const result: boolean = await this.userService.updateUserBio(
-        userId,
+      const result: boolean = await userService.updateUserBio(
+        email,
         bio.biography
       );
       if (result) {
@@ -71,4 +111,21 @@ export default class UserController {
       next(error);
     }
   };
+
+  public async updateAvatarInUserProfile(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const file = req.file;
+      logger.info(file);
+      res.status(StatusCodes.OK).json("ok");
+    } catch (error) {
+      logger.error({ error });
+      next(error);
+    }
+  }
 }
+
+export default new UserController();

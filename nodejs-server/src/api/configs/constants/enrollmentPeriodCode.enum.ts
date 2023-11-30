@@ -1,0 +1,6 @@
+enum EnrollmentPeriodCode {
+  LECTURE_ENROLLMENT_PERIOD = "LECTURE_ENROLLMENT_PERIOD",
+  STUDENT_ENROLLMENT_PERIOD = "STUDENT_ENROLLMENT_PERIOD",
+}
+
+export default EnrollmentPeriodCode;

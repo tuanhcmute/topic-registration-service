@@ -3,7 +3,6 @@ package com.bosch.topicregistration.api.security.jwt;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -16,11 +15,27 @@ public class JwtServiceImpl implements JwtService {
     private String secretKey;
 
     @Override
-    public String createToken(Authentication authentication) {
-        UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
-        Date expiryDate = new Date((new Date()).getTime() + 864000000);
+    public String createToken(String subject) {
+        // Calculate the expiration time in milliseconds for 5 minutes
+        long expirationTimeMillis = System.currentTimeMillis() + (24 * 60 * 60 * 1000); // 60 minutes in milliseconds
+        // Create a Date object representing the calculated expiration time
+        Date expiryDate = new Date(expirationTimeMillis);
         return Jwts.builder()
-                .setSubject(user.getUsername())
+                .setSubject(subject)
+                .setIssuedAt(new Date())
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, secretKey)
+                .compact();
+    }
+
+    @Override
+    public String createRefreshToken(String subject) {
+        // Calculate the expiration time in milliseconds for 5 minutes
+        long expirationTimeMillis = System.currentTimeMillis() + (25 * 60 * 1000); // 120 minutes in milliseconds
+        // Create a Date object representing the calculated expiration time
+        Date expiryDate = new Date(expirationTimeMillis);
+        return Jwts.builder()
+                .setSubject(subject)
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, secretKey)

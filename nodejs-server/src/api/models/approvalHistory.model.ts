@@ -31,6 +31,9 @@ const ApprovalHistory = db.define<ApprovalHistoryInstance>(
     reason: {
       type: DataTypes.BLOB("long"),
       field: "reason".concat(POSTFIX),
+      get() {
+        return this.getDataValue("reason")?.toString();
+      },
     },
     status: {
       type: DataTypes.STRING,

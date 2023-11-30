@@ -1,8 +1,11 @@
 server:
-  port: 90000
+  port: 8080
   servlet:
-    context-path: /api/v1
+    context-path: /api/v1.0.0
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_SCHEMA}
@@ -24,7 +27,17 @@ spring:
         format_sql: true
 app:
   jwt:
-    secret-key: ${SECRET_KEY}
+    secretKey: ${SECRET_KEY}
   security:
-    permit-all:
-      ant-pattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status
+    permitAll:
+      antPattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status, /auth/refresh-token
+    cors:
+      allowedOrigin: "*"
+      allowedMethods: "*"
+      allowedHeaders: "*"
+      allowedCredentials: false
+      corsConfiguration: "/**"
+firebase:
+  serviceAccount:
+  bucketName: ${BUCKET_NAME}
+  imageUrl: https://firebasestorage.googleapis.com/v0/b/${firebase.bucketName}/o/%s?alt=media

@@ -1,7 +1,7 @@
 enum SemesterStatus {
-  ACTIVATED,
-  TERMINATED,
-  SCHEDULED,
+  ACTIVATED = "ACTIVATED",
+  TERMINATED = "TERMINATED",
+  SCHEDULED = "SCHEDULED",
 }
 
 export default SemesterStatus;

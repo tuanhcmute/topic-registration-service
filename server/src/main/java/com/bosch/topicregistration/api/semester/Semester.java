@@ -3,6 +3,7 @@ package com.bosch.topicregistration.api.semester;
 import com.bosch.topicregistration.api.enrollmentperiod.EnrollmentPeriod;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Nationalized;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -35,6 +36,8 @@ public class Semester {
     private SemesterStatus status;
 
     @Column(name = "name_column", nullable = false)
+    @Lob
+    @Nationalized
     private String name;
 
     @Column(name = "start_date_column", nullable = false, unique = true)

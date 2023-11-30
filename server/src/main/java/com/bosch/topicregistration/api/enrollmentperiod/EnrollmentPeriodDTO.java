@@ -1,15 +1,10 @@
 package com.bosch.topicregistration.api.enrollmentperiod;
 
-import java.time.LocalDate;
-
 import com.bosch.topicregistration.api.semester.SemesterDTO;
 import com.bosch.topicregistration.api.topic.TopicType;
+import lombok.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDate;
 
 @Setter
 @Getter

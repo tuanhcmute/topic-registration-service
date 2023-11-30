@@ -8,8 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
-import { Dropdown } from "../components/dropdown";
-import { userLogout } from "../features/auth/authSlice";
+import { Dropdown } from "../components/dropdown1";
+import { userLogout } from "../features/auth";
 import { toggleTheme } from "../features/theme/themeSlice";
 import { paths } from "../utils/constants";
 

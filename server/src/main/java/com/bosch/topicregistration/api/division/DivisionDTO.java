@@ -1,8 +1,7 @@
 package com.bosch.topicregistration.api.division;
 
+import com.bosch.topicregistration.api.topic.TopicDTO;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -14,9 +13,11 @@ public class DivisionDTO {
 
     private String createdBy;
 
-    private LocalDateTime startDate;
+    private String startDate;
 
     private String specifiedTime;
 
     private String place;
+
+    private TopicDTO topic;
 }

@@ -1,6 +1,7 @@
 package com.bosch.topicregistration.api.user;
 
 import com.bosch.topicregistration.api.exception.BadRequestException;
+import com.bosch.topicregistration.api.firebase.FirebaseService;
 import com.bosch.topicregistration.api.logging.LoggerAround;
 import com.bosch.topicregistration.api.response.Response;
 import com.bosch.topicregistration.api.topicenrollment.TopicEnrollmentRepository;
@@ -9,11 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final TopicEnrollmentRepository topicEnrollmentRepository;
     private final MajorRepository majorRepository;
+    private final FirebaseService firebaseService;
 
     @Override
     @LoggerAround
@@ -42,16 +43,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @LoggerAround
-    public Response<UserDTO> updateBiographyInUserProfile(String biography) {
-        if (biography.isEmpty()) {
-            return Response.<UserDTO>builder()
-                    .message("User's biography has been updated unsuccessfully - Value is empty")
-                    .statusCode(HttpStatus.BAD_REQUEST.value())
-                    .build();
-        }
+    public Response<Void> updateBiographyInUserProfile(String biography) {
+        if (biography.isEmpty()) throw new BadRequestException("Biography is not valid");
         User user = userCommon.getCurrentUserByCurrentAuditor();
+        user.setBiography(biography);
         userRepository.save(user);
-        return Response.<UserDTO>builder()
+        return Response.<Void>builder()
                 .message("User's biography has been updated successfully")
                 .statusCode(HttpStatus.OK.value())
                 .build();
@@ -88,22 +85,62 @@ public class UserServiceImpl implements UserService {
     @LoggerAround
     public Response<List<LectureDTO>> getLecturesByMajor(String majorCode) {
 //        Validate major code
-        if(StringUtils.isBlank(majorCode)) throw new BadRequestException("Major code is not valid");
+        if (StringUtils.isBlank(majorCode)) throw new BadRequestException("Major code is not valid");
         Optional<Major> majorOptional = majorRepository.findByCode(majorCode);
-        if(!majorOptional.isPresent()) throw new BadRequestException("major could not be found");
+        if (!majorOptional.isPresent()) throw new BadRequestException("Major could not be found");
         Major major = majorOptional.get();
-
-        List<User> users = userRepository.findByMajor(major)
-                .stream().filter(user -> user.getUserRoles()
-                        .stream().anyMatch(userRole -> userRole.getRole().getCode().equals(RoleCode.ROLE_LECTURE)))
-                .collect(Collectors.toList());
-        List<LectureDTO> lectures = userMapper.toListLectureDTO(users);
+//        Get lectures
+        List<User> users = userRepository.findByMajor(major);
+//        Filter lectures
+        List<User> filterLectures = new ArrayList<>();
+        for(User user : users) {
+            boolean isLecture = false;
+            for(UserRole userRole : user.getUserRoles()) {
+                if(userRole.getRole().getCode().equals(RoleCode.ROLE_LECTURE)) {
+                    isLecture = true;
+                    break;
+                }
+            }
+            if(isLecture) filterLectures.add(user);
+        }
+//        Mapper to DTO
+        List<LectureDTO> lectures = userMapper.toListLectureDTO(filterLectures);
+//        Build data
         Map<String, List<LectureDTO>> data = new HashMap<>();
         data.put("lectures", lectures);
+//        Build response
         return Response.<List<LectureDTO>>builder()
-                .message("the list of lectures has been successfully retrieved")
+                .message("The list of lectures has been successfully retrieved")
                 .statusCode(HttpStatus.OK.value())
                 .data(data)
                 .build();
+    }
+
+    @Override
+    @LoggerAround
+    public Response<Void> updateAvatarInUserProfile(MultipartFile imageFile) {
+        try {
+//            Validate image file
+            if(Objects.isNull(imageFile.getContentType()) || !imageFile.getContentType().startsWith("image/"))
+                throw new BadRequestException("File is not valid");
+
+//            Save file
+            String imageUrl = firebaseService.save(imageFile);
+            log.info("Image url: {}", imageUrl);
+
+//            Update user
+            User user = userCommon.getCurrentUserByCurrentAuditor();
+            user.setImageUrl(imageUrl);
+            userRepository.save(user);
+
+            return Response.<Void>builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message("User's avatar has been updated successfully")
+                    .build();
+
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new BadRequestException(e.getMessage());
+        }
     }
 }

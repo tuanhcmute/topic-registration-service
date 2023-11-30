@@ -1,5 +1,6 @@
 package com.bosch.topicregistration.api.security.oauth2;
 
+import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.exception.OAuth2AuthenticationProcessingException;
 import com.bosch.topicregistration.api.security.jwt.UserPrincipal;
 import com.bosch.topicregistration.api.user.*;
@@ -67,8 +68,25 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User registerNewUser(OAuth2UserRequest userRequest, OAuth2UserInfo oAuth2UserInfo) {
+//        Prepare data
+        Optional<Role> roleOptional;
+        String ntid = oAuth2UserInfo.getId();
         Boolean emailVerified = (Boolean) oAuth2UserInfo.getAttributes().get("email_verified");
 
+//        Set ntid, get role
+        if (oAuth2UserInfo.getEmail().contains(POSTFIX_STUDENT_EMAIL)) {
+            roleOptional = roleRepository.findByCode(RoleCode.ROLE_STUDENT);
+            // ntid: 20110345
+            ntid = oAuth2UserInfo.getEmail().substring(0, 8);
+        } else if (oAuth2UserInfo.getEmail().contains(POSTFIX_LECTURE_EMAIL)) {
+            roleOptional = roleRepository.findByCode(RoleCode.ROLE_LECTURE);
+            ntid = oAuth2UserInfo.getId().substring(0, 4);
+        } else {
+            roleOptional = roleRepository.findByCode(RoleCode.ROLE_ANONYMOUS);
+        }
+        if(!roleOptional.isPresent()) throw new BadRequestException("Role could not be found");
+
+//        Build user
         User user = User.builder()
                 .name(oAuth2UserInfo.getName())
                 .email(oAuth2UserInfo.getEmail())
@@ -77,26 +95,23 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .providerId(oAuth2UserInfo.getId())
                 .createdBy(UUID.randomUUID().toString())
                 .emailVerified(emailVerified)
+                .ntid(ntid)
+                .password(ntid)
+                .biography("")
                 .build();
-//        Set user role
-        UserRole userRole = UserRole.builder().user(user).build();
-        Optional<Role> roleOptional;
-        String ntid = oAuth2UserInfo.getId();
-        if (oAuth2UserInfo.getEmail().contains(POSTFIX_STUDENT_EMAIL)) {
-            roleOptional = roleRepository.findByCode(RoleCode.ROLE_STUDENT);
-            // ntid: 20110345
-            ntid = oAuth2UserInfo.getEmail().substring(0, 9);
-        } else if (oAuth2UserInfo.getEmail().contains(POSTFIX_LECTURE_EMAIL)) {
-            roleOptional = roleRepository.findByCode(RoleCode.ROLE_LECTURE);
-            ntid = oAuth2UserInfo.getId().substring(0, 4);
-        } else {
-            roleOptional = roleRepository.findByCode(RoleCode.ROLE_ANONYMOUS);
-        }
-        roleOptional.ifPresent(userRole::setRole);
-        user.setNtid(ntid);
-        user.setPassword(user.getNtid());
+
+//        Build user role
+        Role role = roleOptional.get();
+        UserRole userRole = UserRole.builder().user(user)
+                .role(role)
+                .description(String.format("%s - %s", user.getName(), role.getCode().toString()))
+                .build();
+
+//        Update user role in user instance
         user.getUserRoles().add(userRole);
         userRoleRepository.save(userRole);
+
+//        Validate
         log.info("User role saved: {}", userRole.getId());
         log.info("Register new user: {}", user.getEmail());
         return user;

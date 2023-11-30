@@ -6,7 +6,7 @@ import cookieSession from "cookie-session";
 import cors from "cors";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 
-import apiRoutes from "./routes";
+import * as apiRoutes from "@routes";
 import {
   errorHandler,
   tokenAuthenticationFilter,
@@ -37,8 +37,8 @@ app.use(passportSetup.initialize());
 app.use(passportSetup.session());
 
 // routes
-apiRoutes.forEach((route) => {
-  app.use("/api/v1", route.router);
+Object.values(apiRoutes).forEach((item) => {
+  app.use("/api/v1", item.router);
 });
 
 // Hanlde 404 error
@@ -54,6 +54,8 @@ app.use(errorHandler);
     // Attempt to authenticate with the database (assuming 'db' is your database object)
     await db.authenticate();
     console.info("Connection has been established successfully.");
+
+    // await db.drop();
     await db.sync();
     console.info("All models were synchronized successfully.");
 

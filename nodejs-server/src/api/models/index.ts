@@ -9,3 +9,4 @@ export * from "./approvalHistory.model";
 export * from "./semester.model";
 export * from "./role.model";
 export * from "./userRole.model";
+export * from "./enrollment.model";

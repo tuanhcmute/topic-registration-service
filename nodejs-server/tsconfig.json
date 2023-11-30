@@ -34,7 +34,8 @@
       "@services/*": ["api/services/*"],
       "@constants/*": ["constants/*"],
       "@utils/*": ["api/utils/*"],
-      "@configs/*": ["api/configs/*"]
+      "@configs/*": ["api/configs/*"],
+      "@resources/*": ["api/resources/*"]
     },
     /* Advanced Options */
     "resolveJsonModule": true /* Include modules imported with '.json' extension */

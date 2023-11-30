@@ -1,71 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
-import Select from "react-select";
 
-import { topicService, userService } from "../../../../services";
 import { topicStatus, topicType } from "../../../../utils/constants";
-import { HttpStatusCode } from "axios";
 import ApprovalTopicModal from "./components/ApprovalTopicModal";
-
-const options = [
-  {
-    value: "e71e687d-d5a9-4178-8225-c4b29a9ffb0d",
-    label:
-      "Đợt đề xuất tiểu luận chuyên ngành học kỳ I/2023 (ĐK và duyệt: 01/10 - 20/10/2023)",
-  },
-];
+import { useDispatch, useSelector } from "react-redux";
+import {
+  approveTopicInLectureEnrollmentPeriod,
+  fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod,
+} from "../../../../features/topic";
 
 function ApprovalTopicManagementPage() {
-  const [openEditTopicModal, setOpenEditTopicMode] = useState(undefined);
+  const [openEditTopicModal, setOpenEditTopicModal] = useState(undefined);
   const [selectedTopic, setSelectedTopic] = useState(null);
-  const [topics, setTopics] = useState([]);
-  const [studentOptions, setStudentOptions] = useState([]);
+  const dispatch = useDispatch();
+  const studentOptions = useSelector(
+    (state) => state.user?.studentsNotEnrolledInTopic
+  );
+  const enrollmentPeriod = useSelector(
+    (state) => state?.enrollmentPeriod?.enrollmentPeriod
+  );
+  const topics = useSelector((state) => state.topic?.notApprovedTopics);
 
-  async function fetchTopicsInLectureEnrollmentPeriod() {
-    try {
-      const response =
-        await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
-          topicType.TLCN
-        );
-      const { data } = response;
-      if (response?.data?.statusCode === HttpStatusCode.Ok) {
-        setTopics(data?.data?.topics);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  async function updateTopicInLectureEnrollmentPeriod(data) {
-    try {
-      const response = await topicService.updateTopicInLectureEnrollmentPeriod(
-        data
-      );
-      if (response?.data?.statusCode === HttpStatusCode.Ok) {
-        setOpenEditTopicMode(undefined);
-        fetchTopicsInLectureEnrollmentPeriod();
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  async function fetchStudentsNotEnrolledInTopic() {
-    try {
-      const response = await userService.getStudentsNotEnrolledInTopic();
-      if (response?.data?.statusCode === HttpStatusCode.Ok) {
-        const data = response.data?.data?.students?.map((item) => ({
-          value: item?.ntid,
-          label: item?.name,
-        }));
-        setStudentOptions(data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  function handleUpdateTopicInLectureEnrollmentPeriod(data) {
+    dispatch(
+      approveTopicInLectureEnrollmentPeriod({
+        values: data,
+        setOpenEditTopicModal,
+      })
+    );
   }
 
   useEffect(() => {
-    fetchTopicsInLectureEnrollmentPeriod();
-    fetchStudentsNotEnrolledInTopic();
+    dispatch(
+      fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod({
+        type: topicType.TLCN,
+      })
+    );
   }, []);
 
   return (
@@ -79,13 +49,8 @@ function ApprovalTopicManagementPage() {
         </div>
         {/* End register topic */}
         {/* Select */}
-        <div className='p-3'>
-          <Select
-            className='w-full'
-            options={options}
-            isSearchable={false}
-            defaultValue={options[0]}
-          />
+        <div className='m-3 border border-gray-400 py-2 px-3 rounded text-sm truncate dark:text-gray-300'>
+          {enrollmentPeriod?.name}
         </div>
         {/* End select */}
         {/* Table */}
@@ -122,7 +87,7 @@ function ApprovalTopicManagementPage() {
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey'>
                               <div className=''>
-                                <span className='bg-orange-400 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
+                                <span className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
                                   {item?.lecture?.ntid}
                                 </span>
                                 <span className='block mt-2 font-normal'>
@@ -131,12 +96,12 @@ function ApprovalTopicManagementPage() {
                               </div>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey'>
-                              <span className='bg-orange-400 py-1 px-3 text-sm font-medium rounded dark:text-black-pearl'>
+                              <span className='bg-green-200 py-1 px-3 text-sm font-medium rounded dark:text-black-pearl block w-fit'>
                                 {topicStatus[item?.status.toLowerCase()].label}
                               </span>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey'>
-                              <span className='bg-orange-400 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
+                              <span className='bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
                                 {item.maxSlot}
                               </span>
                             </td>
@@ -146,7 +111,7 @@ function ApprovalTopicManagementPage() {
                                   className='w-6 h-6 cursor-pointer'
                                   onClick={() => {
                                     setSelectedTopic(item);
-                                    setOpenEditTopicMode("default");
+                                    setOpenEditTopicModal("default");
                                   }}
                                 />
                               </div>
@@ -170,10 +135,10 @@ function ApprovalTopicManagementPage() {
       {/* Approval topic modal */}
       <ApprovalTopicModal
         options={studentOptions}
-        handleUpdateTopic={updateTopicInLectureEnrollmentPeriod}
+        handleUpdateTopic={handleUpdateTopicInLectureEnrollmentPeriod}
         data={selectedTopic}
         openModal={openEditTopicModal}
-        setOpenModal={setOpenEditTopicMode}
+        setOpenModal={setOpenEditTopicModal}
       />
       {/* End content */}
     </React.Fragment>
