@@ -54,6 +54,8 @@ app.use(errorHandler);
     // Attempt to authenticate with the database (assuming 'db' is your database object)
     await db.authenticate();
     console.info("Connection has been established successfully.");
+
+    // await db.drop();
     await db.sync();
     console.info("All models were synchronized successfully.");
 

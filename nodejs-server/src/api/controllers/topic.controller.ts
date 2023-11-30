@@ -10,6 +10,7 @@ import {
   NewTopicRequest,
   IListTopicResponse,
   ApprovalTopicRequest,
+  UpdateTopicRequest,
 } from "@interfaces";
 import { logger } from "@configs";
 import { ValidateFailException } from "@exceptions";
@@ -172,40 +173,119 @@ class TopicController {
     }
   }
 
-  //   public async updateTopic(req: Request, res: Response): Promise<void> {
-  //     const { id } = req.params;
-  //     const { name, description } = req.body;
+  public async getAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const typeRequest = req.query["type"] as string;
+      const email = res.locals.email as string;
 
-  //     try {
-  //       const updatedTopic: Topic | null = await Topic.findByIdAndUpdate(
-  //         id,
-  //         { name, description },
-  //         { new: true }
-  //       );
-  //       if (updatedTopic) {
-  //         res.status(200).json(updatedTopic);
-  //       } else {
-  //         res.status(404).json({ message: "Topic not found" });
-  //       }
-  //     } catch (err) {
-  //       res.status(500).json({ message: err.message });
-  //     }
-  //   }
+      // Validate type
+      if (
+        _.isNull(typeRequest) ||
+        _.isUndefined(typeRequest) ||
+        _.isEmpty(typeRequest)
+      )
+        throw new ValidateFailException("Topic type is not valid");
 
-  //   public async deleteTopic(req: Request, res: Response): Promise<void> {
-  //     const { id } = req.params;
+      // Validate email
+      if (_.isNull(email) || _.isUndefined(email) || _.isEmpty(email))
+        throw new ValidateFailException("Email is not valid");
 
-  //     try {
-  //       const deletedTopic: Topic | null = await Topic.findByIdAndDelete(id);
-  //       if (deletedTopic) {
-  //         res.status(200).json(deletedTopic);
-  //       } else {
-  //         res.status(404).json({ message: "Topic not found" });
-  //       }
-  //     } catch (err) {
-  //       res.status(500).json({ message: err.message });
-  //     }
-  //   }
+      res
+        .status(StatusCodes.OK)
+        .json(
+          await topicService.getAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod(
+            typeRequest,
+            email
+          )
+        );
+    } catch (error) {
+      logger.error({ error });
+      next(error);
+    }
+  }
+
+  public async getAllTopicsApprovedDuringTheLectureEnrollmentPeriod(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const typeRequest = req.query["type"] as string;
+      const email = res.locals.email as string;
+
+      // Validate type
+      if (
+        _.isNull(typeRequest) ||
+        _.isUndefined(typeRequest) ||
+        _.isEmpty(typeRequest)
+      )
+        throw new ValidateFailException("Topic type is not valid");
+
+      // Validate email
+      if (_.isNull(email) || _.isUndefined(email) || _.isEmpty(email))
+        throw new ValidateFailException("Email is not valid");
+
+      res
+        .status(StatusCodes.OK)
+        .json(
+          await topicService.getAllTopicsApprovedDuringTheLectureEnrollmentPeriod(
+            typeRequest,
+            email
+          )
+        );
+    } catch (error) {
+      logger.error({ error });
+      next(error);
+    }
+  }
+  public async updateTopicInLectureEnrollmentPeriod(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      // Get raw topic from client
+      const requestData = req.body;
+      logger.info("Request data: ", requestData);
+      // Convert raw to instance
+      const updateTopic = plainToInstance(UpdateTopicRequest, requestData);
+
+      // Validate instance
+      const errors = await validate(updateTopic);
+      if (errors.length > 0) {
+        const firstError = errors[0];
+        const errorMessage = firstError.constraints
+          ? Object.values(firstError.constraints)[0]
+          : "No error message available";
+        // Build response
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json(
+            new ResponseModelBuilder()
+              .withMessage(errorMessage)
+              .withStatusCode(StatusCodes.BAD_REQUEST)
+              .build()
+          );
+        return;
+      }
+      logger.info("Update topic request: ", updateTopic);
+
+      // Handle call service
+      const email = res.locals.email;
+      res
+        .status(StatusCodes.OK)
+        .json(
+          await topicService.updateTopicInLectureEnrollmentPeriod(updateTopic)
+        );
+    } catch (error) {
+      logger.error({ error });
+      next(error);
+    }
+  }
 }
 
 export default new TopicController();

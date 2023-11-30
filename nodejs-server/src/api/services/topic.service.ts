@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import _ from "lodash";
+import { Op } from "sequelize";
 
 import { SemesterStatus, TopicStatus, TopicType } from "@configs/constants";
 import ValidateException from "@exceptions/ValidateFailException";
@@ -15,11 +16,17 @@ import {
   NewTopicRequest,
   IListTopicResponse,
   ApprovalTopicRequest,
+  UpdateTopicRequest,
 } from "@interfaces/topic.interface";
 import { db, logger } from "@configs";
-import { IResponseModel, ResponseModelBuilder } from "@interfaces";
+import {
+  CreateTopicEnrollmentRequest,
+  IResponseModel,
+  ResponseModelBuilder,
+} from "@interfaces";
 import { UserNotFoundException, ValidateFailException } from "@exceptions";
 import InternalServerErrorException from "@exceptions/InternalServerErrorException";
+import topicEnrollmentService from "./topicEnrollment.service";
 
 class TopicService {
   // Class implementation goes here
@@ -282,6 +289,177 @@ class TopicService {
       .withStatusCode(StatusCodes.OK)
       .withMessage("Topics have been successfully retrieved")
       .withData(data)
+      .build();
+  }
+
+  public async getAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod(
+    type: string,
+    email: string
+  ): Promise<IResponseModel<IListTopicResponse>> {
+    // Validate type
+    const isTypeValid = Object.values(TopicType).some((item) =>
+      _.isEqual(item, type)
+    );
+    if (!isTypeValid)
+      throw new ValidateFailException("Topic type could not be found");
+
+    if (!email) throw new ValidateException("Email is not valid");
+
+    // Get activated semester
+    const semester = await Semester.findOne({
+      where: {
+        status: SemesterStatus.ACTIVATED,
+      },
+    });
+    if (_.isNull(semester))
+      throw new ValidateFailException("Current semester is not activated");
+
+    // Get head
+    const head = await User.findOne({
+      where: { email },
+    });
+    if (_.isNull(head))
+      throw new ValidateFailException("User could not be found");
+
+    const topics = await Topic.findAll({
+      where: {
+        semesterId: semester.id,
+        type: type,
+        majorId: head.majorId,
+        status: {
+          [Op.notIn]: [TopicStatus.APPROVED, TopicStatus.ASSIGNED],
+        },
+      },
+      include: [
+        {
+          model: User,
+          as: "lecture",
+          attributes: ["ntid", "name"],
+        },
+      ],
+    });
+
+    // Build data
+    const data: IListTopicResponse = { topics };
+    return new ResponseModelBuilder<IListTopicResponse>()
+      .withStatusCode(StatusCodes.OK)
+      .withMessage("Topics have been successfully retrieved")
+      .withData(data)
+      .build();
+  }
+
+  public async getAllTopicsApprovedDuringTheLectureEnrollmentPeriod(
+    type: string,
+    email: string
+  ): Promise<IResponseModel<IListTopicResponse>> {
+    // Validate type
+    const isTypeValid = Object.values(TopicType).some((item) =>
+      _.isEqual(item, type)
+    );
+    if (!isTypeValid)
+      throw new ValidateFailException("Topic type could not be found");
+
+    if (!email) throw new ValidateException("Email is not valid");
+
+    // Get activated semester
+    const semester = await Semester.findOne({
+      where: {
+        status: SemesterStatus.ACTIVATED,
+      },
+    });
+    if (_.isNull(semester))
+      throw new ValidateFailException("Current semester is not activated");
+
+    // Get head
+    const head = await User.findOne({
+      where: { email },
+    });
+    if (_.isNull(head))
+      throw new ValidateFailException("User could not be found");
+
+    // Get topics by semester, type, major, status = approved
+    const topics = await Topic.findAll({
+      where: {
+        semesterId: semester.id,
+        type: type,
+        majorId: head.majorId,
+        status: {
+          [Op.in]: [TopicStatus.APPROVED],
+        },
+      },
+    });
+
+    // Build data
+    const data: IListTopicResponse = { topics };
+    return new ResponseModelBuilder<IListTopicResponse>()
+      .withStatusCode(StatusCodes.OK)
+      .withMessage("Topics have been successfully retrieved")
+      .withData(data)
+      .build();
+  }
+
+  public async updateTopicInLectureEnrollmentPeriod(
+    request: UpdateTopicRequest
+  ) {
+    //        Find topic by id
+    const topic = await Topic.findByPk(request.id);
+    if (_.isNull(topic))
+      throw new ValidateFailException("Topic could not be found");
+
+    //        Get current topic enrollment to compare with student request
+    let isAllMatch = false;
+    const currentTopicEnrollments = await TopicEnrollment.findAll({
+      where: { topicId: topic.id },
+      order: [["isLeader", "DESC"]],
+      include: [{ model: User, as: "student" }],
+    });
+
+    if (!_.isEmpty(currentTopicEnrollments)) {
+      for (const topicEnrollment of currentTopicEnrollments) {
+        for (const ntid of request.students) {
+          if (!_.isNull(topicEnrollment.student)) {
+            if (_.isEqual(topicEnrollment.student?.ntid, ntid)) {
+              const index = request.students.indexOf(ntid);
+              request.students.splice(index, 1);
+            }
+          }
+        }
+      }
+      if (_.isEmpty(request.students)) isAllMatch = true;
+    }
+    logger.info(request.students);
+
+    if (!isAllMatch) {
+      if (_.isUndefined(topic.availableSlot))
+        throw new ValidateFailException("Available slot is not valid");
+      if (topic.availableSlot < request.students.length)
+        throw new ValidateFailException(
+          "Available slot could not be less than size of student"
+        );
+
+      for (const ntid of request.students) {
+        // Create enrollment
+        const topicEnrollment = {
+          ntid,
+          topicId: topic.id,
+        } as CreateTopicEnrollmentRequest;
+        await topicEnrollmentService.createTopicEnrollment(topicEnrollment);
+      }
+    }
+
+    // Update value
+    topic.name = request.topicName;
+    topic.goal = request.goal;
+    topic.requirement = request.requirement;
+    topic.maxSlot = request.maxSlot;
+    topic.status = TopicStatus.UPDATED;
+    await topic.save();
+
+    //        Store approval history
+    // Build response
+    return new ResponseModelBuilder<void>()
+      .withStatusCode(StatusCodes.OK)
+      .withMessage("Topics have been successfully updated")
       .build();
   }
 }

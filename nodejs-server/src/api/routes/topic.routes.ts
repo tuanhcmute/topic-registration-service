@@ -34,13 +34,32 @@ class TopicRoutes implements IRoutes {
     );
 
     // [GET] /api/v1/topic/head
+    // this.router.get(
+    //   `${this.path}/head`,
+    //   preAuthorizeFilter([RoleCode.ROLE_HEAD]),
+    //   topicController.getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor
+    // );
+
+    // [GET] /api/v1/topic/head
     this.router.get(
       `${this.path}/head`,
       preAuthorizeFilter([RoleCode.ROLE_HEAD]),
-      topicController.getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor
+      topicController.getAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod
     );
-    // this.router.put("/topics/:id", this.topicController.updateTopic);
-    // this.router.delete("/topics/:id", this.topicController.deleteTopic);
+
+    // [GET] /api/v1/topic/head
+    this.router.get(
+      `${this.path}/head/division`,
+      preAuthorizeFilter([RoleCode.ROLE_HEAD]),
+      topicController.getAllTopicsApprovedDuringTheLectureEnrollmentPeriod
+    );
+
+    // [PUT] /api/v1/topic/lecture
+    this.router.put(
+      `${this.path}/lecture`,
+      preAuthorizeFilter([RoleCode.ROLE_LECTURE]),
+      topicController.updateTopicInLectureEnrollmentPeriod
+    );
   }
 }
 
