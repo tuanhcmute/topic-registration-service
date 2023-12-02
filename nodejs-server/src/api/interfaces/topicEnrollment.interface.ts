@@ -1,3 +1,4 @@
+import { TopicEnrollmentInstance } from "@models";
 import { IsNotEmpty } from "class-validator";
 
 export class CreateTopicEnrollmentRequest {
@@ -6,4 +7,8 @@ export class CreateTopicEnrollmentRequest {
 
   @IsNotEmpty({ message: "Topic id is not valid" })
   topicId: string;
+}
+
+export interface IListTopicEnrollmentResponse {
+  topicEnrollments: TopicEnrollmentInstance[];
 }
