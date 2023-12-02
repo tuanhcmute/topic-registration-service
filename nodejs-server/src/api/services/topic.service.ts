@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import _ from "lodash";
+import _, { reduceRight } from "lodash";
 import { Op } from "sequelize";
 
 import { SemesterStatus, TopicStatus, TopicType } from "@configs/constants";
@@ -141,7 +141,6 @@ class TopicService {
       throw new ValidateFailException(
         "Max slot could not be less than size of student"
       );
-    const availableSlot = request.maxSlot - request.students.length;
 
     let transaction;
     try {
@@ -157,7 +156,7 @@ class TopicService {
           type: request.type,
           lectureId: currentLecture.id,
           semesterId: currentSemester.id,
-          availableSlot: availableSlot,
+          availableSlot: request.maxSlot,
           status: TopicStatus.PENDING,
         },
         { transaction }
@@ -166,7 +165,7 @@ class TopicService {
       // Validate topic
       if (_.isNull(topic))
         throw new InternalServerErrorException("Topic could not be saved");
-      console.info(topic.id);
+      logger.info(topic.id);
 
       // Save topic enrollment
       students.forEach(async (item) => {
@@ -336,6 +335,14 @@ class TopicService {
           as: "lecture",
           attributes: ["ntid", "name"],
         },
+        {
+          model: TopicEnrollment,
+          as: "topicEnrollments",
+          include: [
+            { model: User, as: "student", attributes: ["ntid", "name"] },
+          ],
+          attributes: ["id"],
+        },
       ],
     });
 
@@ -460,6 +467,69 @@ class TopicService {
     return new ResponseModelBuilder<void>()
       .withStatusCode(StatusCodes.OK)
       .withMessage("Topics have been successfully updated")
+      .build();
+  }
+
+  public async getAllApprovedTopicsInStudentEnrollmentPeriod(
+    type: string,
+    email: string
+  ): Promise<IResponseModel<IListTopicResponse>> {
+    // Validate type
+    const isTypeValid = Object.values(TopicType).some((item) =>
+      _.isEqual(item, type)
+    );
+    if (!isTypeValid)
+      throw new ValidateFailException("Topic type could not be found");
+    if (!email) throw new ValidateException("Email is not valid");
+
+    // Get activated semester
+    const semester = await Semester.findOne({
+      where: {
+        status: SemesterStatus.ACTIVATED,
+      },
+    });
+    if (_.isNull(semester))
+      throw new ValidateFailException("Current semester is not activated");
+
+    // Get student
+    const student = await User.findOne({
+      where: { email },
+    });
+    if (_.isNull(student))
+      throw new ValidateFailException("User could not be found");
+
+    const topics = await Topic.findAll({
+      where: {
+        semesterId: semester.id,
+        type: type,
+        majorId: student.majorId,
+        status: {
+          [Op.or]: [TopicStatus.APPROVED, TopicStatus.ASSIGNED],
+        },
+      },
+      include: [
+        {
+          model: User,
+          as: "lecture",
+          attributes: ["ntid", "name"],
+        },
+        {
+          model: TopicEnrollment,
+          as: "topicEnrollments",
+          include: [
+            { model: User, as: "student", attributes: ["ntid", "name"] },
+          ],
+          attributes: ["id"],
+        },
+      ],
+    });
+
+    // Build data
+    const data: IListTopicResponse = { topics };
+    return new ResponseModelBuilder<IListTopicResponse>()
+      .withStatusCode(StatusCodes.OK)
+      .withMessage("Topics have been successfully retrieved")
+      .withData(data)
       .build();
   }
 }

@@ -1,14 +1,15 @@
 import { DataTypes, Model } from "sequelize";
 
-import { POSTFIX } from "@configs/constants";
+import { POSTFIX, TopicStatus } from "@configs/constants";
 import db from "@configs/db.config";
 import { Topic } from "./topic.model";
+import { logger } from "@configs";
 
 interface ApprovalHistoryAttributes {
   id?: string;
   reason?: string;
   status?: string;
-  topicId: string;
+  topicId?: string;
   createdBy?: string;
   createdDate?: Date;
   updatedDate?: Date;
@@ -66,10 +67,19 @@ const ApprovalHistory = db.define<ApprovalHistoryInstance>(
   }
 );
 
-Topic.hasMany(ApprovalHistory, {
-  foreignKey: "topicId",
-  as: "approvalHistories",
-});
-ApprovalHistory.belongsTo(Topic, { as: "topic" });
+// Topic.hasMany(ApprovalHistory, {
+//   foreignKey: "topicId",
+//   as: "approvalHistories",
+// });
+// ApprovalHistory.belongsTo(Topic, { as: "topic" });
+
+// Topic.addHook("afterCreate", async (topic, options) => {
+//   logger.info({ topic });
+//   await ApprovalHistory.create({
+//     reason: "Đã được tạo",
+//     topicId: topic.dataValues.id,
+//     status: TopicStatus.PENDING,
+//   });
+// });
 
 export { ApprovalHistoryAttributes, ApprovalHistoryInstance, ApprovalHistory };

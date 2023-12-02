@@ -1,9 +1,12 @@
 import { DataTypes, Model } from "sequelize";
 import db from "../configs/db.config";
 import { User, UserInstance } from "./user.model";
-import { POSTFIX } from "@configs/constants";
+import { POSTFIX, TopicStatus } from "@configs/constants";
 import { Semester } from "./semester.model";
 import { Major } from "./major.model";
+import { ApprovalHistory } from "./approvalHistory.model";
+import _ from "lodash";
+import { logger } from "@configs";
 
 interface TopicAttributes {
   id?: string;
@@ -118,4 +121,23 @@ Topic.belongsTo(User, { as: "lecture" });
 
 Major.hasMany(Topic, { foreignKey: "majorId", as: "topics" });
 Topic.belongsTo(Major, { as: "major" });
+
+Topic.hasMany(ApprovalHistory, {
+  // foreignKey: "topicId",
+  as: "approvalHistories",
+});
+ApprovalHistory.belongsTo(Topic, {
+  as: "topic",
+  foreignKey: "topicId",
+});
+
+// Topic.addHook("afterCreate", async (topic, options) => {
+//   logger.info({ topic });
+//   await ApprovalHistory.create({
+//     reason: "Đã được tạo",
+//     topicId: topic.dataValues.id,
+//     status: TopicStatus.PENDING,
+//   });
+// });
+
 export { Topic, TopicAttributes, TopicInstance };
