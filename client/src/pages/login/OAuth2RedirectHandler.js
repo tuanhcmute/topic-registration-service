@@ -48,12 +48,17 @@ function OAuth2RedirectHandler() {
     }
   }, [dispatch, searchParams]);
 
-  // if (!authenticated) return <Navigate to={paths.LOGIN} replace />;
   const isAnonymous = currentUser?.userRoles?.some(
     (item) => item === roles.ROLE_ANONYMOUS
   );
   if (authenticated && isAnonymous)
     return <Navigate to='/student/home' replace />;
+
+  const isAdmin = currentUser?.userRoles?.some(
+    (item) => item === roles.ROLE_ADMIN
+  );
+  if (authenticated && isAdmin) return <Navigate to='/admin/home' replace />;
+
   if (
     authenticated &&
     currentUser?.userRoles?.some((item) => item === roles.ROLE_STUDENT)
