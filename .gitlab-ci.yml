@@ -1,0 +1,26 @@
+variables:
+  DOCKER: docker:24.0.6
+
+.configure: &configure
+  - apk add curl bash
+  - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+  - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+
+stages:
+  - deploy
+
+deploy_dev:
+  image: $DOCKER
+  stage: deploy
+  script:
+    - *configure
+    - ssh-keyscan -H $DEPLOY_HOST_DEV > ~/.ssh/known_hosts
+    - cp .secure_files/id_rsa ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - export DOCKER_HOST="ssh://root@$DEPLOY_HOST_DEV"
+    - cp $DEPLOY_ENV_CONF_DEV .env
+    # - echo -e "\nCONFIG_JSON='$(base64 -w 0 $FE_CONFIG_JSON_DEV)'" >> .env
+    - source go.sh; deploy
+  resource_group: deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
