@@ -286,6 +286,28 @@ class TopicController {
       next(error);
     }
   }
+
+  public async getAllApprovedTopicsInStudentEnrollmentPeriod(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const email = res.locals.email as string;
+      const type = req.query.type as string;
+      res
+        .status(StatusCodes.OK)
+        .json(
+          await topicService.getAllApprovedTopicsInStudentEnrollmentPeriod(
+            type,
+            email
+          )
+        );
+    } catch (error) {
+      logger.error({ error });
+      next(error);
+    }
+  }
 }
 
 export default new TopicController();

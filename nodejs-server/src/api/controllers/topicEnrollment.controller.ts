@@ -9,6 +9,8 @@ import {
   ResponseModelBuilder,
 } from "@interfaces";
 import { topicEnrollmentService } from "@services";
+import _ from "lodash";
+import { ValidateFailException } from "@exceptions";
 
 class TopicEnrollmentController {
   public async createTopicEnrollment(
@@ -59,6 +61,40 @@ class TopicEnrollmentController {
             createTopicEnrollmentRequest
           )
         );
+    } catch (error) {
+      logger.error({ error });
+      next(error);
+    }
+  }
+
+  public async deleteTopicEnrollment(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const ntid = req.query["ntid"] as string;
+      if (_.isNull(ntid) || _.isUndefined(ntid) || _.isEmpty(ntid))
+        throw new ValidateFailException("Ntid is not valid");
+      res
+        .status(StatusCodes.OK)
+        .json(await topicEnrollmentService.deleteTopicEnrollment(ntid));
+    } catch (error) {
+      logger.error({ error });
+      next(error);
+    }
+  }
+
+  public async getTopicEnrollmentsByNtid(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const email = res.locals.email as string;
+      res
+        .status(StatusCodes.OK)
+        .json(await topicEnrollmentService.getTopicEnrollmentsByNtid(email));
     } catch (error) {
       logger.error({ error });
       next(error);
