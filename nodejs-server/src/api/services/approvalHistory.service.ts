@@ -33,6 +33,7 @@ class ApprovalHistoryService {
       .withData(data)
       .build();
   }
+  public async createApprovalHistory() {}
 }
 
 export default new ApprovalHistoryService();

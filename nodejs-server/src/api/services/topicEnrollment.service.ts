@@ -2,6 +2,7 @@ import { ValidateFailException } from "@exceptions";
 import _ from "lodash";
 import {
   CreateTopicEnrollmentRequest,
+  IListTopicEnrollmentResponse,
   ResponseModelBuilder,
 } from "@interfaces";
 import { Topic, TopicEnrollment, User } from "@models";
@@ -54,20 +55,78 @@ class TopicEnrollmentService {
       );
 
     // Create topic enrollment
-    const savedTopicEnrollment = await TopicEnrollment.create({
+    await TopicEnrollment.create({
       topicId: topic.id,
       studentId: student.id,
     });
-    if (_.isEmpty(topicEnrollments)) savedTopicEnrollment.isLeader = true;
-    await savedTopicEnrollment.save();
-
-    //        Update available slot
-    if (topic.availableSlot) topic.availableSlot = topic.availableSlot - 1;
 
     // Build response
     return new ResponseModelBuilder<void>()
       .withStatusCode(StatusCodes.OK)
       .withMessage("Topic enrollments have been successfully created")
+      .build();
+  }
+  public async deleteTopicEnrollment(ntid: string) {
+    //        Get user
+    if (_.isNull(ntid) || _.isUndefined(ntid) || _.isEmpty(ntid))
+      throw new ValidateFailException("Ntid is not valid");
+    const user = await User.findOne({
+      where: { ntid },
+    });
+    if (_.isNull(user))
+      throw new ValidateFailException("Student could not be found");
+
+    //        Get topic enrollment
+    const topicEnrollment = await TopicEnrollment.findOne({
+      where: { studentId: user.id },
+      include: [{ model: Topic, as: "topic" }],
+    });
+    if (_.isNull(topicEnrollment))
+      throw new ValidateFailException("Topic enrollment could not be found");
+
+    // Delete topic enrollment
+    topicEnrollment.destroy();
+
+    // Build response
+    return new ResponseModelBuilder<void>()
+      .withStatusCode(StatusCodes.OK)
+      .withMessage("Topic enrollment has been deleted successfully")
+      .build();
+  }
+  public async getTopicEnrollmentsByNtid(email: string) {
+    // Get student
+    const student = await User.findOne({
+      where: { email },
+    });
+    if (_.isNull(student))
+      throw new ValidateFailException("User could not be found");
+
+    //         Get topic enrollment
+    const topicEnrollment = await TopicEnrollment.findOne({
+      where: { studentId: student.id },
+    });
+    if (_.isNull(topicEnrollment))
+      throw new ValidateFailException("Student has not enrolled yet");
+
+    const topicEnrollments = await TopicEnrollment.findAll({
+      where: { topicId: topicEnrollment.topicId },
+      include: [
+        {
+          model: Topic,
+          as: "topic",
+          include: [{ model: User, as: "lecture" }],
+        },
+        { model: User, as: "student" },
+      ],
+      attributes: ["isLeader", "studentId", "topicId", "id"],
+    });
+
+    // Build data
+    const data: IListTopicEnrollmentResponse = { topicEnrollments };
+    return new ResponseModelBuilder<IListTopicEnrollmentResponse>()
+      .withStatusCode(StatusCodes.OK)
+      .withMessage("Topic enrollments have been successfully retrieved")
+      .withData(data)
       .build();
   }
 }

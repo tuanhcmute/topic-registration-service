@@ -60,6 +60,13 @@ class TopicRoutes implements IRoutes {
       preAuthorizeFilter([RoleCode.ROLE_LECTURE]),
       topicController.updateTopicInLectureEnrollmentPeriod
     );
+
+    // [GET] /api/v1/topic/student
+    this.router.get(
+      `${this.path}/student`,
+      preAuthorizeFilter([RoleCode.ROLE_STUDENT]),
+      topicController.getAllApprovedTopicsInStudentEnrollmentPeriod
+    );
   }
 }
 

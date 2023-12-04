@@ -1,7 +1,11 @@
 import { DataTypes, Model } from "sequelize";
 import db from "@configs/db.config";
-import { User, Topic, UserInstance } from "@models";
+import { User, Topic, UserInstance, TopicInstance } from "@models";
 import { POSTFIX } from "@configs/constants";
+import { topicEnrollmentController } from "@controllers";
+import _ from "lodash";
+import { ValidateFailException } from "@exceptions";
+import { logger } from "@configs";
 
 interface TopicEnrollmentAttributes {
   id?: string;
@@ -17,6 +21,7 @@ interface TopicEnrollmentInstance
   extends Model<TopicEnrollmentAttributes>,
     TopicEnrollmentAttributes {
   student?: UserInstance;
+  topic?: TopicInstance;
 }
 
 const modelName: string = "topicEnrollment";
@@ -63,6 +68,52 @@ const TopicEnrollment = db.define<TopicEnrollmentInstance>(
     tableName: "topic_enrollment_tbl",
   }
 );
+
+// Update topic availabel slot
+TopicEnrollment.addHook("afterCreate", async (topicEnrollment, options) => {
+  const topic = await Topic.findByPk(topicEnrollment.dataValues.topicId);
+  if (_.isNull(topic))
+    throw new ValidateFailException("Topic could not be found");
+  if (topic.availableSlot) topic.availableSlot = topic.availableSlot - 1;
+  await topic.save();
+});
+TopicEnrollment.addHook("afterDestroy", async (topicEnrollment, options) => {
+  const topic = await Topic.findByPk(topicEnrollment.dataValues.topicId);
+  if (_.isNull(topic))
+    throw new ValidateFailException("Topic could not be found");
+  if (!_.isUndefined(topic.availableSlot)) {
+    const availableSlot = topic.availableSlot;
+    topic.availableSlot = availableSlot + 1;
+  }
+  await topic.save();
+  logger.info("Topic enrollment updated availableSlot column");
+});
+
+// Check leader
+TopicEnrollment.addHook("afterCreate", async (topicEnrollment, options) => {
+  const topicEnrollments = await TopicEnrollment.findAll({
+    where: { topicId: topicEnrollment.dataValues.topicId },
+  });
+  const isAllMatch = topicEnrollments.every((item) =>
+    _.isEqual(item.dataValues.studentId, topicEnrollment.dataValues.studentId)
+  );
+  if (isAllMatch) topicEnrollment.setDataValue("isLeader", true);
+  else topicEnrollment.setAttributes("isLeader", false);
+  await topicEnrollment.save();
+  logger.info("Topic enrollment updated leader column");
+});
+TopicEnrollment.addHook("afterDestroy", async (topicEnrollment, options) => {
+  if (topicEnrollment.dataValues.isLeader) {
+    const topicEnrollmentInDb = await TopicEnrollment.findOne({
+      where: { topicId: topicEnrollment.dataValues.topicId },
+    });
+    if (!_.isNull(topicEnrollmentInDb)) {
+      topicEnrollmentInDb.setDataValue("isLeader", true);
+      await topicEnrollmentInDb.save();
+      logger.info("Topic enrollment updated leader column");
+    }
+  }
+});
 
 Topic.hasMany(TopicEnrollment, {
   foreignKey: "topicId",
