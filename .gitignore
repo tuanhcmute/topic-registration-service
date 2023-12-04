@@ -48,6 +48,7 @@ build/
 /client/npm-debug.log*
 /client/yarn-debug.log*
 /client/yarn-error.log*
+/client/.env
 
 # nodejs server
 /nodejs-server/node_modules

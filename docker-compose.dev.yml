@@ -3,6 +3,7 @@ version: "3.8"
 volumes:
   nginx_proxy_manager_data:
   letsencrypt:
+  mysql:
 
 services:
   backend:
@@ -20,6 +21,17 @@ services:
       timeout: 5s
       retries: 10
       start_period: 10s
+    environment:
+      DATABASE_HOST: ${MYSQL_HOST}
+      DATABASE_PORT: ${MYSQL_PORT}
+      DATABASE_SCHEMA: ${MYSQL_DATABASE}
+      DATABASE_USERNAME: ${MYSQL_USER}
+      DATABASE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
+      SECRET_KEY: ${SECRET_KEY}
+      BUCKET_NAME: ${BUCKET_NAME}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
 
   frontend:
     build:
@@ -30,6 +42,20 @@ services:
       timeout: 5s
       retries: 5
       start_period: 15s
+    environment:
+      REACT_APP_REDIRECT_URI: ${REACT_APP_REDIRECT_URI}
+      REACT_APP_API_BASE_URL: ${REACT_APP_API_BASE_URL}
+
+  mysql_db:
+    build:
+      context: ./.build/mysql
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3306:3306"
 
   nginx-proxy-manager:
     image: jc21/nginx-proxy-manager:2.9.22
@@ -44,12 +70,4 @@ services:
     depends_on:
       - frontend
       - backend
-
-  # app:
-  #   build:
-  #     context: ./.build/nginx
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     - frontend
-  #   ports:
-  #     - 80:80
+      - mysql_db
