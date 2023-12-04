@@ -38,6 +38,6 @@ app:
       allowedCredentials: false
       corsConfiguration: "/**"
 firebase:
-  serviceAccount:
+  serviceAccount: ${SERVICE_ACCOUNT}
   bucketName: ${BUCKET_NAME}
   imageUrl: https://firebasestorage.googleapis.com/v0/b/${firebase.bucketName}/o/%s?alt=media
