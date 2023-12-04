@@ -76,25 +76,11 @@ function AppAdminHeader() {
         >
           <div className='flex md:items-center md:flex-row md:border-none font-bold text-primary flex-col items-start border-b'>
             <Link
-              to='/admin/topic'
+              to='/admin/management'
               className='hover:bg-primary hover:text-white transition-all ease-in-out flex items-center gap-1 w-full min-w-fit text-start md:p-2 px-2 py-3 dark:text-white'
             >
               <FiBook className='w-4 h-4 md:hidden' />
-              <span>Quản lý đề tài</span>
-            </Link>
-            <Link
-              to='/admin/time'
-              className='hover:bg-primary hover:text-white transition-all ease-in-out flex items-center gap-1 w-full min-w-fit text-start md:p-2 px-2 py-3 dark:text-white'
-            >
-              <HiOutlineUserGroup className='w-4 h-4 md:hidden' />
-              <span>Quản lý thời gian</span>
-            </Link>
-            <Link
-              to='/admin/user'
-              className='hover:bg-primary hover:text-white transition-all ease-in-out flex items-center gap-1 w-full min-w-fit text-start md:p-2 px-2 py-3 dark:text-white'
-            >
-              <HiOutlineUserGroup className='w-4 h-4 md:hidden' />
-              <span>Quản lý người dùng</span>
+              <span>Quản lý hệ thống</span>
             </Link>
           </div>
           {/* Profile */}

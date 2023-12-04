@@ -10,7 +10,8 @@ import { LoginPage as LoginRoute } from "../pages/login";
 import { ProfilePage as ProfileRoute } from "../pages/profile";
 
 import { AdminHomePage as AdminHomeRoute } from "../pages/admin/home";
-import { UserPageWrapper as UserPageWrapperRoutes } from "../pages/admin/userManagement";
+import { TimeManagementPage as TimeManagementRoute } from "../pages/admin/timeManagement";
+import { UserManagementPage as UserManagementRoute } from "../pages/admin/userManagement";
 import { TopicManagementPage as AdminTopicManagementRoute } from "../pages/admin/topicManagement";
 
 import { LecturePage as LectureRoute } from "../pages/lecture";
@@ -77,7 +78,7 @@ const router = createBrowserRouter([
             element: <AdminHomeRoute />,
           },
           {
-            path: "topic",
+            path: "management",
 
             element: (
               <TopicPageWrapperRoutes>
@@ -86,23 +87,16 @@ const router = createBrowserRouter([
             ),
             children: [
               {
-                path: topicType.TLCN.toLowerCase(),
+                path: "topic",
                 element: <AdminTopicManagementRoute />,
               },
-            ],
-          },
-          {
-            path: "user",
-
-            element: (
-              <UserPageWrapperRoutes>
-                <AdminSidebar />
-              </UserPageWrapperRoutes>
-            ),
-            children: [
               {
-                path: topicType.TLCN.toLowerCase(),
-                element: <AdminTopicManagementRoute />,
+                path: "user",
+                element: <UserManagementRoute />,
+              },
+              {
+                path: "time",
+                element: <TimeManagementRoute />,
               },
             ],
           },

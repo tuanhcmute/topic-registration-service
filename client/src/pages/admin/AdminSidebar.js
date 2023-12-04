@@ -2,8 +2,10 @@ import { NavLink } from "react-router-dom";
 import { useRef } from "react";
 import { BsFolder } from "react-icons/bs";
 import { GoPencil } from "react-icons/go";
-import { topicType } from "../../utils/constants";
 import { useSelector } from "react-redux";
+import { IoTime } from "react-icons/io5";
+import { FaUsers } from "react-icons/fa";
+import { FaRegNewspaper } from "react-icons/fa6";
 
 function AdminSidebar() {
   const folderRef = useRef();
@@ -21,15 +23,31 @@ function AdminSidebar() {
           onClick={toggleFolder}
         >
           <BsFolder className='w-4 h-4' />
-          <span className='font-bold text-sm'>Tiểu luận chuyên ngành</span>
+          <span className='font-bold text-sm'>Quản lý hệ thống</span>
         </div>
         <div className='' ref={folderRef}>
           <NavLink
-            to={`/admin/topic/${topicType.TLCN.toLowerCase()}`}
+            to={`/admin/management/topic`}
             className='flex items-center gap-2 px-5 py-3 hover:bg-primary hover:text-white cursor-pointer hover:rounded-b-md dark:hover:bg-transparent'
           >
-            <GoPencil />
+            <FaRegNewspaper />
             <span className='font-medium text-sm'>Danh sách đề tài</span>
+          </NavLink>
+
+          <NavLink
+            to={`/admin/management/time`}
+            className='flex items-center gap-2 px-5 py-3 hover:bg-primary hover:text-white cursor-pointer hover:rounded-b-md dark:hover:bg-transparent'
+          >
+            <IoTime />
+            <span className='font-medium text-sm'>Danh sách thời gian</span>
+          </NavLink>
+
+          <NavLink
+            to={`/admin/management/user`}
+            className='flex items-center gap-2 px-5 py-3 hover:bg-primary hover:text-white cursor-pointer hover:rounded-b-md dark:hover:bg-transparent'
+          >
+            <FaUsers />
+            <span className='font-medium text-sm'>Danh sách người dùng</span>
           </NavLink>
         </div>
       </div>

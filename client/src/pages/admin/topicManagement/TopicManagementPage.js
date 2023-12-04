@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
 import { BiMessageRoundedError } from "react-icons/bi";
 import { Button, TextInput } from "flowbite-react";
@@ -6,22 +6,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { AiOutlineFilter } from "react-icons/ai";
 import _ from "lodash";
 
-import EnrollTopicModal from "./components/EnrollTopicModal";
-import EditTopicModal from "./components/EditTopicModal";
-import {
-  enrollmentPeriodCodes,
-  topicStatus,
-  topicType,
-} from "../../../utils/constants";
+import EditTopicModal from "./components/DetailTopicModal";
+import { topicStatus, topicType } from "../../../utils/constants";
 import { Dropdown } from "../../../components/dropdown1";
 import ApprovalTopicModal from "./components/ApprovalTopicModal";
 import {
   createNewTopicInLectureEnrollmentPeriod,
-  fetchAllTopicsInLectureEnrollmentPeriod,
   updateTopicInLectureEnrollmentPeriod,
 } from "../../../features/topic";
-import { fetchStudentsNotEnrolledInTopic } from "../../../features/user";
-import { fetchEnrollmentPeriodByTopicTypeAndPeriodCode } from "../../../features/enrollmentPeriod";
 
 function TopicManagementPage() {
   const [openModal, setOpenModal] = useState(undefined);
@@ -62,51 +54,14 @@ function TopicManagementPage() {
     );
   }
 
-  useEffect(() => {
-    // Fetch topics
-    if (_.isEmpty(topics) || _.isNull(topics) || _.isUndefined(topics)) {
-      dispatch(fetchAllTopicsInLectureEnrollmentPeriod(topicType.TLCN));
-    }
-
-    // Fetch student options
-    if (
-      _.isEmpty(studentOptions) ||
-      _.isNull(studentOptions) ||
-      _.isUndefined(studentOptions)
-    ) {
-      dispatch(fetchStudentsNotEnrolledInTopic());
-    }
-
-    // Fetch enrollment period
-    if (
-      _.isEmpty(enrollmentPeriod) ||
-      _.isNull(enrollmentPeriod) ||
-      _.isUndefined(enrollmentPeriod)
-    ) {
-      dispatch(
-        fetchEnrollmentPeriodByTopicTypeAndPeriodCode({
-          topicType: topicType.TLCN,
-          periodCode: enrollmentPeriodCodes.LECTURE_ENROLLMENT_PERIOD,
-        })
-      );
-    }
-  }, []);
-
   return (
     <React.Fragment>
       <div className='w-full border border-lightGrey bg-white h-fit rounded-md dark:bg-sambuca dark:border-gray-500'>
         {/* Register topic */}
         <div className='flex items-center justify-between p-3 border-b border-lightGrey'>
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
-            TIỂU LUẬN CHUYÊN NGÀNH
+            DANH SÁCH ĐỀ TÀI
           </span>
-          <Button
-            color='gray'
-            className='rounded-md p-0'
-            onClick={() => setOpenModal("default")}
-          >
-            Xuất excel
-          </Button>
         </div>
         {/* End register topic */}
         {/* Select */}
@@ -148,6 +103,15 @@ function TopicManagementPage() {
             >
               <AiOutlineFilter className='mr-1' />
               <span>Lọc theo năm học</span>
+            </Button>
+          </div>
+          <div className='w-fit' id='topicStatusFilter'>
+            <Button
+              color='gray'
+              className='rounded-md p-0 cursor-default flex items-center'
+            >
+              <AiOutlineFilter className='mr-1' />
+              <span>Lọc theo loại</span>
             </Button>
           </div>
         </div>
@@ -233,15 +197,19 @@ function TopicManagementPage() {
                               {index + 1}
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey w-[300px]'>
-                              <p className='font-normal'>{item?.name}</p>
+                              <p className='font-normal'>
+                                Sử dụng ngôn ngữ Python với thư viện Framework:
+                                Flask và ReactJS để phát triển hệ thống thông
+                                tin hỗ trợ quản lý đào tạo lập trình trực tuyến.
+                              </p>
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey'>
                               <div className=''>
                                 <span className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
-                                  {currentUser?.ntid}
+                                  1045
                                 </span>
                                 <span className='block mt-2 font-normal'>
-                                  {currentUser?.name}
+                                  Nguyen Tran Thi Van
                                 </span>
                               </div>
                             </td>
@@ -249,15 +217,12 @@ function TopicManagementPage() {
                               <span
                                 className={`${statusColor} py-1 px-3 text-sm font-medium rounded dark:text-black-pearl`}
                               >
-                                {
-                                  topicStatus?.[item?.status?.toLowerCase()]
-                                    ?.label
-                                }
+                                Đã phân công
                               </span>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey'>
                               <span className='bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
-                                {item?.maxSlot}
+                                2
                               </span>
                             </td>
                             <td className='border border-collapse border-lightGrey'>
@@ -297,12 +262,6 @@ function TopicManagementPage() {
         {/* End table */}
       </div>
       {/* Enroll topic modal */}
-      <EnrollTopicModal
-        options={studentOptions}
-        openModal={openModal}
-        setOpenModal={setOpenModal}
-        handleNewTopic={handleCreateNewTopicInLectureEnrollmentPeriod}
-      />
       <EditTopicModal
         options={studentOptions}
         handleUpdateTopic={handleUpdateTopicInLectureEnrollmentPeriod}

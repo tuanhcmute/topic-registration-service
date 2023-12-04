@@ -10,6 +10,7 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import * as toipcType from "../../../../utils/constants/topicType";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { roleCode } from "../../../../utils/constants/roles";
 
 const validationSchema = Yup.object().shape({
   type: Yup.string().required(),
@@ -25,7 +26,7 @@ const validationSchema = Yup.object().shape({
   students: Yup.array(),
 });
 
-function EnrollTopicModal(props) {
+function AddUserModal(props) {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const enrollmentPeriod = useSelector(
     (state) => state.enrollmentPeriod?.enrollmentPeriod
@@ -51,12 +52,12 @@ function EnrollTopicModal(props) {
 
   function changeSelect(...props) {
     // Props[] => [Array(0), {action: "", data}]
-    if (props.length < 2) return;
-    if (props[0]?.length > formik.values.maxSlot) {
-      toast.warning(`SVTH không vượt quá ${formik.values.maxSlot}`);
-      return;
-    }
-    setSelectedOptions(props[0]);
+    // if (props.length < 2) return;
+    // if (props[0]?.length > formik.values.maxSlot) {
+    //   toast.warning(`SVTH không vượt quá ${formik.values.maxSlot}`);
+    //   return;
+    // }
+    // setSelectedOptions(props[0]);
   }
 
   function setCloseModal() {
@@ -66,46 +67,74 @@ function EnrollTopicModal(props) {
   }
 
   useEffect(() => {
-    const studentCodes = selectedOptions.map((item) => item.value);
-    formik.setFieldValue("students", studentCodes);
+    // const studentCodes = selectedOptions.map((item) => item.value);
+    // formik.setFieldValue("students", studentCodes);
   }, [selectedOptions]);
 
   return (
-    <Modal size='5xl' show={openModal === "default"} onClose={setCloseModal}>
+    <Modal size='2xl' show={openModal === "default"} onClose={setCloseModal}>
       <Modal.Header className='pt-4 pb-3 bg-primary'>
         <p className='font-Roboto text-base font-bold uppercase text-white'>
-          TIỂU LUẬN CHUYÊN NGÀNH
+          THÊM NGƯỜI DÙNG
         </p>
       </Modal.Header>
       <Modal.Body>
         <div className='space-y-4'>
-          {/* EnrollmentPeriod */}
-          <TextInput
-            placeholder='Đợt đề xuất'
-            required
-            type='text'
-            value={enrollmentPeriod?.name}
-            disabled
-          />
-          {/* End EnrollmentPeriod */}
           <div className='grid grid-cols-2 gap-3'>
-            {/* Lecture name field */}
+            {/* Ntid name field */}
             <div className='mb-2 block font-Roboto'>
-              <Label
-                value='Giảng viên hướng dẫn (*)'
-                className='mb-2 block'
-                htmlFor='lectureName'
-              />
+              <Label value='Ntid (*)' className='mb-2 block' htmlFor='ntid' />
               <TextInput
-                id='lectureName'
-                placeholder='Nhập giảng viên hưỡng dẫn'
+                id='ntid'
+                placeholder='Nhập ntid...'
                 required
                 type='text'
-                value={currentUser?.name}
-                disabled
+                // value={currentUser?.name}
               />
             </div>
-            {/* End lecture filed */}
+            {/* End ntid filed */}
+            {/* Email field */}
+            <div className='mb-2 block font-Roboto'>
+              <Label htmlFor='email' value='Email (*)' className='mb-2 block' />
+              <TextInput
+                id='email'
+                placeholder='Nhập email...'
+                required
+                type='text'
+                // value={currentUser?.major?.name}
+              />
+            </div>
+            {/* End email field */}
+            {/* Name field */}
+            <div className='mb-2 block font-Roboto'>
+              <Label
+                htmlFor='name'
+                value='Họ và tên (*)'
+                className='mb-2 block'
+              />
+              <TextInput
+                id='name'
+                placeholder='Nhập họ và tên...'
+                required
+                type='text'
+              />
+            </div>
+            {/* End name field */}
+            {/* Role field */}
+            <div className='mb-2 block font-Roboto'>
+              <Label
+                htmlFor='role'
+                value='Loại người dùng (*)'
+                className='mb-2 block'
+              />
+              <Select
+                placeholder='Lựa chọn loại người dùng'
+                options={Object.values(roleCode)}
+                isSearchable={true}
+                onChange={changeSelect}
+              />
+            </div>
+            {/* End role field */}
             {/* Major field */}
             <div className='mb-2 block font-Roboto'>
               <Label
@@ -113,79 +142,41 @@ function EnrollTopicModal(props) {
                 value='Chuyên ngành (*)'
                 className='mb-2 block'
               />
-              <TextInput
+              <Select
                 id='major'
-                placeholder='Nhập chuyên ngành'
-                required
-                type='text'
-                value={currentUser?.major?.name}
-                disabled
+                placeholder='Lựa chọn chuyên ngành'
+                options={Object.values(roleCode)}
+                isSearchable={true}
+                onChange={changeSelect}
               />
             </div>
             {/* End major field */}
+            {/* Clazz field */}
+            <div className='mb-2 block font-Roboto'>
+              <Label htmlFor='clazz' value='Lớp (*)' className='mb-2 block' />
+              <Select
+                id='clazz'
+                placeholder='Lựa chọn lớp'
+                options={Object.values(roleCode)}
+                isSearchable={true}
+                onChange={changeSelect}
+              />
+            </div>
+            {/* End clazz field */}
           </div>
-          {/* Select student field*/}
-          <div className='mb-2 block font-Roboto'>
-            <Label htmlFor='email1' value='SVTH' className='mb-2 block' />
-            <Select
-              placeholder='Lựa chọn SVTH'
-              options={options}
-              isSearchable={true}
-              isMulti={true}
-              onChange={changeSelect}
-              value={selectedOptions}
-            />
-          </div>
-          {/* End select student field */}
-          {/* Topic field */}
-          <div className='mb-2 block font-Roboto'>
-            <Label
-              htmlFor='topicName'
-              value='Tên đề tài (*)'
-              className='mb-2 block'
-              color={formik.errors.topicName && "failure"}
-            />
-            <TextInput
-              color={formik.errors.topicName && "failure"}
-              helperText={formik.errors.topicName}
-              placeholder='Nhập tên đề tài...'
-              required
-              type='text'
-              id='topicName'
-              onChange={formik.handleChange}
-              value={formik.values.topicName}
-            />
-          </div>
-          {/* End topic field */}
           {/* Goal field */}
           <div className='mb-2 block font-Roboto'>
             <Label
               color={formik.errors.goal && "failure"}
-              htmlFor='goal'
-              value='Yêu cầu đề tài (*)'
+              htmlFor='biography'
+              value='Tiểu sử'
               className='mb-2 block'
             />
             <CKEditor
               editor={ClassicEditor}
               onChange={(event, editor) => {
                 const data = editor.getData();
-                formik.values.goal = data;
-              }}
-            />
-          </div>
-          {/* End goal field */}
-          <div className='mb-2 block font-Roboto'>
-            <Label
-              color={formik.errors.requirement && "failure"}
-              htmlFor='requirement'
-              value='Kiến thức cần có (*)'
-              className='mb-2 block'
-            />
-            <CKEditor
-              editor={ClassicEditor}
-              onChange={(event, editor) => {
-                const data = editor.getData();
-                formik.values.requirement = data;
+                // formik.values.goal = data;
               }}
             />
           </div>
@@ -212,9 +203,9 @@ function EnrollTopicModal(props) {
   );
 }
 
-export default EnrollTopicModal;
+export default AddUserModal;
 
-EnrollTopicModal.propTypes = {
+AddUserModal.propTypes = {
   openModal: PropTypes.any,
   setOpenModal: PropTypes.func.isRequired,
 };

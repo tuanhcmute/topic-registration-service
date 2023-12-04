@@ -6,25 +6,19 @@ import { Button, TextInput } from "flowbite-react";
 import { BiMessageRoundedError } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 
-import EnrollTopicModal from "./components/EnrollTopicModal";
-import EditTopicModal from "./components/EditTopicModal";
+import AddUserModal from "./components/AddUserModal";
+import EditUserModal from "./components/EditUserModal";
 
-import {
-  enrollmentPeriodCodes,
-  topicStatus,
-  topicType,
-} from "../../../../utils/constants";
+import { topicStatus, topicType } from "../../../utils/constants";
 
-import { Dropdown } from "../../../../components/dropdown1";
+import { Dropdown } from "../../../components/dropdown1";
 import ApprovalTopicModal from "./components/ApprovalTopicModal";
 
 import {
   createNewTopicInLectureEnrollmentPeriod,
-  fetchAllTopicsInLectureEnrollmentPeriod,
   updateTopicInLectureEnrollmentPeriod,
-} from "../../../../features/topic";
-import { fetchStudentsNotEnrolledInTopic } from "../../../../features/user";
-import { fetchEnrollmentPeriodByTopicTypeAndPeriodCode } from "../../../../features/enrollmentPeriod";
+} from "../../../features/topic";
+import { roleCode } from "../../../utils/constants/roles";
 
 function UserManagementPage() {
   const [openModal, setOpenModal] = useState(undefined);
@@ -35,6 +29,7 @@ function UserManagementPage() {
   const [topicStatusFilter, setTopicStatusFilter] = useState(
     topicStatus.all.value
   );
+
   // Get current user from redux
   const currentUser = useSelector((state) => state.user?.currentUser);
   const topics = useSelector((state) => state.topic?.topics);
@@ -65,56 +60,26 @@ function UserManagementPage() {
     );
   }
 
-  useEffect(() => {
-    // Fetch topics
-    if (_.isEmpty(topics) || _.isNull(topics) || _.isUndefined(topics)) {
-      dispatch(fetchAllTopicsInLectureEnrollmentPeriod(topicType.TLCN));
-    }
-
-    // Fetch student options
-    if (
-      _.isEmpty(studentOptions) ||
-      _.isNull(studentOptions) ||
-      _.isUndefined(studentOptions)
-    ) {
-      dispatch(fetchStudentsNotEnrolledInTopic());
-    }
-
-    // Fetch enrollment period
-    if (
-      _.isEmpty(enrollmentPeriod) ||
-      _.isNull(enrollmentPeriod) ||
-      _.isUndefined(enrollmentPeriod)
-    ) {
-      dispatch(
-        fetchEnrollmentPeriodByTopicTypeAndPeriodCode({
-          topicType: topicType.TLCN,
-          periodCode: enrollmentPeriodCodes.LECTURE_ENROLLMENT_PERIOD,
-        })
-      );
-    }
-  }, []);
-
   return (
     <React.Fragment>
       <div className='w-full border border-lightGrey bg-white h-fit rounded-md dark:bg-sambuca dark:border-gray-500'>
         {/* Register topic */}
         <div className='flex items-center justify-between p-3 border-b border-lightGrey'>
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
-            TIỂU LUẬN CHUYÊN NGÀNH
+            DANH SÁCH NGƯỜI DÙNG
           </span>
           <Button
             color='gray'
             className='rounded-md p-0'
             onClick={() => setOpenModal("default")}
           >
-            Xuất excel
+            Thêm mới
           </Button>
         </div>
         {/* End register topic */}
         {/* Select */}
         <div className='m-3 flex gap-2'>
-          <TextInput className='w-full' placeholder='Nhập tên đề tài...' />
+          <TextInput className='w-full' placeholder='Nhập tên người dùng...' />
           <Button
             color='gray'
             className='rounded-md p-0 w-1/6'
@@ -132,25 +97,16 @@ function UserManagementPage() {
               className='rounded-md p-0 cursor-default flex items-center'
             >
               <AiOutlineFilter className='mr-1' />
-              <span>Lọc theo GVHD</span>
+              <span>Lọc theo loại người dùng</span>
             </Button>
           </div>
-          <div className='w-fit' id='topicStatusFilter'>
+          <div className='w-fit'>
             <Button
               color='gray'
               className='rounded-md p-0 cursor-default flex items-center'
             >
               <AiOutlineFilter className='mr-1' />
-              <span>Lọc theo chuyên ngành</span>
-            </Button>
-          </div>
-          <div className='w-fit' id='topicStatusFilter'>
-            <Button
-              color='gray'
-              className='rounded-md p-0 cursor-default flex items-center'
-            >
-              <AiOutlineFilter className='mr-1' />
-              <span>Lọc theo học kỳ</span>
+              <span>Lọc theo ngành</span>
             </Button>
           </div>
         </div>
@@ -160,16 +116,13 @@ function UserManagementPage() {
           anchorSelect='#topicStatusFilter'
         >
           <div className='flex flex-col gap-2 p-3'>
-            {Object.keys(topicStatus).map((item) => {
+            {Object.keys(roleCode).map((item) => {
               return (
                 <div
-                  key={item}
+                  key={roleCode[item].value}
                   className='text-sm px-2 py-1 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer'
-                  onClick={() =>
-                    setTopicStatusFilter(topicStatus?.[item]?.value)
-                  }
                 >
-                  {topicStatus?.[item]?.label}
+                  {roleCode[item].label}
                 </div>
               );
             })}
@@ -189,10 +142,14 @@ function UserManagementPage() {
                         <th className='p-3 text-center border-collapse border'>
                           STT
                         </th>
-                        <th className='p-3 text-center border'>Đề tài</th>
-                        <th className='p-3 text-center border'>GVHD</th>
-                        <th className='p-3 text-center border'>Trạng thái</th>
-                        <th className='p-3 text-center border'>Số SVTH</th>
+                        <th className='p-3 text-center border'>Ntid</th>
+                        <th className='p-3 text-center border'>
+                          Tên người dùng
+                        </th>
+                        <th className='p-3 text-center border w-3'>Email</th>
+                        <th className='p-3 text-center border'>
+                          Loại người dùng
+                        </th>
                         <th className='py-3 px-6 text-center border'></th>
                       </tr>
                     </thead>
@@ -232,38 +189,40 @@ function UserManagementPage() {
                             className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'
                             key={item.id}
                           >
-                            <td className='p-3 text-center whitespace-nowrap border'>
+                            <td className='p-3 text-center whitespace-nowrap border w-4'>
                               {index + 1}
                             </td>
-                            <td className='p-3 text-left border border-collapse border-lightGrey w-[300px]'>
-                              <p className='font-normal'>{item?.name}</p>
+                            <td className='p-3 text-left border border-collapse border-lightGrey w-20'>
+                              {/* <span className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
+                                  {currentUser?.ntid}
+                                </span> */}
+                              <span className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
+                                104526
+                              </span>
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey'>
-                              <div className=''>
-                                <span className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
-                                  {currentUser?.ntid}
-                                </span>
-                                <span className='block mt-2 font-normal'>
-                                  {currentUser?.name}
-                                </span>
+                              {/* <p className='font-normal'>{item?.name}</p> */}
+                              <p className='font-normal'>đỗ tuấn</p>
+                            </td>
+                            <td className='p-3 border border-collapse border-lightGrey w-48'>
+                              <p
+                                className={`${statusColor} py-1 px-3 text-sm font-medium rounded dark:text-black-pearl break-all`}
+                              >
+                                doduongthaituan201102@gmail.com
+                              </p>
+                            </td>
+                            <td className='p-3 text-center border border-collapse border-lightGrey w-36'>
+                              <div className='flex gap-2 flex-col'>
+                                <p className='w-fit bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
+                                  ADMIN
+                                </p>
+
+                                <p className='w-fit bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
+                                  GIẢNG VIÊN
+                                </p>
                               </div>
                             </td>
-                            <td className='p-3 text-center border border-collapse border-lightGrey'>
-                              <span
-                                className={`${statusColor} py-1 px-3 text-sm font-medium rounded dark:text-black-pearl`}
-                              >
-                                {
-                                  topicStatus?.[item?.status?.toLowerCase()]
-                                    ?.label
-                                }
-                              </span>
-                            </td>
-                            <td className='p-3 text-center border border-collapse border-lightGrey'>
-                              <span className='bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
-                                {item?.maxSlot}
-                              </span>
-                            </td>
-                            <td className='border border-collapse border-lightGrey'>
+                            <td className='border border-collapse border-lightGrey w-20'>
                               <div className='flex justify-center flex-wrap gap-1 items-center m-2'>
                                 <LiaEditSolid
                                   className='w-6 h-6 cursor-pointer'
@@ -300,13 +259,13 @@ function UserManagementPage() {
         {/* End table */}
       </div>
       {/* Enroll topic modal */}
-      <EnrollTopicModal
+      <AddUserModal
         options={studentOptions}
         openModal={openModal}
         setOpenModal={setOpenModal}
         handleNewTopic={handleCreateNewTopicInLectureEnrollmentPeriod}
       />
-      <EditTopicModal
+      <EditUserModal
         options={studentOptions}
         handleUpdateTopic={handleUpdateTopicInLectureEnrollmentPeriod}
         data={selectedTopic}

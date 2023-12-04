@@ -1,45 +1,38 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
 import { BiMessageRoundedError } from "react-icons/bi";
 import { Button, TextInput } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import { AiOutlineFilter } from "react-icons/ai";
 import _ from "lodash";
+import { MdOutlineAddComment } from "react-icons/md";
+import { BsThreeDots } from "react-icons/bs";
 
-import EnrollTopicModal from "./components/EnrollTopicModal";
-import EditTopicModal from "./components/EditTopicModal";
-import {
-  enrollmentPeriodCodes,
-  topicStatus,
-  topicType,
-} from "../../../../utils/constants";
-import { Dropdown } from "../../../../components/dropdown1";
-import ApprovalTopicModal from "./components/ApprovalTopicModal";
+import AddTimeModal from "./components/AddTimeModal";
+import EditTimeModal from "./components/EditTimeModal";
+import { topicStatus, topicType } from "../../../utils/constants";
+import { Dropdown } from "../../../components/dropdown1";
+import ListEnrollmentPeriodModal from "./components/ListEnrollmentPeriodModal";
 import {
   createNewTopicInLectureEnrollmentPeriod,
-  fetchAllTopicsInLectureEnrollmentPeriod,
   updateTopicInLectureEnrollmentPeriod,
-} from "../../../../features/topic";
-import { fetchStudentsNotEnrolledInTopic } from "../../../../features/user";
-import { fetchEnrollmentPeriodByTopicTypeAndPeriodCode } from "../../../../features/enrollmentPeriod";
+} from "../../../features/topic";
+import AddEnrollmentPeriodModal from "./components/AddEnrollmentPeriodModal";
 
 function TimeManagementPage() {
   const [openModal, setOpenModal] = useState(undefined);
   const [openEditTopicModal, setOpenEditTopicModal] = useState(undefined);
   const [openApprovalTopicModal, setOpenApprovalTopicModal] =
     useState(undefined);
+  const [openAddEnrollmentPeriodModal, setOpenAddEnrollmentPeriodModal] =
+    useState(undefined);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [topicStatusFilter, setTopicStatusFilter] = useState(
     topicStatus.all.value
   );
   // Get current user from redux
-  const currentUser = useSelector((state) => state.user?.currentUser);
-  const topics = useSelector((state) => state.topic?.topics);
   const studentOptions = useSelector(
     (state) => state.user?.studentsNotEnrolledInTopic
-  );
-  const enrollmentPeriod = useSelector(
-    (state) => state.enrollmentPeriod?.enrollmentPeriod
   );
   const dispatch = useDispatch();
 
@@ -62,56 +55,26 @@ function TimeManagementPage() {
     );
   }
 
-  useEffect(() => {
-    // Fetch topics
-    if (_.isEmpty(topics) || _.isNull(topics) || _.isUndefined(topics)) {
-      dispatch(fetchAllTopicsInLectureEnrollmentPeriod(topicType.TLCN));
-    }
-
-    // Fetch student options
-    if (
-      _.isEmpty(studentOptions) ||
-      _.isNull(studentOptions) ||
-      _.isUndefined(studentOptions)
-    ) {
-      dispatch(fetchStudentsNotEnrolledInTopic());
-    }
-
-    // Fetch enrollment period
-    if (
-      _.isEmpty(enrollmentPeriod) ||
-      _.isNull(enrollmentPeriod) ||
-      _.isUndefined(enrollmentPeriod)
-    ) {
-      dispatch(
-        fetchEnrollmentPeriodByTopicTypeAndPeriodCode({
-          topicType: topicType.TLCN,
-          periodCode: enrollmentPeriodCodes.LECTURE_ENROLLMENT_PERIOD,
-        })
-      );
-    }
-  }, []);
-
   return (
     <React.Fragment>
       <div className='w-full border border-lightGrey bg-white h-fit rounded-md dark:bg-sambuca dark:border-gray-500'>
         {/* Register topic */}
         <div className='flex items-center justify-between p-3 border-b border-lightGrey'>
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
-            TIỂU LUẬN CHUYÊN NGÀNH
+            DANH SÁCH THỜI GIAN
           </span>
           <Button
             color='gray'
             className='rounded-md p-0'
             onClick={() => setOpenModal("default")}
           >
-            Xuất excel
+            Thêm mới
           </Button>
         </div>
         {/* End register topic */}
         {/* Select */}
         <div className='m-3 flex gap-2'>
-          <TextInput className='w-full' placeholder='Nhập tên đề tài...' />
+          <TextInput className='w-full' placeholder='Nhập học kỳ...' />
           <Button
             color='gray'
             className='rounded-md p-0 w-1/6'
@@ -129,7 +92,7 @@ function TimeManagementPage() {
               className='rounded-md p-0 cursor-default flex items-center'
             >
               <AiOutlineFilter className='mr-1' />
-              <span>Lọc theo GVHD</span>
+              <span>Lọc theo trạng thái</span>
             </Button>
           </div>
           <div className='w-fit' id='topicStatusFilter'>
@@ -138,16 +101,7 @@ function TimeManagementPage() {
               className='rounded-md p-0 cursor-default flex items-center'
             >
               <AiOutlineFilter className='mr-1' />
-              <span>Lọc theo chuyên ngành</span>
-            </Button>
-          </div>
-          <div className='w-fit' id='topicStatusFilter'>
-            <Button
-              color='gray'
-              className='rounded-md p-0 cursor-default flex items-center'
-            >
-              <AiOutlineFilter className='mr-1' />
-              <span>Lọc theo học kỳ</span>
+              <span>Lọc theo năm học</span>
             </Button>
           </div>
         </div>
@@ -186,10 +140,10 @@ function TimeManagementPage() {
                         <th className='p-3 text-center border-collapse border'>
                           STT
                         </th>
-                        <th className='p-3 text-center border'>Đề tài</th>
-                        <th className='p-3 text-center border'>GVHD</th>
+                        <th className='p-3 text-center border'>Học kỳ</th>
                         <th className='p-3 text-center border'>Trạng thái</th>
-                        <th className='p-3 text-center border'>Số SVTH</th>
+                        <th className='p-3 text-center border'>Bắt đầu</th>
+                        <th className='p-3 text-center border'>kết thúc</th>
                         <th className='py-3 px-6 text-center border'></th>
                       </tr>
                     </thead>
@@ -233,52 +187,74 @@ function TimeManagementPage() {
                               {index + 1}
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey w-[300px]'>
-                              <p className='font-normal'>{item?.name}</p>
+                              <p className='font-normal'>
+                                HKI năm học 2023 - 2024
+                              </p>
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey'>
-                              <div className=''>
-                                <span className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
-                                  {currentUser?.ntid}
-                                </span>
-                                <span className='block mt-2 font-normal'>
-                                  {currentUser?.name}
-                                </span>
-                              </div>
+                              <p className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
+                                ACTIVATED
+                              </p>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey'>
                               <span
                                 className={`${statusColor} py-1 px-3 text-sm font-medium rounded dark:text-black-pearl`}
                               >
-                                {
-                                  topicStatus?.[item?.status?.toLowerCase()]
-                                    ?.label
-                                }
+                                21/08/2023
                               </span>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey'>
                               <span className='bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
-                                {item?.maxSlot}
+                                18/12/2023
                               </span>
                             </td>
                             <td className='border border-collapse border-lightGrey'>
-                              <div className='flex justify-center flex-wrap gap-1 items-center m-2'>
-                                <LiaEditSolid
+                              <div className='flex justify-center flex-col gap-3 items-center m-2'>
+                                <BsThreeDots
                                   className='w-6 h-6 cursor-pointer'
-                                  onClick={() => {
-                                    setSelectedTopic(item);
-                                    setOpenEditTopicModal("default");
-                                  }}
+                                  id='actions'
                                 />
-                                {item?.status !== topicStatus.pending.value && (
-                                  <BiMessageRoundedError
-                                    className='w-6 h-6 cursor-pointer'
+                              </div>
+                              <Dropdown
+                                place='right-right'
+                                className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
+                                anchorSelect='#actions'
+                              >
+                                <div className='flex flex-col gap-3 p-3'>
+                                  <div
+                                    className='flex items-center gap-1 cursor-pointer'
+                                    onClick={() => {
+                                      setSelectedTopic(item);
+                                      setOpenEditTopicModal("default");
+                                    }}
+                                  >
+                                    <LiaEditSolid className='w-6 h-6 cursor-pointer' />
+                                    <p>Chỉnh sửa học kỳ</p>
+                                  </div>
+                                  <div
+                                    className='flex items-center gap-1 cursor-pointer'
                                     onClick={() => {
                                       setSelectedTopic(item);
                                       setOpenApprovalTopicModal("default");
                                     }}
-                                  />
-                                )}
-                              </div>
+                                  >
+                                    <BiMessageRoundedError className='w-6 h-6 cursor-pointer' />
+                                    <p>DS Khoảng thời gian</p>
+                                  </div>
+                                  <div
+                                    className='flex items-center gap-1 cursor-pointer'
+                                    onClick={() => {
+                                      setSelectedTopic(item);
+                                      setOpenAddEnrollmentPeriodModal(
+                                        "default"
+                                      );
+                                    }}
+                                  >
+                                    <MdOutlineAddComment className='w-6 h-6 cursor-pointer' />
+                                    <p>Thêm khoảng thời gian</p>
+                                  </div>
+                                </div>
+                              </Dropdown>
                             </td>
                           </tr>
                         );
@@ -297,23 +273,27 @@ function TimeManagementPage() {
         {/* End table */}
       </div>
       {/* Enroll topic modal */}
-      <EnrollTopicModal
+      <AddTimeModal
         options={studentOptions}
         openModal={openModal}
         setOpenModal={setOpenModal}
         handleNewTopic={handleCreateNewTopicInLectureEnrollmentPeriod}
       />
-      <EditTopicModal
+      <EditTimeModal
         options={studentOptions}
         handleUpdateTopic={handleUpdateTopicInLectureEnrollmentPeriod}
         data={selectedTopic}
         openModal={openEditTopicModal}
         setOpenModal={setOpenEditTopicModal}
       />
-      <ApprovalTopicModal
+      <ListEnrollmentPeriodModal
         data={selectedTopic}
         openModal={openApprovalTopicModal}
         setOpenModal={setOpenApprovalTopicModal}
+      />
+      <AddEnrollmentPeriodModal
+        openModal={openAddEnrollmentPeriodModal}
+        setOpenModal={setOpenAddEnrollmentPeriodModal}
       />
       {/* End content */}
     </React.Fragment>
