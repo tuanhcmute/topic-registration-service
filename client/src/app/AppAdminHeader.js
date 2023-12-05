@@ -18,7 +18,7 @@ const dropdownItems = [
     id: uuidv4(),
     text: "Thông tin cá nhân",
     icon: PiUserCircleGearLight,
-    to: "/student/profile",
+    to: "/admin/profile",
   },
   {
     id: uuidv4(),

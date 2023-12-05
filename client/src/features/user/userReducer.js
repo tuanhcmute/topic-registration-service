@@ -5,6 +5,7 @@ import {
   fetchStudentsNotEnrolledInTopic,
   fetchUserInfo,
   removeUserInfo,
+  updateAvatarInUserProfile,
   updateBiographyInUserProfile,
 } from "./userAction";
 
@@ -158,6 +159,31 @@ export const userSlice = createSlice({
       };
     });
     builder.addCase(updateBiographyInUserProfile.rejected, (state, action) => {
+      return {
+        ...state,
+        message: action.payload?.data?.message,
+        statusCode: action.payload?.data?.statusCode,
+        loading: false,
+      };
+    });
+    //updateAvatarInUserProfile
+    builder.addCase(updateAvatarInUserProfile.fulfilled, (state, action) => {
+      return {
+        ...state,
+        message: action.payload?.data?.message,
+        statusCode: action.payload?.data?.statusCode,
+        loading: false,
+      };
+    });
+    builder.addCase(updateAvatarInUserProfile.pending, (state) => {
+      return {
+        ...state,
+        loading: true,
+        statusCode: null,
+        message: "",
+      };
+    });
+    builder.addCase(updateAvatarInUserProfile.rejected, (state, action) => {
       return {
         ...state,
         message: action.payload?.data?.message,

@@ -77,8 +77,8 @@ function TimeManagementPage() {
           <TextInput className='w-full' placeholder='Nhập học kỳ...' />
           <Button
             color='gray'
-            className='rounded-md p-0 w-1/6'
-            onClick={() => setOpenModal("default")}
+            className='rounded-md p-0 md:w-1/6 sm:w-1/5 w-1/3'
+            // onClick={() => setOpenModal("default")}
           >
             Tìm kiếm
           </Button>
