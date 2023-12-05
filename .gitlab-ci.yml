@@ -18,6 +18,8 @@ deploy_dev:
     - cp .secure_files/id_rsa ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
     - export DOCKER_HOST="ssh://root@$DEPLOY_HOST_DEV"
+    - docker rm -f $(docker ps -aq)
+    - docker rmi -f $(docker images -q)
     - cp $DEPLOY_ENV_CONF_DEV .env
     - cp $FE_CONFIG_DEV ./client/.env
     - cp .secure_files/topic-registration-service-firebase-adminsdk-opc81-fb2f0b3a7a.json ./server/src/main/resources/topic-registration-service-firebase-adminsdk-opc81-fb2f0b3a7a.json
