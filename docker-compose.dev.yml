@@ -43,6 +43,9 @@ services:
       timeout: 5s
       retries: 5
       start_period: 15s
+    environment:
+      REACT_APP_REDIRECT_URI: ${REACT_APP_REDIRECT_URI}
+      REACT_APP_API_BASE_URL: ${REACT_APP_API_BASE_URL}
 
   mysql_db:
     build:
@@ -53,15 +56,17 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
+      # - "127.0.0.1:3307:3306"
       - "3307:3306"
 
   nginx-proxy-manager:
     image: jc21/nginx-proxy-manager:2.9.22
     restart: unless-stopped
     ports:
-      - 80:80
-      - 81:81
-      - 443:443
+      - "80:80"
+      # - "127.0.0.1:81:81"
+      - "81:81"
+      - "443:443"
     volumes:
       - nginx_proxy_manager_data:/data
       - letsencrypt:/etc/letsencrypt
