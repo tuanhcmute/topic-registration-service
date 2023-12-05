@@ -1,18 +1,15 @@
 import PropTypes from "prop-types";
 import { Modal } from "flowbite-react";
-import { useDispatch, useSelector } from "react-redux";
-import { topicStatus } from "../../../../utils/constants";
+import { useDispatch } from "react-redux";
+import { LiaEditSolid } from "react-icons/lia";
+import EditEnrollmentPeriodModal from "./EditEnrollmentPeriodModal";
+import { useState } from "react";
 
 function ListEnrollmentPeriodModal(props) {
+  const [openEditEnrollmentPeriodModal, setOpenEditEnrollmentPeriodModal] =
+    useState(undefined);
   const dispatch = useDispatch();
   const { openModal, setOpenModal, data } = props;
-  const approvalHistories = useSelector(
-    (state) => state?.approvalHistory?.approvalHistories
-  );
-
-  // useEffect(() => {
-  //   if (data) dispatch(fetchApprovalHistoryByTopicId(data?.id));
-  // }, [data, dispatch]);
 
   return (
     <Modal
@@ -76,8 +73,15 @@ function ListEnrollmentPeriodModal(props) {
                             <td className='p-3 text-center border border-collapse border-lightGrey w-40'>
                               <div className=''>11/09/2023</div>
                             </td>
-                            <td className='p-3 text-center border border-collapse border-lightGrey w-40'>
-                              <div className=''>11/09/2023</div>
+                            <td className='p-3 border border-collapse border-lightGrey w-40'>
+                              <div className='flex items-center w-full justify-center'>
+                                <LiaEditSolid
+                                  className='w-6 h-6 cursor-pointer'
+                                  onClick={() =>
+                                    setOpenEditEnrollmentPeriodModal("default")
+                                  }
+                                />
+                              </div>
                             </td>
                           </tr>
                         );
@@ -89,6 +93,11 @@ function ListEnrollmentPeriodModal(props) {
             </div>
           </div>
         </div>
+        <EditEnrollmentPeriodModal
+          openModal={openEditEnrollmentPeriodModal}
+          setOpenModal={setOpenEditEnrollmentPeriodModal}
+        />
+
         <div className='w-full flex justify-end p-3'>
           {/* <Pagination /> */}
           {/* <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} /> */}

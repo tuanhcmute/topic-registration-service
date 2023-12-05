@@ -57,3 +57,18 @@ export const updateBiographyInUserProfile = createAsyncThunk(
     return response?.data;
   }
 );
+
+export const updateAvatarInUserProfile = createAsyncThunk(
+  `${namespace}/updateAvatarInUserProfile`,
+  async (file, { rejectWithValue, dispatch }) => {
+    console.log(file);
+    const response = await userService.updateAvatarInUserProfile(file);
+    if (response.data?.statusCode !== HttpStatusCode.Ok) {
+      toast.error("Cập nhật ảnh đại diện thất bại");
+      return rejectWithValue(response?.data);
+    }
+    dispatch(fetchUserInfo());
+    toast.success("Cập nhật ảnh đại diện thành công");
+    return response?.data;
+  }
+);

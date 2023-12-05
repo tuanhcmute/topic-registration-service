@@ -77,6 +77,7 @@ const router = createBrowserRouter([
             path: "home",
             element: <AdminHomeRoute />,
           },
+          { path: "profile", element: <ProfileRoute /> },
           {
             path: "management",
 

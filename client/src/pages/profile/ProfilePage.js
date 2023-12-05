@@ -1,19 +1,48 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { PiNewspaperClippingLight } from "react-icons/pi";
 import { Button, TextInput, Label } from "flowbite-react";
-
-import { Banner } from "../../components/banner";
+import _ from "lodash";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { updateBiographyInUserProfile } from "../../features/user";
+
+import { Banner } from "../../components/banner";
+import {
+  updateAvatarInUserProfile,
+  updateBiographyInUserProfile,
+} from "../../features/user";
+import { roleCode } from "../../utils/constants/roles";
 
 function ProfilePage() {
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user?.currentUser);
+  const [roleLabel, setRoleLabel] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [file, setFile] = useState(null);
   const [biography, setBiography] = useState(
     (currentUser) => currentUser?.biography || ""
   );
+
+  function changeFile(e) {
+    setFile(e.target.files[0]);
+  }
+
+  useEffect(() => {
+    const role = currentUser?.userRoles[0];
+    setRoleLabel(roleCode[role]?.label);
+    setImageUrl(currentUser?.imageUrl);
+  }, [currentUser]);
+
+  useEffect(() => {
+    let objectUrl;
+    if (file) {
+      // create the preview
+      objectUrl = URL.createObjectURL(file);
+      setImageUrl(objectUrl);
+    }
+    // free memory when ever this component is unmounted
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
 
   return (
     <React.Fragment>
@@ -22,17 +51,27 @@ function ProfilePage() {
       <div className='xl:w-[1140px] lg:w-[960px] md:w-full p-3 mx-auto my-0 flex justify-start gap-5 font-Roboto flex-col xl:flex-row mt-10 border border-gray-300 rounded bg-white dark:bg-black-pearl dark:border-gray-400'>
         <div className='md:w-[350px] w-full h-fit flex flex-col gap-5 items-center bg-whiteSmoke p-3 md:p-5 rounded dark:bg-sambuca'>
           {/* Image */}
-          <label
-            htmlFor='avatar'
-            style={{
-              backgroundImage: `url("${currentUser?.imageUrl}")`,
-            }}
-            className='object-cover rounded-full w-32 h-32 bg-center bg-no-repeat cursor-pointer hover:bg-gray-200'
-          />
-          <input type='file' id='avatar' hidden />
+          <label htmlFor='avatar' className='cursor-pointer'>
+            <div
+              style={{
+                backgroundImage: `url("${imageUrl}")`,
+              }}
+              className='w-40 h-40 rounded-full bg-cover bg-center bg-no-repeat'
+            ></div>
+          </label>
+          <input type='file' id='avatar' hidden onChange={changeFile} />
+          {file && (
+            <Button
+              color='gray'
+              type='button'
+              onClick={() => dispatch(updateAvatarInUserProfile(file))}
+            >
+              Cập nhật
+            </Button>
+          )}
           {/* Info */}
           <div className='text-center'>
-            <p className='font-bold text-red-600 text-sm mb-1'>Sinh viên</p>
+            <p className='font-bold text-red-600 text-sm mb-1'>{roleLabel}</p>
             <p className='font-bold text-primary text-sm dark:text-gray-300'>
               {currentUser?.name}
             </p>

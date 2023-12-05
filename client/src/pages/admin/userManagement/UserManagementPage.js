@@ -68,13 +68,26 @@ function UserManagementPage() {
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
             DANH SÁCH NGƯỜI DÙNG
           </span>
-          <Button
-            color='gray'
-            className='rounded-md p-0'
-            onClick={() => setOpenModal("default")}
-          >
+          <Button color='gray' className='rounded-md p-0' id='addUserMethod'>
             Thêm mới
           </Button>
+          <Dropdown
+            place='right-right'
+            className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
+            anchorSelect='#addUserMethod'
+          >
+            <div className='flex flex-col gap-2 p-3'>
+              <div
+                className='text-sm px-2 py-1 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer'
+                onClick={() => setOpenModal("default")}
+              >
+                Thêm thủ công
+              </div>
+              <div className='text-sm px-2 py-1 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer'>
+                Import excel
+              </div>
+            </div>
+          </Dropdown>
         </div>
         {/* End register topic */}
         {/* Select */}
@@ -82,8 +95,8 @@ function UserManagementPage() {
           <TextInput className='w-full' placeholder='Nhập tên người dùng...' />
           <Button
             color='gray'
-            className='rounded-md p-0 w-1/6'
-            onClick={() => setOpenModal("default")}
+            className='rounded-md p-0 md:w-1/6 sm:w-1/5 w-1/3'
+            // onClick={() => setOpenModal("default")}
           >
             Tìm kiếm
           </Button>

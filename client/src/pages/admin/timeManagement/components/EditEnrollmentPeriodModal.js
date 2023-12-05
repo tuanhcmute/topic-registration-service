@@ -23,7 +23,7 @@ const validationSchema = Yup.object().shape({
   students: Yup.array(),
 });
 
-function AddEnrollmentPeriodModal(props) {
+function EditEnrollmentPeriodModal(props) {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const enrollmentPeriod = useSelector(
     (state) => state.enrollmentPeriod?.enrollmentPeriod
@@ -72,7 +72,7 @@ function AddEnrollmentPeriodModal(props) {
     <Modal size='lg' show={openModal === "default"} onClose={setCloseModal}>
       <Modal.Header className='pt-4 pb-3 bg-primary'>
         <p className='font-Roboto text-base font-bold uppercase text-white'>
-          THÊM KHOẢNG THỜI GIAN ĐĂNG KÝ
+          CHỈNH SỬA KHOẢNG THỜI GIAN ĐĂNG KÝ
         </p>
       </Modal.Header>
       <Modal.Body>
@@ -174,9 +174,9 @@ function AddEnrollmentPeriodModal(props) {
   );
 }
 
-export default AddEnrollmentPeriodModal;
+export default EditEnrollmentPeriodModal;
 
-AddEnrollmentPeriodModal.propTypes = {
+EditEnrollmentPeriodModal.propTypes = {
   openModal: PropTypes.any,
   setOpenModal: PropTypes.func.isRequired,
 };

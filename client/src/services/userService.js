@@ -23,6 +23,16 @@ const userService = {
     const requestUrl = `${baseUrl}/lecture?majorCode=${majorCode}`;
     return axiosClient.get(requestUrl);
   },
+  updateAvatarInUserProfile: (file) => {
+    const requestUrl = `${baseUrl}/profile/upload`;
+    const formData = new FormData();
+    formData.append("image", file);
+    return axiosClient.put(requestUrl, formData, {
+      headers: {
+        [headers.CONTENT_TYPE]: headers.MULTIPART_FORM_DATA_VALUE,
+      },
+    });
+  },
 };
 
 export default userService;
