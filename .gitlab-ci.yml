@@ -19,8 +19,9 @@ deploy_dev:
     - chmod 600 ~/.ssh/id_rsa
     - export DOCKER_HOST="ssh://root@$DEPLOY_HOST_DEV"
     - cp $DEPLOY_ENV_CONF_DEV .env
+    - cp $FE_CONFIG_DEV ./client/.env
     - cp .secure_files/topic-registration-service-firebase-adminsdk-opc81-fb2f0b3a7a.json ./server/src/main/resources/topic-registration-service-firebase-adminsdk-opc81-fb2f0b3a7a.json
-    # - echo -e "\nCONFIG_JSON='$(base64 -w 0 $FE_CONFIG_JSON_DEV)'" >> .env
+
     - source go.sh; deploy
   resource_group: deploy
   rules:
