@@ -1,5 +1,4 @@
 import axios, { HttpStatusCode } from "axios";
-import axiosRetry from "axios-retry";
 import queryString from "query-string";
 import { toast } from "react-toastify";
 import { refreshToken } from "../features/auth";
