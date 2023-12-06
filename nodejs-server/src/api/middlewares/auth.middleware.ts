@@ -49,6 +49,8 @@ export const preAuthorizeFilter =
         },
       });
 
+      console.log(currentUser);
+
       // Validate user
       if (
         _.isNull(currentUser) ||

@@ -5,3 +5,4 @@ export { default as topicController } from "./topic.controller";
 export { default as approvalHistoryController } from "./approvalHistory.controller";
 export { default as divisionController } from "./division.controller";
 export { default as topicEnrollmentController } from "./topicEnrollment.controller";
+export { default as semesterController } from "./semester.controller";
