@@ -12,7 +12,7 @@ const initialState = {
   enrollmentPeriod: {},
 };
 
-export const enrollmentPeriodSlide = createSlice({
+export const enrollmentPeriodSlice = createSlice({
   name: namespace,
   initialState,
   extraReducers: (builder) => {
@@ -60,4 +60,4 @@ export const enrollmentPeriodSlide = createSlice({
   },
 });
 
-export default enrollmentPeriodSlide.reducer;
+export default enrollmentPeriodSlice.reducer;

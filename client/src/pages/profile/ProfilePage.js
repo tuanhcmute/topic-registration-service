@@ -23,15 +23,15 @@ function ProfilePage() {
     (currentUser) => currentUser?.biography || ""
   );
 
-  function changeFile(e) {
-    setFile(e.target.files[0]);
-  }
-
   useEffect(() => {
     const role = currentUser?.userRoles[0];
     setRoleLabel(roleCode[role]?.label);
     setImageUrl(currentUser?.imageUrl);
   }, [currentUser]);
+
+  function changeFile(e) {
+    setFile(e.target.files[0]);
+  }
 
   useEffect(() => {
     let objectUrl;

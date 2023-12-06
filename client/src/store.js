@@ -11,11 +11,13 @@ import { topicReducer } from "./features/topic";
 import { userReducer } from "./features/user";
 import { approvalHistoryReducer } from "./features/approvalHistory";
 import { topicEnrollmentReducer } from "./features/topicEnrollment";
+import { semesterReducer } from "./features/semester";
 
 const persistConfig = {
   key: "root",
   storage,
 };
+
 const rootReducer = combineReducers({
   auth: authReducer,
   theme: themeReducer,
@@ -25,6 +27,7 @@ const rootReducer = combineReducers({
   enrollmentPeriod: enrollmentPeriodReducer,
   approvalHistory: approvalHistoryReducer,
   topicEnrollment: topicEnrollmentReducer,
+  semester: semesterReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
