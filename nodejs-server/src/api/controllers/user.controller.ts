@@ -112,6 +112,18 @@ class UserController {
     }
   };
 
+  public getAllUsers = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      res.status(StatusCodes.OK).json(await userService.getAllUsers());
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public async updateAvatarInUserProfile(
     req: Request,
     res: Response,

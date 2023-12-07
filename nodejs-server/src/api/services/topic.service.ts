@@ -87,6 +87,7 @@ class TopicService {
         },
         order: ["createdDate"],
       });
+
       const data: IListTopicResponse = { topics };
       return new ResponseModelBuilder<IListTopicResponse>()
         .withMessage("Topics have been successfully retrieved")
@@ -290,6 +291,51 @@ class TopicService {
       .withData(data)
       .build();
   }
+
+  public getAllTopicsRoleAdmin = async (): Promise<
+    IResponseModel<IListTopicResponse>
+  > => {
+    try {
+      const topics = await Topic.findAll({
+        include: [
+          {
+            model: User,
+            as: "lecture",
+            attributes: ["ntid", "name"],
+          },
+          {
+            model: TopicEnrollment,
+            as: "topicEnrollments",
+            include: [
+              { model: User, as: "student", attributes: ["ntid", "name"] },
+            ],
+            attributes: ["id"],
+          },
+        ],
+        attributes: {
+          exclude: [
+            "createdBy",
+            "createdDate",
+            "updatedDate",
+            "lectureId",
+            "majorId",
+            "semesterId",
+            "id",
+          ],
+        },
+        order: ["createdDate"],
+      });
+      const data: IListTopicResponse = { topics };
+      return new ResponseModelBuilder<IListTopicResponse>()
+        .withMessage("Topics have been successfully retrieved")
+        .withStatusCode(StatusCodes.OK)
+        .withData(data)
+        .build();
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
 
   public async getAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod(
     type: string,
