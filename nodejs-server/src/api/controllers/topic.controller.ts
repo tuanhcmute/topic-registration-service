@@ -308,6 +308,19 @@ class TopicController {
       next(error);
     }
   }
+  public getAllTopicsRoleAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const data: IResponseModel<IListTopicResponse> =
+        await topicService.getAllTopicsRoleAdmin();
+      res.status(StatusCodes.OK).json(data);
+    } catch (err) {
+      next(err);
+    }
+  };
 }
 
 export default new TopicController();
