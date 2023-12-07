@@ -1,8 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  createEnrollmentPeriod,
+  fetchEnrollmentPeriodBySemesterId,
   fetchEnrollmentPeriodByTopicTypeAndPeriodCode,
   namespace,
   resetEnrollmentPeriodState,
+  updateEnrollmentPeriod,
 } from "./enrollmentPeriodAction";
 
 const initialState = {
@@ -10,9 +13,10 @@ const initialState = {
   message: "",
   loading: false,
   enrollmentPeriod: {},
+  enrollmentPeriods: [],
 };
 
-export const enrollmentPeriodSlice = createSlice({
+export const enrollmentPeriodSlide = createSlice({
   name: namespace,
   initialState,
   extraReducers: (builder) => {
@@ -57,7 +61,91 @@ export const enrollmentPeriodSlice = createSlice({
     builder.addCase(resetEnrollmentPeriodState.fulfilled, () => {
       return initialState;
     });
+    // fetchEnrollmentPeriodBySemesterId
+    builder.addCase(
+      fetchEnrollmentPeriodBySemesterId.fulfilled,
+      (state, action) => {
+        return {
+          ...state,
+          enrollmentPeriods: action.payload?.data?.enrollmentPeriods,
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    builder.addCase(
+      fetchEnrollmentPeriodBySemesterId.rejected,
+      (state, action) => {
+        return {
+          ...state,
+          enrollmentPeriods: [],
+          message: action.payload?.message,
+          statusCode: action.payload?.statusCode,
+          loading: false,
+        };
+      }
+    );
+    builder.addCase(fetchEnrollmentPeriodBySemesterId.pending, (state) => {
+      return {
+        ...state,
+        enrollmentPeriods: [],
+        message: "",
+        statusCode: null,
+        loading: false,
+      };
+    });
+    // createEnrollmentPeriod
+    builder.addCase(createEnrollmentPeriod.fulfilled, (state, action) => {
+      return {
+        ...state,
+        message: action.payload?.message,
+        statusCode: action.payload?.statusCode,
+        loading: false,
+      };
+    });
+    builder.addCase(createEnrollmentPeriod.rejected, (state, action) => {
+      return {
+        ...state,
+        message: action.payload?.message,
+        statusCode: action.payload?.statusCode,
+        loading: false,
+      };
+    });
+    builder.addCase(createEnrollmentPeriod.pending, (state) => {
+      return {
+        ...state,
+        message: "",
+        statusCode: null,
+        loading: false,
+      };
+    });
+    // updateEnrollmentPeriod
+    builder.addCase(updateEnrollmentPeriod.fulfilled, (state, action) => {
+      return {
+        ...state,
+        message: action.payload?.message,
+        statusCode: action.payload?.statusCode,
+        loading: false,
+      };
+    });
+    builder.addCase(updateEnrollmentPeriod.rejected, (state, action) => {
+      return {
+        ...state,
+        message: action.payload?.message,
+        statusCode: action.payload?.statusCode,
+        loading: false,
+      };
+    });
+    builder.addCase(updateEnrollmentPeriod.pending, (state) => {
+      return {
+        ...state,
+        message: "",
+        statusCode: null,
+        loading: false,
+      };
+    });
   },
 });
 
-export default enrollmentPeriodSlice.reducer;
+export default enrollmentPeriodSlide.reducer;

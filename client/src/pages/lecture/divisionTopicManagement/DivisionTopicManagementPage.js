@@ -6,7 +6,7 @@ import { AiOutlineFilter } from "react-icons/ai";
 import _ from "lodash";
 
 import {
-  enrollmentPeriodCodes,
+  enrollmentPeriodCode,
   topicStatus,
   topicType,
 } from "../../../utils/constants";
@@ -55,7 +55,7 @@ function DivisionTopicManagement() {
       dispatch(
         fetchEnrollmentPeriodByTopicTypeAndPeriodCode({
           topicType: topicType.TLCN,
-          periodCode: enrollmentPeriodCodes.LECTURE_ENROLLMENT_PERIOD,
+          periodCode: enrollmentPeriodCode.LECTURE_ENROLLMENT_PERIOD.value,
         })
       );
     }

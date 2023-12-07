@@ -1,59 +1,63 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
 import { BiMessageRoundedError } from "react-icons/bi";
 import { Button, TextInput } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import { AiOutlineFilter } from "react-icons/ai";
-import _ from "lodash";
 import { MdOutlineAddComment } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
 
 import AddTimeModal from "./components/AddTimeModal";
 import EditTimeModal from "./components/EditTimeModal";
-import { topicStatus, topicType } from "../../../utils/constants";
+import { topicStatus } from "../../../utils/constants";
 import { Dropdown } from "../../../components/dropdown1";
 import ListEnrollmentPeriodModal from "./components/ListEnrollmentPeriodModal";
 import {
-  createNewTopicInLectureEnrollmentPeriod,
-  updateTopicInLectureEnrollmentPeriod,
-} from "../../../features/topic";
+  createSemester,
+  fetchAllSemesters,
+  updateSemester,
+} from "../../../features/semester";
 import AddEnrollmentPeriodModal from "./components/AddEnrollmentPeriodModal";
+import { createEnrollmentPeriod } from "../../../features/enrollmentPeriod/enrollmentPeriodAction";
 
 function TimeManagementPage() {
   const [openModal, setOpenModal] = useState(undefined);
-  const [openEditTopicModal, setOpenEditTopicModal] = useState(undefined);
-  const [openApprovalTopicModal, setOpenApprovalTopicModal] =
+  const [openEditTimeModal, setOpenEditTimeModal] = useState(undefined);
+  const [openListEnrollmentPeriodModal, setOpenListEnrollmentPeriodModal] =
     useState(undefined);
   const [openAddEnrollmentPeriodModal, setOpenAddEnrollmentPeriodModal] =
     useState(undefined);
-  const [selectedTopic, setSelectedTopic] = useState(null);
-  const [topicStatusFilter, setTopicStatusFilter] = useState(
-    topicStatus.all.value
-  );
-  // Get current user from redux
-  const studentOptions = useSelector(
-    (state) => state.user?.studentsNotEnrolledInTopic
-  );
+  const [selectedSemester, setSelectedSemester] = useState(null);
+  const semesters = useSelector((state) => state.semester.semesters);
   const dispatch = useDispatch();
 
-  async function handleCreateNewTopicInLectureEnrollmentPeriod(data) {
+  function handleCreateSemester(data) {
     dispatch(
-      createNewTopicInLectureEnrollmentPeriod({
+      createSemester({
         data,
         setOpenModal,
-        type: topicType.TLCN,
       })
     );
   }
-  async function handleUpdateTopicInLectureEnrollmentPeriod(data) {
+
+  function handleUpdateSemester(id, data) {
+    console.log({ id, data });
+    dispatch(updateSemester({ id, data, setOpenEditTimeModal }));
+  }
+
+  function handleCreateEnrollmentPeriod(semesterId, data) {
     dispatch(
-      updateTopicInLectureEnrollmentPeriod({
+      createEnrollmentPeriod({
+        semesterId,
         data,
-        type: topicType.TLCN,
-        setOpenEditTopicModal,
+        setOpenAddEnrollmentPeriodModal,
       })
     );
   }
+
+  useEffect(() => {
+    dispatch(fetchAllSemesters());
+  }, []);
 
   return (
     <React.Fragment>
@@ -116,9 +120,9 @@ function TimeManagementPage() {
                 <div
                   key={item}
                   className='text-sm px-2 py-1 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer'
-                  onClick={() =>
-                    setTopicStatusFilter(topicStatus?.[item]?.value)
-                  }
+                  // onClick={() =>
+                  //   setTopicStatusFilter(topicStatus?.[item]?.value)
+                  // }
                 >
                   {topicStatus?.[item]?.label}
                 </div>
@@ -148,36 +152,8 @@ function TimeManagementPage() {
                       </tr>
                     </thead>
                     <tbody className='text-gray-600 text-sm font-light'>
-                      {/* {topics
-                        ?.filter((item) => {
-                          if (
-                            _.isEqual(topicStatusFilter, topicStatus.all.value)
-                          )
-                            return true;
-                          return item?.status === topicStatusFilter;
-                        }) */}
-                      {[1, 2, 3, 4, 5]?.map((item, index) => {
-                        let statusColor = "";
-                        if (
-                          _.isEqual(item?.status, topicStatus.approved.value)
-                        ) {
-                          statusColor = "bg-green-200";
-                        }
-                        if (
-                          _.isEqual(item?.status, topicStatus.rejected.value)
-                        ) {
-                          statusColor = "bg-red-300";
-                        }
-                        if (
-                          _.isEqual(item?.status, topicStatus.pending.value)
-                        ) {
-                          statusColor = "bg-teal-200";
-                        }
-                        if (
-                          _.isEqual(item?.status, topicStatus.updated.value)
-                        ) {
-                          statusColor = "bg-teal-200";
-                        } else statusColor = "bg-teal-200";
+                      {semesters?.map((item, index) => {
+                        let statusColor = "bg-teal-200";
                         return (
                           <tr
                             className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'
@@ -187,45 +163,43 @@ function TimeManagementPage() {
                               {index + 1}
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey w-[300px]'>
-                              <p className='font-normal'>
-                                HKI năm học 2023 - 2024
-                              </p>
+                              <p className='font-normal'>{item?.name}</p>
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey'>
                               <p className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
-                                ACTIVATED
+                                {item?.status}
                               </p>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey'>
                               <span
                                 className={`${statusColor} py-1 px-3 text-sm font-medium rounded dark:text-black-pearl`}
                               >
-                                21/08/2023
+                                {item?.startDate}
                               </span>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey'>
                               <span className='bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
-                                18/12/2023
+                                {item?.endDate}
                               </span>
                             </td>
                             <td className='border border-collapse border-lightGrey'>
                               <div className='flex justify-center flex-col gap-3 items-center m-2'>
                                 <BsThreeDots
                                   className='w-6 h-6 cursor-pointer'
-                                  id='actions'
+                                  id={`actions-${item?.id}`}
                                 />
                               </div>
                               <Dropdown
                                 place='right-right'
                                 className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
-                                anchorSelect='#actions'
+                                anchorSelect={`#actions-${item?.id}`}
                               >
                                 <div className='flex flex-col gap-3 p-3'>
                                   <div
                                     className='flex items-center gap-1 cursor-pointer'
                                     onClick={() => {
-                                      setSelectedTopic(item);
-                                      setOpenEditTopicModal("default");
+                                      setSelectedSemester(item);
+                                      setOpenEditTimeModal("default");
                                     }}
                                   >
                                     <LiaEditSolid className='w-6 h-6 cursor-pointer' />
@@ -234,17 +208,19 @@ function TimeManagementPage() {
                                   <div
                                     className='flex items-center gap-1 cursor-pointer'
                                     onClick={() => {
-                                      setSelectedTopic(item);
-                                      setOpenApprovalTopicModal("default");
+                                      setSelectedSemester(item);
+                                      setOpenListEnrollmentPeriodModal(
+                                        "default"
+                                      );
                                     }}
                                   >
                                     <BiMessageRoundedError className='w-6 h-6 cursor-pointer' />
-                                    <p>DS Khoảng thời gian</p>
+                                    <p>DS khoảng thời gian</p>
                                   </div>
                                   <div
                                     className='flex items-center gap-1 cursor-pointer'
                                     onClick={() => {
-                                      setSelectedTopic(item);
+                                      setSelectedSemester(item);
                                       setOpenAddEnrollmentPeriodModal(
                                         "default"
                                       );
@@ -274,26 +250,26 @@ function TimeManagementPage() {
       </div>
       {/* Enroll topic modal */}
       <AddTimeModal
-        options={studentOptions}
         openModal={openModal}
         setOpenModal={setOpenModal}
-        handleNewTopic={handleCreateNewTopicInLectureEnrollmentPeriod}
+        createSemester={handleCreateSemester}
       />
       <EditTimeModal
-        options={studentOptions}
-        handleUpdateTopic={handleUpdateTopicInLectureEnrollmentPeriod}
-        data={selectedTopic}
-        openModal={openEditTopicModal}
-        setOpenModal={setOpenEditTopicModal}
+        updateSemester={handleUpdateSemester}
+        data={selectedSemester}
+        openModal={openEditTimeModal}
+        setOpenModal={setOpenEditTimeModal}
       />
       <ListEnrollmentPeriodModal
-        data={selectedTopic}
-        openModal={openApprovalTopicModal}
-        setOpenModal={setOpenApprovalTopicModal}
+        data={selectedSemester}
+        openModal={openListEnrollmentPeriodModal}
+        setOpenModal={setOpenListEnrollmentPeriodModal}
       />
       <AddEnrollmentPeriodModal
         openModal={openAddEnrollmentPeriodModal}
         setOpenModal={setOpenAddEnrollmentPeriodModal}
+        data={selectedSemester}
+        createEnrollmentPeriod={handleCreateEnrollmentPeriod}
       />
       {/* End content */}
     </React.Fragment>
