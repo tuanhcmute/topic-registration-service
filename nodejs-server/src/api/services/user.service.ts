@@ -1,10 +1,16 @@
 import { StatusCodes } from "http-status-codes";
 import _ from "lodash";
-import multer from "multer";
 
 import { User, Major, Clazz, UserRole, Role, UserRoleInstance, TopicEnrollment } from "@models";
 import { UserNotFoundException, ErrorMessages, ValidateFailException } from "@exceptions";
-import { IListLecture, IListStudent, IResponseModel, IUserProfile, ResponseModelBuilder } from "@interfaces";
+import {
+  IListLecture,
+  IListStudent,
+  IResponseModel,
+  IUserProfile,
+  IListUserResponse,
+  ResponseModelBuilder
+} from "@interfaces";
 import { RoleCode } from "@configs/constants";
 
 class UserService {
@@ -157,6 +163,43 @@ class UserService {
       .withMessage("The list of lectures has been successfully retrieved")
       .withData(data)
       .build();
+  }
+
+  public async getAllUsers(): Promise<IResponseModel<IListUserResponse>> {
+    try {
+      const users = await User.findAll({
+        attributes: ["ntid", "name", "email", "biography", "clazzId", "majorId"],
+        include: [
+          {
+            model: Major,
+            as: "major",
+            attributes: ["code", "name"]
+          },
+          {
+            model: Clazz,
+            as: "clazz",
+            attributes: ["code", "description"]
+          },
+          {
+            model: UserRole,
+            as: "userRoles",
+            include: [{ model: Role, as: "role", attributes: ["code"] }],
+            attributes: ["id"]
+          }
+        ]
+      });
+
+      const data: IListUserResponse = { users };
+
+      return new ResponseModelBuilder<IListUserResponse>()
+        .withMessage("Users have been successfully retrieved")
+        .withStatusCode(StatusCodes.OK)
+        .withData(data)
+        .build();
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 }
 

@@ -5,11 +5,11 @@ import { Semester } from "./semester.model";
 
 interface EnrollmentPeriodAttributes {
   id?: string;
-  code: string;
-  name: string;
+  code?: string;
+  name?: string;
   startDate?: Date;
   endDate?: Date;
-  status: string;
+  status?: string;
   type?: string;
   semesterId?: string;
   createdBy?: string;

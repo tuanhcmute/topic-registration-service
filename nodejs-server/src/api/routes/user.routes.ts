@@ -47,6 +47,13 @@ class UserRoutes implements IRoutes {
       preAuthorizeFilter([RoleCode.ROLE_LECTURE]),
       userController.getLecturesByMajor
     );
+
+    // [GET] /api/v1/user/admin
+    this.router.get(
+      `${this.path}/admin`,
+      preAuthorizeFilter([RoleCode.ROLE_ADMIN]),
+      userController.getAllUsers
+    );
   }
 }
 

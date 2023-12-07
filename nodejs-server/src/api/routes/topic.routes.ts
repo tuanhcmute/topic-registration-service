@@ -31,13 +31,6 @@ class TopicRoutes implements IRoutes {
     this.router.put(`${this.path}/lecture/approval`, topicController.approveTopicInLectureEnrollmentPeriod);
 
     // [GET] /api/v1/topic/head
-    // this.router.get(
-    //   `${this.path}/head`,
-    //   preAuthorizeFilter([RoleCode.ROLE_HEAD]),
-    //   topicController.getAllTopicsInLectureEnrollmentPeriodByTypeAndTopicStatusAndMajor
-    // );
-
-    // [GET] /api/v1/topic/head
     this.router.get(
       `${this.path}/head`,
       preAuthorizeFilter([RoleCode.ROLE_HEAD]),
@@ -63,6 +56,13 @@ class TopicRoutes implements IRoutes {
       `${this.path}/student`,
       preAuthorizeFilter([RoleCode.ROLE_STUDENT]),
       topicController.getAllApprovedTopicsInStudentEnrollmentPeriod
+    );
+
+    // [GET] /api/v1/topic/admin
+    this.router.get(
+      `${this.path}/admin`,
+      preAuthorizeFilter([RoleCode.ROLE_ADMIN]),
+      topicController.getAllTopicsRoleAdmin
     );
   }
 }

@@ -13,6 +13,12 @@ export interface IListLecture {
   lectures?: UserRoleInstance[];
 }
 
+export interface IListUserResponse {
+  users?: UserInstance[];
+}
+
+export interface UserResponse {}
+
 export class UpdatedBio {
   @Length(0, 100, {
     message: "Biography must be between $constraint1 and $constraint2 characters"
