@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import _, { reduceRight } from "lodash";
+import _ from "lodash";
 import { Op } from "sequelize";
 
 import { SemesterStatus, TopicStatus, TopicType } from "@configs/constants";
@@ -247,38 +247,26 @@ class TopicService {
       .build();
   }
 
-  public getAllTopicsRoleAdmin = async (): Promise<
-    IResponseModel<IListTopicResponse>
-  > => {
+  public getAllTopicsRoleAdmin = async (): Promise<IResponseModel<IListTopicResponse>> => {
     try {
       const topics = await Topic.findAll({
         include: [
           {
             model: User,
             as: "lecture",
-            attributes: ["ntid", "name"],
+            attributes: ["ntid", "name"]
           },
           {
             model: TopicEnrollment,
             as: "topicEnrollments",
-            include: [
-              { model: User, as: "student", attributes: ["ntid", "name"] },
-            ],
-            attributes: ["id"],
-          },
+            include: [{ model: User, as: "student", attributes: ["ntid", "name"] }],
+            attributes: ["id"]
+          }
         ],
         attributes: {
-          exclude: [
-            "createdBy",
-            "createdDate",
-            "updatedDate",
-            "lectureId",
-            "majorId",
-            "semesterId",
-            "id",
-          ],
+          exclude: ["createdBy", "createdDate", "updatedDate", "lectureId", "majorId", "semesterId", "id"]
         },
-        order: ["createdDate"],
+        order: ["createdDate"]
       });
       const data: IListTopicResponse = { topics };
       return new ResponseModelBuilder<IListTopicResponse>()

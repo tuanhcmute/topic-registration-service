@@ -33,6 +33,10 @@ const userService = {
       },
     });
   },
+  fetchAllUsers: () => {
+    const requestUrl = `${baseUrl}/admin`;
+    return axiosClient.get(requestUrl);
+  },
 };
 
 export default userService;

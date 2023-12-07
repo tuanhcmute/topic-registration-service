@@ -1,4 +1,3 @@
-import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import Select from "react-select";
 import { Modal, Button, TextInput, Label } from "flowbite-react";
@@ -7,57 +6,37 @@ import { useFormik } from "formik";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
-import * as toipcType from "../../../../utils/constants/topicType";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import { roleCode } from "../../../../utils/constants/roles";
 
 const validationSchema = Yup.object().shape({
-  type: Yup.string().required(),
-  majorCode: Yup.string().required(),
-  ntid: Yup.string().required(),
-  topicName: Yup.string().required("Tên đề tài là bắt buộc"),
-  goal: Yup.string().required("Yêu cầu đề tài là bắt buộc"),
-  requirement: Yup.string().required("Kiến thức cần có là bắt buộc"),
-  maxSlot: Yup.number()
-    .min(1, "Số lượng SVTH phải lớn hơn 0")
-    .max(2, "Số lượng SVTH không quá 2")
-    .required("Số lượng SVTH là bắt buộc"),
-  students: Yup.array(),
+  ntid: Yup.string().required("Ntid là bắt buộc"),
+  email: Yup.string().required("Email là bắt buộc"),
+  name: Yup.string().required("Tên đề tài là bắt buộc"),
+  role: Yup.string().required("Loại người dùng là bắt buộc"),
+  majorId: Yup.string(),
+  clazzId: Yup.string(),
 });
 
 function AddUserModal(props) {
   const [selectedOptions, setSelectedOptions] = useState([]);
-  const enrollmentPeriod = useSelector(
-    (state) => state.enrollmentPeriod?.enrollmentPeriod
-  );
-  const { openModal, setOpenModal, handleNewTopic, options } = props;
-  const currentUser = useSelector((state) => state.user?.currentUser);
+  const { openModal, setOpenModal } = props;
   const formik = useFormik({
     initialValues: {
-      type: toipcType.TLCN,
-      majorCode: currentUser?.major?.code,
-      ntid: currentUser?.ntid,
-      maxSlot: 2,
-      topicName: "",
-      goal: "",
-      requirement: "",
-      students: [],
+      ntid: "",
+      email: "",
+      name: "",
+      role: "",
+      majorId: "",
+      clazzId: "",
+      biography: "",
     },
-    onSubmit: (values) => {
-      handleNewTopic(values);
-    },
+    onSubmit: (values) => {},
     validationSchema,
   });
 
   function changeSelect(...props) {
     // Props[] => [Array(0), {action: "", data}]
-    // if (props.length < 2) return;
-    // if (props[0]?.length > formik.values.maxSlot) {
-    //   toast.warning(`SVTH không vượt quá ${formik.values.maxSlot}`);
-    //   return;
-    // }
-    // setSelectedOptions(props[0]);
   }
 
   function setCloseModal() {
@@ -66,10 +45,7 @@ function AddUserModal(props) {
     formik.setValues(formik.initialValues);
   }
 
-  useEffect(() => {
-    // const studentCodes = selectedOptions.map((item) => item.value);
-    // formik.setFieldValue("students", studentCodes);
-  }, [selectedOptions]);
+  useEffect(() => {}, [selectedOptions]);
 
   return (
     <Modal size='2xl' show={openModal === "default"} onClose={setCloseModal}>
@@ -130,8 +106,9 @@ function AddUserModal(props) {
               <Select
                 placeholder='Lựa chọn loại người dùng'
                 options={Object.values(roleCode)}
-                isSearchable={true}
+                isSearchable={false}
                 onChange={changeSelect}
+                isSearchablek
               />
             </div>
             {/* End role field */}
@@ -175,7 +152,7 @@ function AddUserModal(props) {
             <CKEditor
               editor={ClassicEditor}
               onChange={(event, editor) => {
-                const data = editor.getData();
+                // const data = editor.getData();
                 // formik.values.goal = data;
               }}
             />

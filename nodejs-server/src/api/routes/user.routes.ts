@@ -49,11 +49,7 @@ class UserRoutes implements IRoutes {
     );
 
     // [GET] /api/v1/user/admin
-    this.router.get(
-      `${this.path}/admin`,
-      preAuthorizeFilter([RoleCode.ROLE_ADMIN]),
-      userController.getAllUsers
-    );
+    this.router.get(`${this.path}/admin`, preAuthorizeFilter([RoleCode.ROLE_ADMIN]), userController.getAllUsers);
   }
 }
 

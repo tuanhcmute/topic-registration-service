@@ -72,3 +72,13 @@ export const updateAvatarInUserProfile = createAsyncThunk(
     return response?.data;
   }
 );
+
+export const fetchAllUsers = createAsyncThunk(
+  `${namespace}/fetchAllUsers`,
+  async (data, { rejectWithValue }) => {
+    const response = await userService.fetchAllUsers();
+    if (response.data?.statusCode !== HttpStatusCode.Ok)
+      return rejectWithValue(response?.data);
+    return response.data;
+  }
+);
