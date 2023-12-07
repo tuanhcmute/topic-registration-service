@@ -10,7 +10,7 @@ import {
   NewTopicRequest,
   IListTopicResponse,
   ApprovalTopicRequest,
-  UpdateTopicRequest,
+  UpdateTopicRequest
 } from "@interfaces";
 import { logger } from "@configs";
 import { ValidateFailException } from "@exceptions";
@@ -26,10 +26,7 @@ class TopicController {
       const email = res.locals.email;
       const type = req.query.type as string;
       const data: IResponseModel<IListTopicResponse> =
-        await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
-          type,
-          email
-        );
+        await topicService.getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(type, email);
       res.status(StatusCodes.OK).json(data);
     } catch (err) {
       console.log(err);
@@ -37,11 +34,7 @@ class TopicController {
     }
   }
 
-  public async createNewTopicInLectureEnrollmentPeriod(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  public async createNewTopicInLectureEnrollmentPeriod(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       // Get raw topic from client
       const requestData = req.body;
@@ -60,47 +53,28 @@ class TopicController {
         // Build response
         res
           .status(StatusCodes.BAD_REQUEST)
-          .json(
-            new ResponseModelBuilder()
-              .withMessage(errorMessage)
-              .withStatusCode(StatusCodes.BAD_REQUEST)
-              .build()
-          );
+          .json(new ResponseModelBuilder().withMessage(errorMessage).withStatusCode(StatusCodes.BAD_REQUEST).build());
         return;
       }
       logger.info("New topic request: ", newTopic);
 
       // Handle call service
       const email = res.locals.email;
-      res
-        .status(StatusCodes.OK)
-        .json(
-          await topicService.createNewTopicInLectureEnrollmentPeriod(
-            newTopic,
-            email
-          )
-        );
+      res.status(StatusCodes.OK).json(await topicService.createNewTopicInLectureEnrollmentPeriod(newTopic, email));
     } catch (err) {
       console.log(err);
       next(err);
     }
   }
 
-  public async approveTopicInLectureEnrollmentPeriod(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  public async approveTopicInLectureEnrollmentPeriod(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       // Get request data
       const requestData = req.body;
       logger.info("Request data:", requestData);
 
       // Convert raw to instance
-      const approvalTopicRequest = plainToInstance(
-        ApprovalTopicRequest,
-        requestData
-      );
+      const approvalTopicRequest = plainToInstance(ApprovalTopicRequest, requestData);
       // Validate instance
       const errors = await validate(approvalTopicRequest);
       if (errors.length > 0) {
@@ -111,23 +85,12 @@ class TopicController {
         // Build response
         res
           .status(StatusCodes.BAD_REQUEST)
-          .json(
-            new ResponseModelBuilder()
-              .withMessage(errorMessage)
-              .withStatusCode(StatusCodes.BAD_REQUEST)
-              .build()
-          );
+          .json(new ResponseModelBuilder().withMessage(errorMessage).withStatusCode(StatusCodes.BAD_REQUEST).build());
         return;
       }
       logger.info("Approval topic request:", approvalTopicRequest);
 
-      res
-        .status(StatusCodes.OK)
-        .json(
-          await topicService.approveTopicInLectureEnrollmentPeriod(
-            approvalTopicRequest
-          )
-        );
+      res.status(StatusCodes.OK).json(await topicService.approveTopicInLectureEnrollmentPeriod(approvalTopicRequest));
     } catch (error) {
       console.error(error);
       next(error);
@@ -144,17 +107,9 @@ class TopicController {
       const typeRequest = req.query["type"] as string;
       const statusRequest = req.query["status"] as string;
       const email = res.locals.email;
-      if (
-        _.isNull(typeRequest) ||
-        _.isUndefined(typeRequest) ||
-        _.isEmpty(typeRequest)
-      )
+      if (_.isNull(typeRequest) || _.isUndefined(typeRequest) || _.isEmpty(typeRequest))
         throw new ValidateFailException("Topic type is not valid");
-      if (
-        _.isNull(statusRequest) ||
-        _.isUndefined(statusRequest) ||
-        _.isEmpty(statusRequest)
-      )
+      if (_.isNull(statusRequest) || _.isUndefined(statusRequest) || _.isEmpty(statusRequest))
         throw new ValidateFailException("Topic status is not valid");
 
       // Response
@@ -183,11 +138,7 @@ class TopicController {
       const email = res.locals.email as string;
 
       // Validate type
-      if (
-        _.isNull(typeRequest) ||
-        _.isUndefined(typeRequest) ||
-        _.isEmpty(typeRequest)
-      )
+      if (_.isNull(typeRequest) || _.isUndefined(typeRequest) || _.isEmpty(typeRequest))
         throw new ValidateFailException("Topic type is not valid");
 
       // Validate email
@@ -196,33 +147,20 @@ class TopicController {
 
       res
         .status(StatusCodes.OK)
-        .json(
-          await topicService.getAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod(
-            typeRequest,
-            email
-          )
-        );
+        .json(await topicService.getAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod(typeRequest, email));
     } catch (error) {
       logger.error({ error });
       next(error);
     }
   }
 
-  public async getAllTopicsApprovedDuringTheLectureEnrollmentPeriod(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  public async getAllTopicsApprovedDuringTheLectureEnrollmentPeriod(req: Request, res: Response, next: NextFunction) {
     try {
       const typeRequest = req.query["type"] as string;
       const email = res.locals.email as string;
 
       // Validate type
-      if (
-        _.isNull(typeRequest) ||
-        _.isUndefined(typeRequest) ||
-        _.isEmpty(typeRequest)
-      )
+      if (_.isNull(typeRequest) || _.isUndefined(typeRequest) || _.isEmpty(typeRequest))
         throw new ValidateFailException("Topic type is not valid");
 
       // Validate email
@@ -231,22 +169,13 @@ class TopicController {
 
       res
         .status(StatusCodes.OK)
-        .json(
-          await topicService.getAllTopicsApprovedDuringTheLectureEnrollmentPeriod(
-            typeRequest,
-            email
-          )
-        );
+        .json(await topicService.getAllTopicsApprovedDuringTheLectureEnrollmentPeriod(typeRequest, email));
     } catch (error) {
       logger.error({ error });
       next(error);
     }
   }
-  public async updateTopicInLectureEnrollmentPeriod(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  public async updateTopicInLectureEnrollmentPeriod(req: Request, res: Response, next: NextFunction) {
     try {
       // Get raw topic from client
       const requestData = req.body;
@@ -264,23 +193,14 @@ class TopicController {
         // Build response
         res
           .status(StatusCodes.BAD_REQUEST)
-          .json(
-            new ResponseModelBuilder()
-              .withMessage(errorMessage)
-              .withStatusCode(StatusCodes.BAD_REQUEST)
-              .build()
-          );
+          .json(new ResponseModelBuilder().withMessage(errorMessage).withStatusCode(StatusCodes.BAD_REQUEST).build());
         return;
       }
       logger.info("Update topic request: ", updateTopic);
 
       // Handle call service
       const email = res.locals.email;
-      res
-        .status(StatusCodes.OK)
-        .json(
-          await topicService.updateTopicInLectureEnrollmentPeriod(updateTopic)
-        );
+      res.status(StatusCodes.OK).json(await topicService.updateTopicInLectureEnrollmentPeriod(updateTopic));
     } catch (error) {
       logger.error({ error });
       next(error);
@@ -295,27 +215,15 @@ class TopicController {
     try {
       const email = res.locals.email as string;
       const type = req.query.type as string;
-      res
-        .status(StatusCodes.OK)
-        .json(
-          await topicService.getAllApprovedTopicsInStudentEnrollmentPeriod(
-            type,
-            email
-          )
-        );
+      res.status(StatusCodes.OK).json(await topicService.getAllApprovedTopicsInStudentEnrollmentPeriod(type, email));
     } catch (error) {
       logger.error({ error });
       next(error);
     }
   }
-  public getAllTopicsRoleAdmin = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  public getAllTopicsRoleAdmin = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const data: IResponseModel<IListTopicResponse> =
-        await topicService.getAllTopicsRoleAdmin();
+      const data: IResponseModel<IListTopicResponse> = await topicService.getAllTopicsRoleAdmin();
       res.status(StatusCodes.OK).json(data);
     } catch (err) {
       next(err);

@@ -11,9 +11,7 @@ interface EnrollmentAttributes {
   createdBy?: string;
 }
 
-interface EnrollmentInstance
-  extends Model<EnrollmentAttributes>,
-    EnrollmentAttributes {}
+interface EnrollmentInstance extends Model<EnrollmentAttributes>, EnrollmentAttributes {}
 
 const Enrollment = db.define<EnrollmentInstance>(
   "enrollment",
@@ -23,32 +21,32 @@ const Enrollment = db.define<EnrollmentInstance>(
       defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       primaryKey: true,
-      field: "id",
+      field: "id"
     },
     topicId: {
       type: DataTypes.STRING,
-      field: "topic_id",
+      field: "topic_id"
     },
     studentId: {
       type: DataTypes.STRING,
-      field: "student_id",
+      field: "student_id"
     },
     createdDate: {
       type: DataTypes.DATE,
-      field: "created_date",
+      field: "created_date"
     },
     updatedDate: {
       type: DataTypes.DATE,
-      field: "updated_date",
+      field: "updated_date"
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: "created_by",
-    },
+      field: "created_by"
+    }
   },
   {
     timestamps: false,
-    tableName: "Enrollment",
+    tableName: "Enrollment"
   }
 );
 
@@ -57,14 +55,14 @@ User.belongsToMany(Topic, {
   through: { model: Enrollment },
   foreignKey: "studentId", // The foreign key in the Enrollment table that links to User
   otherKey: "topicId", // The foreign key in the Enrollment table that links to Topic
-  as: "students",
+  as: "students"
 });
 
 Topic.belongsToMany(User, {
   through: { model: Enrollment },
   foreignKey: "topicId", // The foreign key in the Enrollment table that links to Topic
   otherKey: "studentId", // The foreign key in the Enrollment table that links to User
-  as: "students",
+  as: "students"
 });
 
 // // Optionally, you can add additional metadata to the association

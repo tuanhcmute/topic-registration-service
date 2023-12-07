@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { namespace } from "../division";
 import {
+  fetchAllUsers,
   fetchLecturesByMajor,
   fetchStudentsNotEnrolledInTopic,
   fetchUserInfo,
@@ -10,6 +11,7 @@ import {
 } from "./userAction";
 
 const initialState = {
+  users: [],
   lectures: [],
   currentUser: {},
   statusCode: null,
@@ -186,6 +188,33 @@ export const userSlice = createSlice({
     builder.addCase(updateAvatarInUserProfile.rejected, (state, action) => {
       return {
         ...state,
+        message: action.payload?.data?.message,
+        statusCode: action.payload?.data?.statusCode,
+        loading: false,
+      };
+    });
+    // fetchAllUsers
+    builder.addCase(fetchAllUsers.fulfilled, (state, action) => {
+      return {
+        ...state,
+        users: action.payload?.data?.users,
+        message: action.payload?.data?.message,
+        statusCode: action.payload?.data?.statusCode,
+        loading: false,
+      };
+    });
+    builder.addCase(fetchAllUsers.pending, (state) => {
+      return {
+        ...state,
+        loading: true,
+        statusCode: null,
+        message: "",
+      };
+    });
+    builder.addCase(fetchAllUsers.rejected, (state, action) => {
+      return {
+        ...state,
+        users: [],
         message: action.payload?.data?.message,
         statusCode: action.payload?.data?.statusCode,
         loading: false,

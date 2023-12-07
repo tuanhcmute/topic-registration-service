@@ -8,7 +8,7 @@ import _ from "lodash";
 
 import EditTopicModal from "./components/EditTopicModal";
 import {
-  enrollmentPeriodCodes,
+  enrollmentPeriodCode,
   positionType,
   topicStatus,
   topicType,
@@ -89,7 +89,7 @@ function TopicManagementPage() {
       dispatch(
         fetchEnrollmentPeriodByTopicTypeAndPeriodCode({
           topicType: topicType.TLCN,
-          periodCode: enrollmentPeriodCodes.STUDENT_ENROLLMENT_PERIOD,
+          periodCode: enrollmentPeriodCode.STUDENT_ENROLLMENT_PERIOD,
         })
       );
     }

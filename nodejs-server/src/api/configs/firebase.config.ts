@@ -3,7 +3,7 @@ import serviceAccount from "@resources/serviceAccount.json";
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-  storageBucket: `topic-registration-service.appspot.com`,
+  storageBucket: `topic-registration-service.appspot.com`
 });
 
 // Cloud storage

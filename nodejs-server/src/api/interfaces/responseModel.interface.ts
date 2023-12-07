@@ -30,7 +30,7 @@ export class ResponseModelBuilder<T> {
     return {
       statusCode: this.statusCode,
       message: this.message,
-      data: this.data,
+      data: this.data
     };
   }
 }

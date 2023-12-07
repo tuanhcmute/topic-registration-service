@@ -4,61 +4,27 @@ import { AiOutlineFilter } from "react-icons/ai";
 import React, { useEffect, useState } from "react";
 import { Button, TextInput } from "flowbite-react";
 import { BiMessageRoundedError } from "react-icons/bi";
+import { BsThreeDots } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 
 import AddUserModal from "./components/AddUserModal";
 import EditUserModal from "./components/EditUserModal";
-
-import { topicStatus, topicType } from "../../../utils/constants";
-
+import { topicStatus } from "../../../utils/constants";
 import { Dropdown } from "../../../components/dropdown1";
-import ApprovalTopicModal from "./components/ApprovalTopicModal";
-
-import {
-  createNewTopicInLectureEnrollmentPeriod,
-  updateTopicInLectureEnrollmentPeriod,
-} from "../../../features/topic";
 import { roleCode } from "../../../utils/constants/roles";
+import { fetchAllUsers } from "../../../features/user";
 
 function UserManagementPage() {
-  const [openModal, setOpenModal] = useState(undefined);
-  const [openEditTopicModal, setOpenEditTopicModal] = useState(undefined);
-  const [openApprovalTopicModal, setOpenApprovalTopicModal] =
-    useState(undefined);
-  const [selectedTopic, setSelectedTopic] = useState(null);
-  const [topicStatusFilter, setTopicStatusFilter] = useState(
-    topicStatus.all.value
-  );
+  const [openAddUserModal, setOpenAddUserModal] = useState(undefined);
+  const [openEditUserModal, setOpenEditUserModal] = useState(undefined);
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  // Get current user from redux
-  const currentUser = useSelector((state) => state.user?.currentUser);
-  const topics = useSelector((state) => state.topic?.topics);
-  const studentOptions = useSelector(
-    (state) => state.user?.studentsNotEnrolledInTopic
-  );
-  const enrollmentPeriod = useSelector(
-    (state) => state.enrollmentPeriod?.enrollmentPeriod
-  );
   const dispatch = useDispatch();
+  const users = useSelector((state) => state.user?.users);
 
-  async function handleCreateNewTopicInLectureEnrollmentPeriod(data) {
-    dispatch(
-      createNewTopicInLectureEnrollmentPeriod({
-        data,
-        setOpenModal,
-        type: topicType.TLCN,
-      })
-    );
-  }
-  async function handleUpdateTopicInLectureEnrollmentPeriod(data) {
-    dispatch(
-      updateTopicInLectureEnrollmentPeriod({
-        data,
-        type: topicType.TLCN,
-        setOpenEditTopicModal,
-      })
-    );
-  }
+  useEffect(() => {
+    dispatch(fetchAllUsers());
+  }, []);
 
   return (
     <React.Fragment>
@@ -79,7 +45,7 @@ function UserManagementPage() {
             <div className='flex flex-col gap-2 p-3'>
               <div
                 className='text-sm px-2 py-1 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer'
-                onClick={() => setOpenModal("default")}
+                onClick={() => setOpenAddUserModal("default")}
               >
                 Thêm thủ công
               </div>
@@ -96,7 +62,6 @@ function UserManagementPage() {
           <Button
             color='gray'
             className='rounded-md p-0 md:w-1/6 sm:w-1/5 w-1/3'
-            // onClick={() => setOpenModal("default")}
           >
             Tìm kiếm
           </Button>
@@ -175,7 +140,7 @@ function UserManagementPage() {
                             return true;
                           return item?.status === topicStatusFilter;
                         }) */}
-                      {[1, 2, 3, 4, 5]?.map((item, index) => {
+                      {users?.map((item, index) => {
                         let statusColor = "";
                         if (
                           _.isEqual(item?.status, topicStatus.approved.value)
@@ -206,54 +171,68 @@ function UserManagementPage() {
                               {index + 1}
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey w-20'>
-                              {/* <span className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
-                                  {currentUser?.ntid}
-                                </span> */}
                               <span className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
-                                104526
+                                {item?.ntid}
                               </span>
                             </td>
                             <td className='p-3 text-left border border-collapse border-lightGrey'>
-                              {/* <p className='font-normal'>{item?.name}</p> */}
-                              <p className='font-normal'>đỗ tuấn</p>
+                              <p className='font-normal'>{item?.name}</p>
                             </td>
                             <td className='p-3 border border-collapse border-lightGrey w-48'>
                               <p
                                 className={`${statusColor} py-1 px-3 text-sm font-medium rounded dark:text-black-pearl break-all`}
                               >
-                                doduongthaituan201102@gmail.com
+                                {item?.email}
                               </p>
                             </td>
                             <td className='p-3 text-center border border-collapse border-lightGrey w-36'>
                               <div className='flex gap-2 flex-col'>
-                                <p className='w-fit bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
-                                  ADMIN
-                                </p>
-
-                                <p className='w-fit bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
-                                  GIẢNG VIÊN
-                                </p>
+                                {item?.userRoles?.map((item) => {
+                                  return (
+                                    <p className='w-fit bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
+                                      {item?.role?.code}
+                                    </p>
+                                  );
+                                })}
                               </div>
                             </td>
                             <td className='border border-collapse border-lightGrey w-20'>
-                              <div className='flex justify-center flex-wrap gap-1 items-center m-2'>
-                                <LiaEditSolid
+                              <div className='flex justify-center flex-col gap-3 items-center m-2'>
+                                <BsThreeDots
                                   className='w-6 h-6 cursor-pointer'
-                                  onClick={() => {
-                                    setSelectedTopic(item);
-                                    setOpenEditTopicModal("default");
-                                  }}
+                                  id={`actions-${item?.id}`}
                                 />
-                                {item?.status !== topicStatus.pending.value && (
-                                  <BiMessageRoundedError
-                                    className='w-6 h-6 cursor-pointer'
-                                    onClick={() => {
-                                      setSelectedTopic(item);
-                                      setOpenApprovalTopicModal("default");
-                                    }}
-                                  />
-                                )}
                               </div>
+                              <Dropdown
+                                place='right-right'
+                                className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
+                                anchorSelect={`#actions-${item?.id}`}
+                              >
+                                <div className='flex flex-col gap-3 p-3'>
+                                  <div
+                                    className='flex items-center gap-1 cursor-pointer'
+                                    onClick={() => {
+                                      setSelectedUser(item);
+                                      // setOpenEditTimeModal("default");
+                                    }}
+                                  >
+                                    <LiaEditSolid className='w-6 h-6 cursor-pointer' />
+                                    <p>Chỉnh sửa người dùng</p>
+                                  </div>
+                                  <div
+                                    className='flex items-center gap-1 cursor-pointer'
+                                    onClick={() => {
+                                      setSelectedUser(item);
+                                      // setOpenListEnrollmentPeriodModal(
+                                      //   "default"
+                                      // );
+                                    }}
+                                  >
+                                    <BiMessageRoundedError className='w-6 h-6 cursor-pointer' />
+                                    <p>DS khoảng thời gian</p>
+                                  </div>
+                                </div>
+                              </Dropdown>
                             </td>
                           </tr>
                         );
@@ -273,22 +252,13 @@ function UserManagementPage() {
       </div>
       {/* Enroll topic modal */}
       <AddUserModal
-        options={studentOptions}
-        openModal={openModal}
-        setOpenModal={setOpenModal}
-        handleNewTopic={handleCreateNewTopicInLectureEnrollmentPeriod}
+        openModal={openAddUserModal}
+        setOpenModal={setOpenAddUserModal}
       />
       <EditUserModal
-        options={studentOptions}
-        handleUpdateTopic={handleUpdateTopicInLectureEnrollmentPeriod}
-        data={selectedTopic}
-        openModal={openEditTopicModal}
-        setOpenModal={setOpenEditTopicModal}
-      />
-      <ApprovalTopicModal
-        data={selectedTopic}
-        openModal={openApprovalTopicModal}
-        setOpenModal={setOpenApprovalTopicModal}
+        data={selectedUser}
+        openModal={openEditUserModal}
+        setOpenModal={setOpenEditUserModal}
       />
       {/* End content */}
     </React.Fragment>

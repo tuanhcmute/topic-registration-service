@@ -17,9 +17,7 @@ interface TopicEnrollmentAttributes {
   isLeader?: boolean;
 }
 
-interface TopicEnrollmentInstance
-  extends Model<TopicEnrollmentAttributes>,
-    TopicEnrollmentAttributes {
+interface TopicEnrollmentInstance extends Model<TopicEnrollmentAttributes>, TopicEnrollmentAttributes {
   student?: UserInstance;
   topic?: TopicInstance;
 }
@@ -32,55 +30,53 @@ const TopicEnrollment = db.define<TopicEnrollmentInstance>(
       type: DataTypes.UUID,
       primaryKey: true,
       field: "id".concat(POSTFIX),
-      defaultValue: DataTypes.UUIDV4,
+      defaultValue: DataTypes.UUIDV4
     },
     topicId: {
       type: DataTypes.UUID,
-      field: "topic_id".concat(POSTFIX),
+      field: "topic_id".concat(POSTFIX)
     },
     studentId: {
       type: DataTypes.UUID,
-      field: "student_id".concat(POSTFIX),
+      field: "student_id".concat(POSTFIX)
     },
     createdDate: {
       type: DataTypes.DATE,
       field: "created_date".concat(POSTFIX),
       allowNull: false,
-      defaultValue: DataTypes.NOW,
+      defaultValue: DataTypes.NOW
     },
     updatedDate: {
       type: DataTypes.DATE,
       field: "updated_date".concat(POSTFIX),
       allowNull: false,
-      defaultValue: DataTypes.NOW,
+      defaultValue: DataTypes.NOW
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: "created_by".concat(POSTFIX),
+      field: "created_by".concat(POSTFIX)
     },
     isLeader: {
       type: DataTypes.BOOLEAN,
-      field: "is_leader".concat(POSTFIX),
-    },
+      field: "is_leader".concat(POSTFIX)
+    }
   },
   {
     timestamps: false,
-    tableName: "topic_enrollment_tbl",
+    tableName: "topic_enrollment_tbl"
   }
 );
 
 // Update topic availabel slot
 TopicEnrollment.addHook("afterCreate", async (topicEnrollment, options) => {
   const topic = await Topic.findByPk(topicEnrollment.dataValues.topicId);
-  if (_.isNull(topic))
-    throw new ValidateFailException("Topic could not be found");
+  if (_.isNull(topic)) throw new ValidateFailException("Topic could not be found");
   if (topic.availableSlot) topic.availableSlot = topic.availableSlot - 1;
   await topic.save();
 });
 TopicEnrollment.addHook("afterDestroy", async (topicEnrollment, options) => {
   const topic = await Topic.findByPk(topicEnrollment.dataValues.topicId);
-  if (_.isNull(topic))
-    throw new ValidateFailException("Topic could not be found");
+  if (_.isNull(topic)) throw new ValidateFailException("Topic could not be found");
   if (!_.isUndefined(topic.availableSlot)) {
     const availableSlot = topic.availableSlot;
     topic.availableSlot = availableSlot + 1;
@@ -92,7 +88,7 @@ TopicEnrollment.addHook("afterDestroy", async (topicEnrollment, options) => {
 // Check leader
 TopicEnrollment.addHook("afterCreate", async (topicEnrollment, options) => {
   const topicEnrollments = await TopicEnrollment.findAll({
-    where: { topicId: topicEnrollment.dataValues.topicId },
+    where: { topicId: topicEnrollment.dataValues.topicId }
   });
   const isAllMatch = topicEnrollments.every((item) =>
     _.isEqual(item.dataValues.studentId, topicEnrollment.dataValues.studentId)
@@ -105,7 +101,7 @@ TopicEnrollment.addHook("afterCreate", async (topicEnrollment, options) => {
 TopicEnrollment.addHook("afterDestroy", async (topicEnrollment, options) => {
   if (topicEnrollment.dataValues.isLeader) {
     const topicEnrollmentInDb = await TopicEnrollment.findOne({
-      where: { topicId: topicEnrollment.dataValues.topicId },
+      where: { topicId: topicEnrollment.dataValues.topicId }
     });
     if (!_.isNull(topicEnrollmentInDb)) {
       topicEnrollmentInDb.setDataValue("isLeader", true);
@@ -117,13 +113,13 @@ TopicEnrollment.addHook("afterDestroy", async (topicEnrollment, options) => {
 
 Topic.hasMany(TopicEnrollment, {
   foreignKey: "topicId",
-  as: "topicEnrollments",
+  as: "topicEnrollments"
 });
 TopicEnrollment.belongsTo(Topic, { as: "topic" });
 
 User.hasMany(TopicEnrollment, {
   foreignKey: "studentId",
-  as: "topicEnrollments",
+  as: "topicEnrollments"
 });
 TopicEnrollment.belongsTo(User, { as: "student" });
 

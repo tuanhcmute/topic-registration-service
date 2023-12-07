@@ -22,38 +22,38 @@ const Clazz = db.define<ClazzInstance>(
       type: DataTypes.UUID,
       primaryKey: true,
       field: "id".concat(POSTFIX),
-      defaultValue: DataTypes.UUIDV4,
+      defaultValue: DataTypes.UUIDV4
     },
     code: {
       type: DataTypes.STRING,
       field: "code".concat(POSTFIX),
       allowNull: false,
-      unique: true,
+      unique: true
     },
     description: {
       type: DataTypes.STRING,
-      field: "description".concat(POSTFIX),
+      field: "description".concat(POSTFIX)
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: "created_by".concat(POSTFIX),
+      field: "created_by".concat(POSTFIX)
     },
     createdDate: {
       type: DataTypes.DATE,
       field: "created_date".concat(POSTFIX),
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
     },
     updatedDate: {
       type: DataTypes.DATE,
       field: "updated_date".concat(POSTFIX),
       defaultValue: DataTypes.NOW,
-      allowNull: false,
-    },
+      allowNull: false
+    }
   },
   {
     timestamps: false,
-    tableName: "clazz_tbl",
+    tableName: "clazz_tbl"
   }
 );
 

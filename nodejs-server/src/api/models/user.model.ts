@@ -37,87 +37,87 @@ const User = db.define<UserInstance>(
       type: DataTypes.UUID,
       primaryKey: true,
       field: "id".concat(POSTFIX),
-      defaultValue: DataTypes.UUIDV4,
+      defaultValue: DataTypes.UUIDV4
     },
     ntid: {
       type: DataTypes.STRING,
       field: "ntid".concat(POSTFIX),
       unique: true,
-      allowNull: false,
+      allowNull: false
     },
     email: {
       type: DataTypes.STRING,
       field: "email".concat(POSTFIX),
       unique: true,
-      allowNull: false,
+      allowNull: false
     },
     imageUrl: {
       type: DataTypes.STRING,
-      field: "image_url".concat(POSTFIX),
+      field: "image_url".concat(POSTFIX)
     },
     name: {
       type: DataTypes.STRING,
-      field: "name".concat(POSTFIX),
+      field: "name".concat(POSTFIX)
     },
     phoneNumber: {
       type: DataTypes.STRING,
-      field: "phone_number".concat(POSTFIX),
+      field: "phone_number".concat(POSTFIX)
     },
     providerId: {
       type: DataTypes.STRING,
-      field: "provider_id".concat(POSTFIX),
+      field: "provider_id".concat(POSTFIX)
     },
     password: {
       type: DataTypes.STRING,
-      field: "password".concat(POSTFIX),
+      field: "password".concat(POSTFIX)
     },
     provider: {
       type: DataTypes.STRING,
-      field: "provider".concat(POSTFIX),
+      field: "provider".concat(POSTFIX)
     },
     biography: {
       type: DataTypes.BLOB("long"),
       field: "biography".concat(POSTFIX),
       get() {
         return this.getDataValue("biography")?.toString();
-      },
+      }
     },
     schoolYear: {
       type: DataTypes.STRING,
-      field: "school_year".concat(POSTFIX),
+      field: "school_year".concat(POSTFIX)
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: "created_by".concat(POSTFIX),
+      field: "created_by".concat(POSTFIX)
     },
     createdDate: {
       type: DataTypes.DATE,
       field: "created_date".concat(POSTFIX),
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
     },
     updatedDate: {
       type: DataTypes.DATE,
       field: "updated_date".concat(POSTFIX),
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
     },
     clazzId: {
       type: DataTypes.UUID,
-      field: "clazz_id".concat(POSTFIX),
+      field: "clazz_id".concat(POSTFIX)
     },
     majorId: {
       type: DataTypes.UUID,
-      field: "major_id".concat(POSTFIX),
+      field: "major_id".concat(POSTFIX)
     },
     emailVerified: {
       type: DataTypes.BOOLEAN,
-      field: "email_verified".concat(POSTFIX),
-    },
+      field: "email_verified".concat(POSTFIX)
+    }
   },
   {
     timestamps: false,
-    tableName: "user_tbl",
+    tableName: "user_tbl"
   }
 );
 

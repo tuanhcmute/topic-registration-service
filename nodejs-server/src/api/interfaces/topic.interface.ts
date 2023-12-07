@@ -1,13 +1,6 @@
 import { TopicType } from "@configs/constants";
 import { TopicInstance } from "@models";
-import {
-  IsNotEmpty,
-  IsIn,
-  Min,
-  Max,
-  IsNumber,
-  IsNumberString,
-} from "class-validator";
+import { IsNotEmpty, IsIn, Min, Max, IsNumber, IsNumberString } from "class-validator";
 
 export interface IListTopicResponse {
   topics: TopicInstance[];
@@ -48,7 +41,7 @@ export class UpdateTopicRequest {
 export class NewTopicRequest {
   @IsNotEmpty({ message: "Topic type is not valid" })
   @IsIn([TopicType.TLCN, TopicType.KLTN], {
-    message: `Topic type must be ${TopicType.TLCN} or ${TopicType.KLTN}`,
+    message: `Topic type must be ${TopicType.TLCN} or ${TopicType.KLTN}`
   })
   type: string;
 

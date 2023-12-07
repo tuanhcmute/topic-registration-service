@@ -5,11 +5,11 @@ import { Semester } from "./semester.model";
 
 interface EnrollmentPeriodAttributes {
   id?: string;
-  code: string;
-  name: string;
+  code?: string;
+  name?: string;
   startDate?: Date;
   endDate?: Date;
-  status: string;
+  status?: string;
   type?: string;
   semesterId?: string;
   createdBy?: string;
@@ -17,9 +17,7 @@ interface EnrollmentPeriodAttributes {
   updatedDate?: string;
 }
 
-interface EnrollmentPeriodInstance
-  extends Model<EnrollmentPeriodAttributes>,
-    EnrollmentPeriodAttributes {}
+interface EnrollmentPeriodInstance extends Model<EnrollmentPeriodAttributes>, EnrollmentPeriodAttributes {}
 
 const modelName: string = "enrollmentPeriod";
 const EnrollmentPeriod = db.define<EnrollmentPeriodInstance>(
@@ -29,76 +27,72 @@ const EnrollmentPeriod = db.define<EnrollmentPeriodInstance>(
       type: DataTypes.UUID,
       primaryKey: true,
       field: "id".concat(POSTFIX),
-      defaultValue: DataTypes.UUIDV4,
+      defaultValue: DataTypes.UUIDV4
     },
     code: {
       type: DataTypes.STRING,
       field: "code".concat(POSTFIX),
-      allowNull: false,
+      allowNull: false
     },
     name: {
       type: DataTypes.STRING,
       field: "name".concat(POSTFIX),
-      allowNull: false,
+      allowNull: false
     },
     startDate: {
       type: DataTypes.DATEONLY,
       field: "start_date".concat(POSTFIX),
       allowNull: false,
-      unique: true,
+      unique: true
     },
     endDate: {
       type: DataTypes.DATEONLY,
       field: "end_date".concat(POSTFIX),
-      allowNull: false,
+      allowNull: false
     },
     status: {
       type: DataTypes.STRING,
       field: "status".concat(POSTFIX),
-      allowNull: false,
+      allowNull: false
     },
     type: {
       type: DataTypes.STRING,
       field: "type".concat(POSTFIX),
-      allowNull: false,
+      allowNull: false
     },
     semesterId: {
       type: DataTypes.UUID,
-      field: "semester_id".concat(POSTFIX),
+      field: "semester_id".concat(POSTFIX)
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: "created_by".concat(POSTFIX),
+      field: "created_by".concat(POSTFIX)
     },
     createdDate: {
       type: DataTypes.DATE,
       field: "created_date".concat(POSTFIX),
       allowNull: false,
-      defaultValue: DataTypes.NOW,
+      defaultValue: DataTypes.NOW
     },
     updatedDate: {
       type: DataTypes.DATE,
       field: "updated_date".concat(POSTFIX),
       allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
+      defaultValue: DataTypes.NOW
+    }
   },
   {
     timestamps: false,
-    tableName: "enrollment_period_tbl",
+    tableName: "enrollment_period_tbl"
   }
 );
 
 Semester.hasMany(EnrollmentPeriod, {
   foreignKey: "semesterId",
-  as: "enrollmentPeriods",
+  as: "enrollmentPeriods"
 });
 EnrollmentPeriod.belongsTo(Semester, {
-  as: "semester",
+  as: "semester"
 });
 
-export {
-  EnrollmentPeriodAttributes,
-  EnrollmentPeriodInstance,
-  EnrollmentPeriod,
-};
+export { EnrollmentPeriodAttributes, EnrollmentPeriodInstance, EnrollmentPeriod };

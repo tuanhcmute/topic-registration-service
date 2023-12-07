@@ -4,90 +4,54 @@ import Select from "react-select";
 import { Modal, Button, TextInput, Label } from "flowbite-react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
-import { useDispatch, useSelector } from "react-redux";
-
-import { toast } from "react-toastify";
-import { deleteTopicEnrollment } from "../../../../features/topicEnrollment/topicEnrollmentAction";
+import { semesterType } from "../../../../utils/constants";
 import _ from "lodash";
 
 const validationSchema = Yup.object().shape({
-  id: Yup.string().required(),
-  topicName: Yup.string().required("Tên đề tài là bắt buộc"),
-  goal: Yup.string().required("Yêu cầu đề tài là bắt buộc"),
-  requirement: Yup.string().required("Kiến thức cần có là bắt buộc"),
-  students: Yup.array(),
-  maxSlot: Yup.number()
-    .min(1, "Số lượng SVTH phải lớn hơn 0")
-    .max(2, "Số lượng SVTH không quá 2"),
+  type: Yup.string().required("Type là bắt buộc"),
+  name: Yup.string().required("Mô tả là bắt buộc"),
+  startDate: Yup.string().required("Start date là bắt buộc"),
+  endDate: Yup.string().required("End date là bắt buộc"),
 });
 
 function EditTimeModal(props) {
-  const dispatch = useDispatch();
-  const [selectedOptions, setSelectedOptions] = useState([]);
-  const [isDisabled, setDisabled] = useState(false);
-  const { openModal, setOpenModal, data, options, handleUpdateTopic } = props;
-  const enrollmentPeriod = useSelector(
-    (state) => state.enrollmentPeriod?.enrollmentPeriod
-  );
-  const currentUser = useSelector((state) => state.user?.currentUser);
-  const [initialValues, setInitialValues] = useState({
-    id: "",
-    maxSlot: 0,
-    topicName: "",
-    goal: "",
-    requirement: "",
-    students: [],
-  });
+  const [selectedOption, setSelectedOption] = useState([]);
+  const { openModal, setOpenModal, data, updateSemester } = props;
   const formik = useFormik({
-    initialValues,
+    initialValues: {
+      type: "",
+      name: "",
+      startDate: "",
+      endDate: "",
+    },
     enableReinitialize: true,
     onSubmit: (values) => {
-      handleUpdateTopic(values);
+      updateSemester(data?.id, values);
     },
     validationSchema,
   });
 
   function changeSelect(...props) {
-    if (props.length < 2) return;
-    const option = props[1];
-    if (option?.action === "remove-value") {
-      const isExist = data?.students?.some((item) =>
-        _.isEqual(item?.ntid, option?.removedValue?.value)
-      );
-      console.log(isExist);
-      if (isExist) dispatch(deleteTopicEnrollment(option?.removedValue?.value));
-    }
-    if (props[0]?.length > formik.values.maxSlot) {
-      toast.warning(`SVTH không vượt quá ${formik.values.maxSlot}`);
-      return;
-    }
-    setSelectedOptions(props[0]);
+    setSelectedOption(props[0]);
   }
 
-  // useEffect(() => {
-  //   setInitialValues({
-  //     id: data?.id,
-  //     topicName: data?.name,
-  //     goal: data?.goal,
-  //     requirement: data?.requirement,
-  //     maxSlot: data?.maxSlot,
-  //   });
-  //   setSelectedOptions(
-  //     data?.students?.map((item) => ({
-  //       label: item?.name,
-  //       value: item?.ntid,
-  //     }))
-  //   );
-  //   setDisabled(
-  //     data?.status === topicStatus.approved.value ||
-  //       data?.status === topicStatus.assigned.value
-  //   );
-  // }, [data]);
+  useEffect(() => {
+    formik.setValues({
+      type: data?.type,
+      name: data?.name,
+      startDate: data?.startDate,
+      endDate: data?.endDate,
+    });
+    setSelectedOption(
+      Object.values(semesterType).find((item) =>
+        _.isEqual(data?.type, item.value)
+      )
+    );
+  }, [data]);
 
-  // useEffect(() => {
-  //   const studentCodes = selectedOptions?.map((item) => item.value);
-  //   formik.setFieldValue("students", studentCodes);
-  // }, [selectedOptions]);
+  useEffect(() => {
+    formik.setFieldValue("type", selectedOption?.value);
+  }, [selectedOption]);
 
   return (
     <Modal
@@ -109,23 +73,34 @@ function EditTimeModal(props) {
                 value='Loại học kỳ (*)'
                 className='mb-2 block'
                 htmlFor='type'
+                color={formik.errors.type && "failure"}
               />
               <Select
                 placeholder='Lựa chọn loại học kỳ'
-                options={options}
+                options={Object.values(semesterType)}
                 onChange={changeSelect}
-                value={selectedOptions}
+                value={selectedOption}
+                isSearchable={false}
               />
             </div>
             {/* End type filed */}
             {/* Name field */}
             <div className='mb-2 block font-Roboto'>
-              <Label htmlFor='name' value='Mô tả (*)' className='mb-2 block' />
+              <Label
+                htmlFor='name'
+                value='Mô tả (*)'
+                className='mb-2 block'
+                color={formik.errors.name && "failure"}
+              />
               <TextInput
                 id='name'
                 placeholder='Nhập mô tả...'
                 required
                 type='text'
+                onChange={formik.handleChange}
+                value={formik.values.name}
+                helperText={formik.errors.name}
+                color={formik.errors.name && "failure"}
               />
             </div>
             {/* End name field */}
@@ -135,8 +110,17 @@ function EditTimeModal(props) {
                 htmlFor='startDate'
                 value='Thời gian bắt đầu (*)'
                 className='mb-2 block'
+                color={formik.errors.startDate && "failure"}
               />
-              <TextInput id='startDate' required type='date' />
+              <TextInput
+                id='startDate'
+                required
+                type='date'
+                onChange={formik.handleChange}
+                value={formik.values.startDate}
+                helperText={formik.errors.startDate}
+                color={formik.errors.startDate && "failure"}
+              />
             </div>
             {/* End start date field */}
             {/* End date field */}
@@ -145,14 +129,23 @@ function EditTimeModal(props) {
                 htmlFor='endDate'
                 value='Thời gian kết thúc (*)'
                 className='mb-2 block'
+                color={formik.errors.endDate && "failure"}
               />
-              <TextInput id='endDate' required type='date' />
+              <TextInput
+                id='endDate'
+                required
+                type='date'
+                onChange={formik.handleChange}
+                value={formik.values.endDate}
+                helperText={formik.errors.endDate}
+                color={formik.errors.endDate && "failure"}
+              />
             </div>
             {/* End date field */}
           </div>
         </div>
       </Modal.Body>
-      {!isDisabled && (
+      {true && (
         <Modal.Footer>
           <div className='w-full flex items-center justify-end gap-5'>
             <Button
@@ -182,9 +175,8 @@ function EditTimeModal(props) {
 export default EditTimeModal;
 
 EditTimeModal.propTypes = {
-  options: PropTypes.array.isRequired,
   openModal: PropTypes.any,
   setOpenModal: PropTypes.func.isRequired,
-  handleUpdateTopic: PropTypes.func.isRequired,
+  updateSemester: PropTypes.func.isRequired,
   data: PropTypes.object || undefined,
 };

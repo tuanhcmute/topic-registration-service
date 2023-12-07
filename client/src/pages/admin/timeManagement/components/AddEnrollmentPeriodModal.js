@@ -1,72 +1,63 @@
-import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import Select from "react-select";
 import { Modal, Button, TextInput, Label } from "flowbite-react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
+import { useEffect, useState } from "react";
 
-import * as toipcType from "../../../../utils/constants/topicType";
-import { useState } from "react";
-import { toast } from "react-toastify";
+import { enrollmentPeriodCode, topicType } from "../../../../utils/constants";
 
 const validationSchema = Yup.object().shape({
-  type: Yup.string().required(),
-  majorCode: Yup.string().required(),
-  ntid: Yup.string().required(),
-  topicName: Yup.string().required("Tên đề tài là bắt buộc"),
-  goal: Yup.string().required("Yêu cầu đề tài là bắt buộc"),
-  requirement: Yup.string().required("Kiến thức cần có là bắt buộc"),
-  maxSlot: Yup.number()
-    .min(1, "Số lượng SVTH phải lớn hơn 0")
-    .max(2, "Số lượng SVTH không quá 2")
-    .required("Số lượng SVTH là bắt buộc"),
-  students: Yup.array(),
+  code: Yup.string().required("Mã đăng ký là bắt buộc"),
+  type: Yup.string().required("Loại đề tài là bắt buộc"),
+  name: Yup.string().required("Mô tả là bắt buộc"),
+  startDate: Yup.string().required("Thời gian bắt đầu là bắt buộc"),
+  endDate: Yup.string().required("Thời gian kết thúc là bắt buộc"),
 });
 
 function AddEnrollmentPeriodModal(props) {
-  const [selectedOptions, setSelectedOptions] = useState([]);
-  const enrollmentPeriod = useSelector(
-    (state) => state.enrollmentPeriod?.enrollmentPeriod
-  );
-  const { openModal, setOpenModal, handleNewTopic, options } = props;
-  const currentUser = useSelector((state) => state.user?.currentUser);
+  const [selectedCodeOption, setSelectedCodeOption] = useState(null);
+  const [selectedTypeOption, setSelectedTypeOption] = useState(null);
+  const { openModal, setOpenModal, createEnrollmentPeriod, data } = props;
   const formik = useFormik({
     initialValues: {
-      type: toipcType.TLCN,
-      majorCode: currentUser?.major?.code,
-      ntid: currentUser?.ntid,
-      maxSlot: 2,
-      topicName: "",
-      goal: "",
-      requirement: "",
-      students: [],
+      code: "",
+      type: "",
+      name: "",
+      startDate: "",
+      endDate: "",
     },
     onSubmit: (values) => {
-      handleNewTopic(values);
+      console.log(values);
+      createEnrollmentPeriod(data?.id, values);
     },
     validationSchema,
   });
 
-  function changeSelect(...props) {
+  function changeSelectCode(...props) {
     // Props[] => [Array(0), {action: "", data}]
-    if (props.length < 2) return;
-    if (props[0]?.length > formik.values.maxSlot) {
-      toast.warning(`SVTH không vượt quá ${formik.values.maxSlot}`);
-      return;
-    }
-    setSelectedOptions(props[0]);
+    setSelectedCodeOption(props[0]);
+  }
+
+  function changeSelectType(...props) {
+    // Props[] => [Array(0), {action: "", data}]
+    setSelectedTypeOption(props[0]);
   }
 
   function setCloseModal() {
     setOpenModal(undefined);
-    setSelectedOptions([]);
+    setSelectedCodeOption();
+    setSelectedTypeOption([]);
     formik.setValues(formik.initialValues);
   }
 
-  // useEffect(() => {
-  //   const studentCodes = selectedOptions.map((item) => item.value);
-  //   formik.setFieldValue("students", studentCodes);
-  // }, [selectedOptions]);
+  useEffect(() => {
+    formik.setFieldValue("type", selectedTypeOption?.value);
+  }, [selectedTypeOption]);
+
+  useEffect(() => {
+    formik.setFieldValue("code", selectedCodeOption?.value);
+  }, [selectedCodeOption]);
 
   return (
     <Modal size='lg' show={openModal === "default"} onClose={setCloseModal}>
@@ -83,10 +74,9 @@ function AddEnrollmentPeriodModal(props) {
               <Label value='Học kỳ (*)' className='mb-2 block' htmlFor='type' />
               <TextInput
                 id='name'
-                placeholder='Nhập mô tả khoảng thời gian...'
                 required
                 type='text'
-                value='HKI năm học 2023 - 2024'
+                value={data?.name}
                 disabled
               />
             </div>
@@ -97,12 +87,14 @@ function AddEnrollmentPeriodModal(props) {
                 value='Mã thời gian đăng ký (*)'
                 className='mb-2 block'
                 htmlFor='type'
+                color={formik.errors.code && "failure"}
               />
               <Select
                 placeholder='Lựa chọn mã thời gian đăng ký'
-                options={options}
-                onChange={changeSelect}
-                value={selectedOptions}
+                options={Object.values(enrollmentPeriodCode)}
+                onChange={changeSelectCode}
+                value={selectedCodeOption}
+                isSearchable={false}
               />
             </div>
             {/* End type filed */}
@@ -111,22 +103,36 @@ function AddEnrollmentPeriodModal(props) {
                 htmlFor='type'
                 value='Thời gian đăng ký dành cho loại đề tài (*)'
                 className='mb-2 block'
+                color={formik.errors.type && "failure"}
               />
               <Select
                 placeholder='Nhập thời gian đăng ký dành cho loại đề tài'
-                options={options}
-                onChange={changeSelect}
-                value={selectedOptions}
+                options={Object.values(topicType).map((item) => ({
+                  label: item,
+                  value: item,
+                }))}
+                onChange={changeSelectType}
+                value={selectedTypeOption}
+                isSearchable={false}
               />
             </div>
             {/* Name field */}
             <div className='mb-2 block font-Roboto'>
-              <Label htmlFor='name' value='Mô tả (*)' className='mb-2 block' />
+              <Label
+                htmlFor='name'
+                value='Mô tả (*)'
+                className='mb-2 block'
+                color={formik.errors.name && "failure"}
+              />
               <TextInput
                 id='name'
                 placeholder='Nhập mô tả khoảng thời gian...'
                 required
                 type='text'
+                color={formik.errors.name && "failure"}
+                helperText={formik.errors.name}
+                value={formik.values.name}
+                onChange={formik.handleChange}
               />
             </div>
             {/* End name field */}
@@ -136,8 +142,17 @@ function AddEnrollmentPeriodModal(props) {
                 htmlFor='startDate'
                 value='Thời gian bắt đầu (*)'
                 className='mb-2 block'
+                color={formik.errors.startDate && "failure"}
               />
-              <TextInput id='startDate' required type='date' />
+              <TextInput
+                id='startDate'
+                required
+                type='date'
+                color={formik.errors.startDate && "failure"}
+                value={formik.values.startDate}
+                onChange={formik.handleChange}
+                helperText={formik.errors.startDate}
+              />
             </div>
             {/* End start date field */}
             {/* End date field */}
@@ -146,8 +161,17 @@ function AddEnrollmentPeriodModal(props) {
                 htmlFor='endDate'
                 value='Thời gian kết thúc (*)'
                 className='mb-2 block'
+                color={formik.errors.endDate && "failure"}
               />
-              <TextInput id='endDate' required type='date' />
+              <TextInput
+                id='endDate'
+                required
+                type='date'
+                helperText={formik.errors.endDate}
+                color={formik.errors.endDate && "failure"}
+                value={formik.values.endDate}
+                onChange={formik.handleChange}
+              />
             </div>
             {/* End date field */}
           </div>
@@ -179,4 +203,6 @@ export default AddEnrollmentPeriodModal;
 AddEnrollmentPeriodModal.propTypes = {
   openModal: PropTypes.any,
   setOpenModal: PropTypes.func.isRequired,
+  data: PropTypes.object.isRequired,
+  createEnrollmentPeriod: PropTypes.func.isRequired,
 };
