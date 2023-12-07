@@ -14,9 +14,7 @@ interface UserRoleAttributes {
   description?: string;
 }
 
-interface UserRoleInstance
-  extends Model<UserRoleAttributes>,
-    UserRoleAttributes {}
+interface UserRoleInstance extends Model<UserRoleAttributes>, UserRoleAttributes {}
 
 const modelName: string = "userRole";
 const UserRole = db.define<UserRoleInstance>(
@@ -26,36 +24,36 @@ const UserRole = db.define<UserRoleInstance>(
       type: DataTypes.UUID,
       primaryKey: true,
       field: "id".concat(POSTFIX),
-      defaultValue: DataTypes.UUIDV4,
+      defaultValue: DataTypes.UUIDV4
     },
     userId: {
       type: DataTypes.UUID,
-      field: "user_id".concat(POSTFIX),
+      field: "user_id".concat(POSTFIX)
     },
     roleId: {
       type: DataTypes.UUID,
-      field: "role_id".concat(POSTFIX),
+      field: "role_id".concat(POSTFIX)
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: "created_by".concat(POSTFIX),
+      field: "created_by".concat(POSTFIX)
     },
     createdDate: {
       type: DataTypes.DATE,
       field: "created_date".concat(POSTFIX),
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
     },
     updatedDate: {
       type: DataTypes.DATE,
       field: "updated_date".concat(POSTFIX),
       defaultValue: DataTypes.NOW,
-      allowNull: false,
+      allowNull: false
     },
     description: {
       type: DataTypes.STRING,
-      field: "description".concat(POSTFIX),
-    },
+      field: "description".concat(POSTFIX)
+    }
   },
   { timestamps: false, tableName: "user_role_tbl" }
 );

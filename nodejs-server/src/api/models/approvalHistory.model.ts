@@ -15,9 +15,7 @@ interface ApprovalHistoryAttributes {
   updatedDate?: Date;
 }
 
-interface ApprovalHistoryInstance
-  extends Model<ApprovalHistoryAttributes>,
-    ApprovalHistoryAttributes {}
+interface ApprovalHistoryInstance extends Model<ApprovalHistoryAttributes>, ApprovalHistoryAttributes {}
 
 const modelName: string = "approvalHistory";
 const ApprovalHistory = db.define<ApprovalHistoryInstance>(
@@ -27,43 +25,43 @@ const ApprovalHistory = db.define<ApprovalHistoryInstance>(
       type: DataTypes.UUID,
       primaryKey: true,
       field: "id".concat(POSTFIX),
-      defaultValue: DataTypes.UUIDV4,
+      defaultValue: DataTypes.UUIDV4
     },
     reason: {
       type: DataTypes.BLOB("long"),
       field: "reason".concat(POSTFIX),
       get() {
         return this.getDataValue("reason")?.toString();
-      },
+      }
     },
     status: {
       type: DataTypes.STRING,
-      field: "status".concat(POSTFIX),
+      field: "status".concat(POSTFIX)
     },
     topicId: {
       type: DataTypes.UUID,
-      field: "topic_id".concat(POSTFIX),
+      field: "topic_id".concat(POSTFIX)
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: "created_by".concat(POSTFIX),
+      field: "created_by".concat(POSTFIX)
     },
     createdDate: {
       type: DataTypes.DATE,
       field: "created_date".concat(POSTFIX),
       allowNull: false,
-      defaultValue: DataTypes.NOW,
+      defaultValue: DataTypes.NOW
     },
     updatedDate: {
       type: DataTypes.DATE,
       field: "updated_date".concat(POSTFIX),
       allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
+      defaultValue: DataTypes.NOW
+    }
   },
   {
     timestamps: false,
-    tableName: "approval_history_tbl",
+    tableName: "approval_history_tbl"
   }
 );
 

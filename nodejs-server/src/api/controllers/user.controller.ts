@@ -13,66 +13,41 @@ import { logger, storage } from "@configs";
 const upload: Multer = multer({ storage: storage });
 
 class UserController {
-  public getUserProfile = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  public getUserProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const email = res.locals.email;
-      if (_.isNull(email))
-        throw new ValidateFailException("Email could not be found");
+      if (_.isNull(email)) throw new ValidateFailException("Email could not be found");
       res.status(StatusCodes.OK).json(await userService.getUserProfile(email));
     } catch (error) {
       next(error);
     }
   };
 
-  public getStudentsNotEnrolledInTopic = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  public getStudentsNotEnrolledInTopic = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      res
-        .status(StatusCodes.OK)
-        .json(await userService.getStudentsNotEnrolledInTopic());
+      res.status(StatusCodes.OK).json(await userService.getStudentsNotEnrolledInTopic());
     } catch (error) {
       console.error(error);
       next(error);
     }
   };
 
-  public async getLecturesByMajor(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  public async getLecturesByMajor(req: Request, res: Response, next: NextFunction) {
     // Get and validate Major code
     const majorCodeRequest = req.query["majorCode"] as string;
-    if (
-      _.isNull(majorCodeRequest) ||
-      _.isUndefined(majorCodeRequest) ||
-      _.isEmpty(majorCodeRequest)
-    )
+    if (_.isNull(majorCodeRequest) || _.isUndefined(majorCodeRequest) || _.isEmpty(majorCodeRequest))
       throw new ValidateFailException("Major code is not valid");
 
-    // Reponse
-    res
-      .status(StatusCodes.OK)
-      .json(await userService.getLecturesByMajor(majorCodeRequest));
     try {
+      // Reponse
+      res.status(StatusCodes.OK).json(await userService.getLecturesByMajor(majorCodeRequest));
     } catch (error) {
       logger.error("Error: ", error);
       next(error);
     }
   }
 
-  public updateUserBio = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  public updateUserBio = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const email = res.locals.email;
       const bio = req.body;
@@ -93,10 +68,7 @@ class UserController {
       }
 
       console.log(bio.biography.length);
-      const result: boolean = await userService.updateUserBio(
-        email,
-        bio.biography
-      );
+      const result: boolean = await userService.updateUserBio(email, bio.biography);
       if (result) {
         return res
           .status(200)
@@ -112,11 +84,7 @@ class UserController {
     }
   };
 
-  public async updateAvatarInUserProfile(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  public async updateAvatarInUserProfile(req: Request, res: Response, next: NextFunction) {
     try {
       const file = req.file;
       logger.info(file);

@@ -28,10 +28,7 @@ class TopicRoutes implements IRoutes {
     );
 
     // [PUT] /api/v1/topic/approval
-    this.router.put(
-      `${this.path}/lecture/approval`,
-      topicController.approveTopicInLectureEnrollmentPeriod
-    );
+    this.router.put(`${this.path}/lecture/approval`, topicController.approveTopicInLectureEnrollmentPeriod);
 
     // [GET] /api/v1/topic/head
     // this.router.get(

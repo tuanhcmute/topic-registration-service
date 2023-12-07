@@ -22,44 +22,44 @@ const Major = db.define<MajorInstance>(
       type: DataTypes.UUID,
       primaryKey: true,
       field: "id".concat(POSTFIX),
-      defaultValue: DataTypes.UUIDV4,
+      defaultValue: DataTypes.UUIDV4
     },
     code: {
       type: DataTypes.STRING,
       field: "code".concat(POSTFIX),
       unique: true,
-      allowNull: false,
+      allowNull: false
     },
     name: {
       type: DataTypes.STRING,
       field: "name".concat(POSTFIX),
       unique: false,
-      allowNull: false,
+      allowNull: false
     },
     description: {
       type: DataTypes.STRING,
-      field: "description".concat(POSTFIX),
+      field: "description".concat(POSTFIX)
     },
     createdBy: {
       type: DataTypes.STRING,
-      field: "created_by".concat(POSTFIX),
+      field: "created_by".concat(POSTFIX)
     },
     createdDate: {
       type: DataTypes.DATE,
       field: "created_date".concat(POSTFIX),
       allowNull: false,
-      defaultValue: DataTypes.NOW,
+      defaultValue: DataTypes.NOW
     },
     updatedDate: {
       type: DataTypes.DATE,
       field: "updated_date".concat(POSTFIX),
       allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
+      defaultValue: DataTypes.NOW
+    }
   },
   {
     timestamps: false,
-    tableName: "major_tbl",
+    tableName: "major_tbl"
   }
 );
 

@@ -16,48 +16,28 @@ class UserRoutes implements IRoutes {
     // [GET] /api/v1/user/profile
     this.router.get(
       `${this.path}/profile`,
-      preAuthorizeFilter([
-        RoleCode.ROLE_STUDENT,
-        RoleCode.ROLE_LECTURE,
-        RoleCode.ROLE_HEAD,
-        RoleCode.ROLE_ADMIN,
-      ]),
+      preAuthorizeFilter([RoleCode.ROLE_STUDENT, RoleCode.ROLE_LECTURE, RoleCode.ROLE_HEAD, RoleCode.ROLE_ADMIN]),
       userController.getUserProfile
     );
 
     // [PUT] /api/v1/user/profile
     this.router.put(
       `${this.path}/profile`,
-      preAuthorizeFilter([
-        RoleCode.ROLE_STUDENT,
-        RoleCode.ROLE_LECTURE,
-        RoleCode.ROLE_HEAD,
-        RoleCode.ROLE_ADMIN,
-      ]),
+      preAuthorizeFilter([RoleCode.ROLE_STUDENT, RoleCode.ROLE_LECTURE, RoleCode.ROLE_HEAD, RoleCode.ROLE_ADMIN]),
       userController.updateUserBio
     );
 
     // [PUT] /api/v1/user/profile/upload
     this.router.put(
       `${this.path}/profile/upload`,
-      preAuthorizeFilter([
-        RoleCode.ROLE_STUDENT,
-        RoleCode.ROLE_LECTURE,
-        RoleCode.ROLE_HEAD,
-        RoleCode.ROLE_ADMIN,
-      ]),
+      preAuthorizeFilter([RoleCode.ROLE_STUDENT, RoleCode.ROLE_LECTURE, RoleCode.ROLE_HEAD, RoleCode.ROLE_ADMIN]),
       userController.updateUserBio
     );
 
     // [GET] /api/v1/user/student
     this.router.get(
       `${this.path}/student`,
-      preAuthorizeFilter([
-        RoleCode.ROLE_STUDENT,
-        RoleCode.ROLE_LECTURE,
-        RoleCode.ROLE_HEAD,
-        RoleCode.ROLE_ADMIN,
-      ]),
+      preAuthorizeFilter([RoleCode.ROLE_STUDENT, RoleCode.ROLE_LECTURE, RoleCode.ROLE_HEAD, RoleCode.ROLE_ADMIN]),
       userController.getStudentsNotEnrolledInTopic
     );
 

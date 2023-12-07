@@ -23,7 +23,7 @@ export const passportSetup = passport.use(
     {
       clientID: keys.google.clientId,
       clientSecret: keys.google.clientSecret,
-      callbackURL: keys.google.callbackURL,
+      callbackURL: keys.google.callbackURL
     },
     async (accessToken, refreshToken, profile, done) => {
       const email = profile._json.email;
@@ -42,8 +42,8 @@ export const passportSetup = passport.use(
             imageUrl: profile._json.picture,
             name: profile._json.name,
             provider: profile.provider.toUpperCase(),
-            emailVerified: true,
-          },
+            emailVerified: true
+          }
         });
         // Validate created
         if (created) {

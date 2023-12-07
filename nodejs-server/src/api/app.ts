@@ -7,11 +7,7 @@ import cors from "cors";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 
 import * as apiRoutes from "@routes";
-import {
-  errorHandler,
-  tokenAuthenticationFilter,
-  logMiddleware,
-} from "@middlewares";
+import { errorHandler, tokenAuthenticationFilter, logMiddleware } from "@middlewares";
 import { keys, db, passportSetup } from "@configs";
 
 dotenv.config();
@@ -26,7 +22,7 @@ app.use(cors());
 app.use(
   cookieSession({
     maxAge: 10 * 60 * 1000,
-    keys: [keys.session.cookieKey],
+    keys: [keys.session.cookieKey]
   })
 );
 app.use(tokenAuthenticationFilter);
@@ -48,7 +44,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // add error handler
 app.use(errorHandler);
-
 (async () => {
   try {
     // Attempt to authenticate with the database (assuming 'db' is your database object)

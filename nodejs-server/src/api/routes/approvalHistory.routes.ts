@@ -9,10 +9,7 @@ class ApprovalHistoryRoutes implements IRoutes {
     this.initializeRoutes();
   }
   public initializeRoutes(): void {
-    this.router.get(
-      this.path,
-      approvalHistoryController.getApprovalHistoryByTopicId
-    );
+    this.router.get(this.path, approvalHistoryController.getApprovalHistoryByTopicId);
   }
 }
 

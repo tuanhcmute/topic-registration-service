@@ -17,6 +17,11 @@ class EnrollmentPeriodRoutes implements IRoutes {
       preAuthorizeFilter([RoleCode.ROLE_STUDENT, RoleCode.ROLE_LECTURE]),
       enrollmentPeriodController.getEnrollmentPeriod
     );
+    this.router.get(
+      `${this.path}/all`,
+      preAuthorizeFilter([RoleCode.ROLE_ADMIN]),
+      enrollmentPeriodController.getEnrollmentPeriodBySemesterId
+    );
   }
 }
 

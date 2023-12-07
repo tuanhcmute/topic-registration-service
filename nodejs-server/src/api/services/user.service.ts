@@ -2,71 +2,50 @@ import { StatusCodes } from "http-status-codes";
 import _ from "lodash";
 import multer from "multer";
 
-import {
-  User,
-  Major,
-  Clazz,
-  UserRole,
-  Role,
-  UserRoleInstance,
-  TopicEnrollment,
-} from "@models";
-import {
-  UserNotFoundException,
-  ErrorMessages,
-  ValidateFailException,
-} from "@exceptions";
-import {
-  IListLecture,
-  IListStudent,
-  IResponseModel,
-  IUserProfile,
-  ResponseModelBuilder,
-} from "@interfaces";
+import { User, Major, Clazz, UserRole, Role, UserRoleInstance, TopicEnrollment } from "@models";
+import { UserNotFoundException, ErrorMessages, ValidateFailException } from "@exceptions";
+import { IListLecture, IListStudent, IResponseModel, IUserProfile, ResponseModelBuilder } from "@interfaces";
 import { RoleCode } from "@configs/constants";
 
 class UserService {
-  public getStudentsNotEnrolledInTopic = async (): Promise<
-    IResponseModel<IListStudent>
-  > => {
+  public getStudentsNotEnrolledInTopic = async (): Promise<IResponseModel<IListStudent>> => {
     // Get and validate role
     const studentRole = await Role.findOne({
       where: {
-        code: RoleCode.ROLE_STUDENT,
-      },
+        code: RoleCode.ROLE_STUDENT
+      }
     });
-    if (_.isNull(studentRole))
-      throw new ValidateFailException("Student role could not be found");
+    if (_.isNull(studentRole)) throw new ValidateFailException("Student role could not be found");
 
     // Get students
     const userRoles = await UserRole.findAll({
       where: {
-        roleId: studentRole.id,
+        roleId: studentRole.id
       },
       include: [
         {
           model: User,
           as: "user",
-          attributes: ["ntid", "name"],
-        },
+          attributes: ["ntid", "name"]
+        }
       ],
       attributes: ["userId"],
       raw: true,
-      nest: true,
+      nest: true
     });
 
     //  Filter students are not enrolled (NOT performance)
-    let filterStudent: UserRoleInstance[] = [];
+    const filterStudent: UserRoleInstance[] = [];
     for (const item of userRoles) {
       const topicEnrollment = await TopicEnrollment.findOne({
         where: {
-          studentId: item.userId,
-        },
+          studentId: item.userId
+        }
       });
       if (_.isNull(topicEnrollment)) filterStudent.push(item);
     }
     const data: IListStudent = {
-      students: filterStudent,
+      students: filterStudent
     };
     return new ResponseModelBuilder<IListStudent>()
       .withMessage("The list of students has been successfully retrieved")
@@ -75,139 +54,98 @@ class UserService {
       .build();
   };
 
-  public getUserProfile = async (
-    email: string
-  ): Promise<IResponseModel<IUserProfile>> => {
-    try {
-      // Get current user
-      const foundUser = await User.findOne({
-        where: { email },
-        include: [
-          {
-            model: Major,
-            as: "major",
-            attributes: ["code", "name"],
-          },
-          {
-            model: Clazz,
-            as: "clazz",
-            attributes: ["code", "description"],
-          },
-          {
-            model: UserRole,
-            as: "userRoles",
-            include: [{ model: Role, as: "role", attributes: ["code"] }],
-            attributes: {
-              exclude: [
-                "userId",
-                "roleId",
-                "createdBy",
-                "createdDate",
-                "updatedDate",
-              ],
-            },
-          },
-        ],
-        attributes: [
-          "ntid",
-          "email",
-          "imageUrl",
-          "name",
-          "phoneNumber",
-          "biography",
-          "schoolYear",
-        ],
-      });
+  public getUserProfile = async (email: string): Promise<IResponseModel<IUserProfile>> => {
+    // Get current user
+    const foundUser = await User.findOne({
+      where: { email },
+      include: [
+        {
+          model: Major,
+          as: "major",
+          attributes: ["code", "name"]
+        },
+        {
+          model: Clazz,
+          as: "clazz",
+          attributes: ["code", "description"]
+        },
+        {
+          model: UserRole,
+          as: "userRoles",
+          include: [{ model: Role, as: "role", attributes: ["code"] }],
+          attributes: {
+            exclude: ["userId", "roleId", "createdBy", "createdDate", "updatedDate"]
+          }
+        }
+      ],
+      attributes: ["ntid", "email", "imageUrl", "name", "phoneNumber", "biography", "schoolYear"]
+    });
 
-      // Validate user
-      if (!foundUser)
-        throw new UserNotFoundException(
-          ErrorMessages.USER_NOT_FOUND + "with email: " + email
-        );
-      const data: IUserProfile = {
-        profile: foundUser,
-      };
+    // Validate user
+    if (!foundUser) throw new UserNotFoundException(ErrorMessages.USER_NOT_FOUND + "with email: " + email);
+    const data: IUserProfile = {
+      profile: foundUser
+    };
 
-      // Buid response
-      return new ResponseModelBuilder<IUserProfile>()
-        .withMessage("User's profile has been successfully retrieved")
-        .withStatusCode(StatusCodes.OK)
-        .withData(data)
-        .build();
-    } catch (err) {
-      throw err;
-    }
+    // Buid response
+    return new ResponseModelBuilder<IUserProfile>()
+      .withMessage("User's profile has been successfully retrieved")
+      .withStatusCode(StatusCodes.OK)
+      .withData(data)
+      .build();
   };
 
-  public updateUserBio = async (
-    email: string,
-    bio: string
-  ): Promise<boolean> => {
-    try {
-      const foundUser = await User.findOne({
-        where: { email },
-      });
-      if (!foundUser)
-        throw new UserNotFoundException(
-          ErrorMessages.USER_NOT_FOUND + "with email: " + email
-        );
-      foundUser.biography = bio;
-      await foundUser.save();
-      return true;
-    } catch (error) {
-      throw error;
-    }
+  public updateUserBio = async (email: string, bio: string): Promise<boolean> => {
+    const foundUser = await User.findOne({
+      where: { email }
+    });
+    if (!foundUser) throw new UserNotFoundException(ErrorMessages.USER_NOT_FOUND + "with email: " + email);
+    foundUser.biography = bio;
+    await foundUser.save();
+    return true;
   };
 
-  public async getLecturesByMajor(
-    majorCodeRequest: string
-  ): Promise<IResponseModel<IListLecture>> {
+  public async getLecturesByMajor(majorCodeRequest: string): Promise<IResponseModel<IListLecture>> {
     // Validate Major code
-    if (
-      _.isNull(majorCodeRequest) ||
-      _.isUndefined(majorCodeRequest) ||
-      _.isEmpty(majorCodeRequest)
-    )
+    if (_.isNull(majorCodeRequest) || _.isUndefined(majorCodeRequest) || _.isEmpty(majorCodeRequest))
       throw new ValidateFailException("Major code is not valid");
 
     // Validate major
     const major = await Major.findOne({ where: { code: majorCodeRequest } });
-    if (_.isNull(major))
-      throw new ValidateFailException("Major could not be found");
+    if (_.isNull(major)) throw new ValidateFailException("Major could not be found");
     // Get and validate role
     const lectureRole = await Role.findOne({
       where: {
-        code: RoleCode.ROLE_LECTURE,
-      },
+        code: RoleCode.ROLE_LECTURE
+      }
     });
-    if (_.isNull(lectureRole))
-      throw new ValidateFailException("Student role could not be found");
+    if (_.isNull(lectureRole)) throw new ValidateFailException("Student role could not be found");
 
     // Get lectures
     const userRoles = await UserRole.findAll({
       where: {
-        roleId: lectureRole.id,
+        roleId: lectureRole.id
       },
       include: [
         {
           model: User,
           as: "user",
-          attributes: ["ntid", "name"],
-        },
+          attributes: ["ntid", "name"]
+        }
       ],
       attributes: ["userId"],
       raw: true,
-      nest: true,
+      nest: true
     });
 
     //  Filter lecture with major from client(NOT performance)
-    let filterLectures: UserRoleInstance[] = [];
+    const filterLectures: UserRoleInstance[] = [];
     for (const item of userRoles) {
       const user = await User.findOne({
         where: {
           id: item.userId,
-          majorId: major.id,
-        },
+          majorId: major.id
+        }
       });
       if (!_.isNull(user)) filterLectures.push(item);
     }

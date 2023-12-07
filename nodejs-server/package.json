@@ -7,7 +7,11 @@
     "test": "mocha -r ts-node/register src/tests/**/*.ts",
     "start": "ts-node -r tsconfig-paths/register src/api/app.ts",
     "dev": "nodemon",
-    "build": "tsc && tsc-alias -p ."
+    "build": "tsc && tsc-alias -p .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write ."
   },
   "author": "thanhduy",
   "license": "ISC",
@@ -61,11 +65,19 @@
     "@types/passport-google-oauth20": "^2.0.11",
     "@types/sequelize": "^4.28.15",
     "@types/uuid": "^9.0.4",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
     "chai": "^4.3.8",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.0.1",
     "mocha": "^10.2.0",
-    "nodemon": "^3.0.1",
+    "nodemon": "^3.0.2",
     "openssl": "^2.0.0",
+    "prettier": "^3.1.0",
+    "rimraf": "^5.0.5",
     "ts-node": "^10.9.1",
+    "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0"
   }
 }

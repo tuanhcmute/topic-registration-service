@@ -4,26 +4,15 @@ import { Op } from "sequelize";
 
 import { SemesterStatus, TopicStatus, TopicType } from "@configs/constants";
 import ValidateException from "@exceptions/ValidateFailException";
-import {
-  Topic,
-  User,
-  Semester,
-  TopicEnrollment,
-  Major,
-  ApprovalHistory,
-} from "@models";
+import { Topic, User, Semester, TopicEnrollment, Major, ApprovalHistory } from "@models";
 import {
   NewTopicRequest,
   IListTopicResponse,
   ApprovalTopicRequest,
-  UpdateTopicRequest,
+  UpdateTopicRequest
 } from "@interfaces/topic.interface";
 import { db, logger } from "@configs";
-import {
-  CreateTopicEnrollmentRequest,
-  IResponseModel,
-  ResponseModelBuilder,
-} from "@interfaces";
+import { CreateTopicEnrollmentRequest, IResponseModel, ResponseModelBuilder } from "@interfaces";
 import { UserNotFoundException, ValidateFailException } from "@exceptions";
 import InternalServerErrorException from "@exceptions/InternalServerErrorException";
 import topicEnrollmentService from "./topicEnrollment.service";
@@ -37,25 +26,22 @@ class TopicService {
     try {
       // Validate type
       if (_.isEmpty(type)) throw new ValidateException("type is not valid");
-      const isTypeValid = Object.keys(TopicType).some(
-        (item) => item === type.toUpperCase()
-      );
+      const isTypeValid = Object.keys(TopicType).some((item) => item === type.toUpperCase());
       if (!isTypeValid) throw new ValidateException("Topic type is not valid");
 
       // Validate lecture
       const lecture = await User.findOne({
         where: {
-          email: email,
-        },
+          email: email
+        }
       });
-      if (_.isNull(lecture) || _.isEmpty(lecture))
-        throw new ValidateException("Lecture could not be found");
+      if (_.isNull(lecture) || _.isEmpty(lecture)) throw new ValidateException("Lecture could not be found");
 
       // Validate current semester
       const currentSemester = await Semester.findOne({
         where: {
-          status: SemesterStatus.ACTIVATED,
-        },
+          status: SemesterStatus.ACTIVATED
+        }
       });
       if (_.isNull(currentSemester) || _.isEmpty(currentSemester))
         throw new ValidateException("Current semester could not be found");
@@ -65,27 +51,25 @@ class TopicService {
         where: {
           type: type,
           lectureId: lecture.dataValues.id,
-          semesterId: currentSemester.dataValues.id,
+          semesterId: currentSemester.dataValues.id
         },
         include: [
           {
             model: User,
             as: "lecture",
-            attributes: ["ntid", "name"],
+            attributes: ["ntid", "name"]
           },
           {
             model: TopicEnrollment,
             as: "topicEnrollments",
-            include: [
-              { model: User, as: "student", attributes: ["ntid", "name"] },
-            ],
-            attributes: ["id"],
-          },
+            include: [{ model: User, as: "student", attributes: ["ntid", "name"] }],
+            attributes: ["id"]
+          }
         ],
         attributes: {
-          exclude: ["createdBy", "createdDate", "updatedDate", "lectureId"],
+          exclude: ["createdBy", "createdDate", "updatedDate", "lectureId"]
         },
-        order: ["createdDate"],
+        order: ["createdDate"]
       });
       const data: IListTopicResponse = { topics };
       return new ResponseModelBuilder<IListTopicResponse>()
@@ -106,41 +90,35 @@ class TopicService {
     // Get lecture
     const currentLecture = await User.findOne({ where: { email } });
     // Validate lecture
-    if (_.isNull(currentLecture))
-      throw new UserNotFoundException("Current lecture could not be found");
+    if (_.isNull(currentLecture)) throw new UserNotFoundException("Current lecture could not be found");
     if (!_.isEqual(currentLecture?.ntid, request.ntid))
       throw new ValidateFailException("Ntid is not the same with current user");
 
     // Validate major
     const major = await Major.findOne({ where: { code: request.majorCode } });
-    if (_.isNull(major))
-      throw new ValidateFailException("Major could not be found");
+    if (_.isNull(major)) throw new ValidateFailException("Major could not be found");
 
     // Validate semester
     const currentSemester = await Semester.findOne({
-      where: { status: SemesterStatus.ACTIVATED },
+      where: { status: SemesterStatus.ACTIVATED }
     });
-    if (_.isNull(currentSemester))
-      throw new ValidateFailException("Current semester could not be found");
+    if (_.isNull(currentSemester)) throw new ValidateFailException("Current semester could not be found");
 
     const students = await Promise.all(
       request.students.map(async (item) => {
         const student = await User.findOne({
           where: {
-            ntid: item,
-          },
+            ntid: item
+          }
         });
-        if (_.isNull(student))
-          throw new ValidateFailException(`${item} is not valid`);
+        if (_.isNull(student)) throw new ValidateFailException(`${item} is not valid`);
         return student;
       })
     );
 
     // Validate available slot
     if (request.maxSlot < request.students.length)
-      throw new ValidateFailException(
-        "Max slot could not be less than size of student"
-      );
+      throw new ValidateFailException("Max slot could not be less than size of student");
 
     let transaction;
     try {
@@ -157,21 +135,20 @@ class TopicService {
           lectureId: currentLecture.id,
           semesterId: currentSemester.id,
           availableSlot: request.maxSlot,
-          status: TopicStatus.PENDING,
+          status: TopicStatus.PENDING
         },
         { transaction }
       );
 
       // Validate topic
-      if (_.isNull(topic))
-        throw new InternalServerErrorException("Topic could not be saved");
+      if (_.isNull(topic)) throw new InternalServerErrorException("Topic could not be saved");
       logger.info(topic.id);
 
       // Save topic enrollment
       students.forEach(async (item) => {
         await TopicEnrollment.create({
           topicId: topic.id, // Use the ID of the created topic
-          studentId: item.id, // Use the ID of the fetched student
+          studentId: item.id // Use the ID of the fetched student
           // Set other relevant fields as needed
         });
       });
@@ -191,21 +168,15 @@ class TopicService {
     }
   };
 
-  public async approveTopicInLectureEnrollmentPeriod(
-    request: ApprovalTopicRequest
-  ): Promise<IResponseModel<void>> {
+  public async approveTopicInLectureEnrollmentPeriod(request: ApprovalTopicRequest): Promise<IResponseModel<void>> {
     // Get topic status
-    const isStatusValid = Object.values(TopicStatus).some((item) =>
-      _.isEqual(item, request.status)
-    );
-    if (!isStatusValid)
-      throw new ValidateFailException("Topic status could not be found");
+    const isStatusValid = Object.values(TopicStatus).some((item) => _.isEqual(item, request.status));
+    if (!isStatusValid) throw new ValidateFailException("Topic status could not be found");
     const topicStatus = request.status as TopicStatus;
 
     // Get topic
     const topic = await Topic.findByPk(request.id);
-    if (_.isNull(topic))
-      throw new ValidateFailException("Topic could not be found");
+    if (_.isNull(topic)) throw new ValidateFailException("Topic could not be found");
 
     // Handle if topic is not approved
     if (!_.isEqual(topic.status, TopicStatus.APPROVED)) {
@@ -216,7 +187,7 @@ class TopicService {
       const approvalHistory = await ApprovalHistory.create({
         reason: request.reason,
         topicId: request.id,
-        status: request.status,
+        status: request.status
       });
       logger.info("Approval history: ", approvalHistory.dataValues);
     }
@@ -233,45 +204,29 @@ class TopicService {
     email: string
   ): Promise<IResponseModel<IListTopicResponse>> {
     // Validate
-    if (
-      _.isNull(typeRequest) ||
-      _.isUndefined(typeRequest) ||
-      _.isEmpty(typeRequest)
-    )
+    if (_.isNull(typeRequest) || _.isUndefined(typeRequest) || _.isEmpty(typeRequest))
       throw new ValidateFailException("Topic type is not valid");
-    if (
-      _.isNull(statusRequest) ||
-      _.isUndefined(statusRequest) ||
-      _.isEmpty(statusRequest)
-    )
+    if (_.isNull(statusRequest) || _.isUndefined(statusRequest) || _.isEmpty(statusRequest))
       throw new ValidateFailException("Topic status is not valid");
-    const isTypeValid = Object.values(TopicType).some((item) =>
-      _.isEqual(item, typeRequest)
-    );
-    if (!isTypeValid)
-      throw new ValidateFailException("Topic type could not be found");
+    const isTypeValid = Object.values(TopicType).some((item) => _.isEqual(item, typeRequest));
+    if (!isTypeValid) throw new ValidateFailException("Topic type could not be found");
 
-    const isStatusValid = Object.values(TopicStatus).some((item) =>
-      _.isEqual(item, statusRequest)
-    );
-    if (!isStatusValid)
-      throw new ValidateFailException("Topic status could not be found");
+    const isStatusValid = Object.values(TopicStatus).some((item) => _.isEqual(item, statusRequest));
+    if (!isStatusValid) throw new ValidateFailException("Topic status could not be found");
 
     // Get activated semester
     const semester = await Semester.findOne({
       where: {
-        status: SemesterStatus.ACTIVATED,
-      },
+        status: SemesterStatus.ACTIVATED
+      }
     });
-    if (_.isNull(semester))
-      throw new ValidateFailException("Current semester is not activated");
+    if (_.isNull(semester)) throw new ValidateFailException("Current semester is not activated");
 
     // Get head
     const head = await User.findOne({
-      where: { email },
+      where: { email }
     });
-    if (_.isNull(head))
-      throw new ValidateFailException("User could not be found");
+    if (_.isNull(head)) throw new ValidateFailException("User could not be found");
 
     // Query
     const topics = await Topic.findAll({
@@ -279,8 +234,8 @@ class TopicService {
         semesterId: semester.id,
         type: typeRequest,
         status: statusRequest,
-        majorId: head.majorId,
-      },
+        majorId: head.majorId
+      }
     });
     // Build data
     const data: IListTopicResponse = { topics };
@@ -296,29 +251,24 @@ class TopicService {
     email: string
   ): Promise<IResponseModel<IListTopicResponse>> {
     // Validate type
-    const isTypeValid = Object.values(TopicType).some((item) =>
-      _.isEqual(item, type)
-    );
-    if (!isTypeValid)
-      throw new ValidateFailException("Topic type could not be found");
+    const isTypeValid = Object.values(TopicType).some((item) => _.isEqual(item, type));
+    if (!isTypeValid) throw new ValidateFailException("Topic type could not be found");
 
     if (!email) throw new ValidateException("Email is not valid");
 
     // Get activated semester
     const semester = await Semester.findOne({
       where: {
-        status: SemesterStatus.ACTIVATED,
-      },
+        status: SemesterStatus.ACTIVATED
+      }
     });
-    if (_.isNull(semester))
-      throw new ValidateFailException("Current semester is not activated");
+    if (_.isNull(semester)) throw new ValidateFailException("Current semester is not activated");
 
     // Get head
     const head = await User.findOne({
-      where: { email },
+      where: { email }
     });
-    if (_.isNull(head))
-      throw new ValidateFailException("User could not be found");
+    if (_.isNull(head)) throw new ValidateFailException("User could not be found");
 
     const topics = await Topic.findAll({
       where: {
@@ -326,24 +276,22 @@ class TopicService {
         type: type,
         majorId: head.majorId,
         status: {
-          [Op.notIn]: [TopicStatus.APPROVED, TopicStatus.ASSIGNED],
-        },
+          [Op.notIn]: [TopicStatus.APPROVED, TopicStatus.ASSIGNED]
+        }
       },
       include: [
         {
           model: User,
           as: "lecture",
-          attributes: ["ntid", "name"],
+          attributes: ["ntid", "name"]
         },
         {
           model: TopicEnrollment,
           as: "topicEnrollments",
-          include: [
-            { model: User, as: "student", attributes: ["ntid", "name"] },
-          ],
-          attributes: ["id"],
-        },
-      ],
+          include: [{ model: User, as: "student", attributes: ["ntid", "name"] }],
+          attributes: ["id"]
+        }
+      ]
     });
 
     // Build data
@@ -360,29 +308,24 @@ class TopicService {
     email: string
   ): Promise<IResponseModel<IListTopicResponse>> {
     // Validate type
-    const isTypeValid = Object.values(TopicType).some((item) =>
-      _.isEqual(item, type)
-    );
-    if (!isTypeValid)
-      throw new ValidateFailException("Topic type could not be found");
+    const isTypeValid = Object.values(TopicType).some((item) => _.isEqual(item, type));
+    if (!isTypeValid) throw new ValidateFailException("Topic type could not be found");
 
     if (!email) throw new ValidateException("Email is not valid");
 
     // Get activated semester
     const semester = await Semester.findOne({
       where: {
-        status: SemesterStatus.ACTIVATED,
-      },
+        status: SemesterStatus.ACTIVATED
+      }
     });
-    if (_.isNull(semester))
-      throw new ValidateFailException("Current semester is not activated");
+    if (_.isNull(semester)) throw new ValidateFailException("Current semester is not activated");
 
     // Get head
     const head = await User.findOne({
-      where: { email },
+      where: { email }
     });
-    if (_.isNull(head))
-      throw new ValidateFailException("User could not be found");
+    if (_.isNull(head)) throw new ValidateFailException("User could not be found");
 
     // Get topics by semester, type, major, status = approved
     const topics = await Topic.findAll({
@@ -391,9 +334,9 @@ class TopicService {
         type: type,
         majorId: head.majorId,
         status: {
-          [Op.in]: [TopicStatus.APPROVED],
-        },
-      },
+          [Op.in]: [TopicStatus.APPROVED]
+        }
+      }
     });
 
     // Build data
@@ -405,20 +348,17 @@ class TopicService {
       .build();
   }
 
-  public async updateTopicInLectureEnrollmentPeriod(
-    request: UpdateTopicRequest
-  ) {
+  public async updateTopicInLectureEnrollmentPeriod(request: UpdateTopicRequest) {
     //        Find topic by id
     const topic = await Topic.findByPk(request.id);
-    if (_.isNull(topic))
-      throw new ValidateFailException("Topic could not be found");
+    if (_.isNull(topic)) throw new ValidateFailException("Topic could not be found");
 
     //        Get current topic enrollment to compare with student request
     let isAllMatch = false;
     const currentTopicEnrollments = await TopicEnrollment.findAll({
       where: { topicId: topic.id },
       order: [["isLeader", "DESC"]],
-      include: [{ model: User, as: "student" }],
+      include: [{ model: User, as: "student" }]
     });
 
     if (!_.isEmpty(currentTopicEnrollments)) {
@@ -437,18 +377,15 @@ class TopicService {
     logger.info(request.students);
 
     if (!isAllMatch) {
-      if (_.isUndefined(topic.availableSlot))
-        throw new ValidateFailException("Available slot is not valid");
+      if (_.isUndefined(topic.availableSlot)) throw new ValidateFailException("Available slot is not valid");
       if (topic.availableSlot < request.students.length)
-        throw new ValidateFailException(
-          "Available slot could not be less than size of student"
-        );
+        throw new ValidateFailException("Available slot could not be less than size of student");
 
       for (const ntid of request.students) {
         // Create enrollment
         const topicEnrollment = {
           ntid,
-          topicId: topic.id,
+          topicId: topic.id
         } as CreateTopicEnrollmentRequest;
         await topicEnrollmentService.createTopicEnrollment(topicEnrollment);
       }
@@ -475,28 +412,23 @@ class TopicService {
     email: string
   ): Promise<IResponseModel<IListTopicResponse>> {
     // Validate type
-    const isTypeValid = Object.values(TopicType).some((item) =>
-      _.isEqual(item, type)
-    );
-    if (!isTypeValid)
-      throw new ValidateFailException("Topic type could not be found");
+    const isTypeValid = Object.values(TopicType).some((item) => _.isEqual(item, type));
+    if (!isTypeValid) throw new ValidateFailException("Topic type could not be found");
     if (!email) throw new ValidateException("Email is not valid");
 
     // Get activated semester
     const semester = await Semester.findOne({
       where: {
-        status: SemesterStatus.ACTIVATED,
-      },
+        status: SemesterStatus.ACTIVATED
+      }
     });
-    if (_.isNull(semester))
-      throw new ValidateFailException("Current semester is not activated");
+    if (_.isNull(semester)) throw new ValidateFailException("Current semester is not activated");
 
     // Get student
     const student = await User.findOne({
-      where: { email },
+      where: { email }
     });
-    if (_.isNull(student))
-      throw new ValidateFailException("User could not be found");
+    if (_.isNull(student)) throw new ValidateFailException("User could not be found");
 
     const topics = await Topic.findAll({
       where: {
@@ -504,24 +436,22 @@ class TopicService {
         type: type,
         majorId: student.majorId,
         status: {
-          [Op.or]: [TopicStatus.APPROVED, TopicStatus.ASSIGNED],
-        },
+          [Op.or]: [TopicStatus.APPROVED, TopicStatus.ASSIGNED]
+        }
       },
       include: [
         {
           model: User,
           as: "lecture",
-          attributes: ["ntid", "name"],
+          attributes: ["ntid", "name"]
         },
         {
           model: TopicEnrollment,
           as: "topicEnrollments",
-          include: [
-            { model: User, as: "student", attributes: ["ntid", "name"] },
-          ],
-          attributes: ["id"],
-        },
-      ],
+          include: [{ model: User, as: "student", attributes: ["ntid", "name"] }],
+          attributes: ["id"]
+        }
+      ]
     });
 
     // Build data
