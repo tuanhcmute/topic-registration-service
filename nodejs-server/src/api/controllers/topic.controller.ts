@@ -221,9 +221,9 @@ class TopicController {
       next(error);
     }
   }
-  public getAllTopicsRoleAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  public getAllTopics = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const data: IResponseModel<IListTopicResponse> = await topicService.getAllTopicsRoleAdmin();
+      const data: IResponseModel<IListTopicResponse> = await topicService.getAllTopics();
       res.status(StatusCodes.OK).json(data);
     } catch (err) {
       next(err);

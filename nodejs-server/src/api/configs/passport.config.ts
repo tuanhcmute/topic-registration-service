@@ -27,7 +27,7 @@ export const passportSetup = passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       const email = profile._json.email;
-      let ntid = uuidv4();
+      let ntid = profile._json.sub.substring(0, 7);
       if (email?.includes("@student.hcmute.edu.vn")) {
         ntid = email.substring(0, 7);
       }
