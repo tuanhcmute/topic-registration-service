@@ -9,4 +9,6 @@ public interface SemesterService {
     Response<List<SemesterDetailDTO>> getListSemester();
 
     Response<String> createNewSemester(SemesterRequest request);
+
+    Response<String> modifySemester(String semesterId, SemesterRequest request);
 }

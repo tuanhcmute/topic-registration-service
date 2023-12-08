@@ -8,6 +8,8 @@ import java.util.List;
 import org.springframework.web.bind.annotation.*;
 import com.bosch.topicregistration.api.response.Response;
 import org.springframework.security.access.prepost.PreAuthorize;
+
+import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
 
 @Slf4j
@@ -27,12 +29,23 @@ public class SemesterController {
         return semesterService.getListSemester();
     }
 
+    //    [POST] /api/v1/admin/semesters
     @PostMapping("/semesters")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @LoggerAround
     public Response<String> createNewSemester(@RequestBody SemesterRequest semesterRequest) {
-        System.out.println(semesterRequest.getName());
         return semesterService.createNewSemester(semesterRequest);
+    }
+
+    //    [PUT] /api/v1/admin/semesters
+    @PutMapping("/semesters")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @LoggerAround
+    public Response<String> modifySemester(@RequestParam("id") String id, @RequestBody SemesterRequest semesterRequest) {
+        if(id.isEmpty()) 
+            throw new BadRequestException("Semester id is empty");
+        return semesterService.modifySemester(id, semesterRequest);
     }
 }

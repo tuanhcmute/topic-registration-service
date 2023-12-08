@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -86,6 +87,53 @@ public class SemesterServiceImpl implements SemesterService {
             return Response.<String>builder()
                     .statusCode(HttpStatus.CREATED.value())
                     .message("New semester has been created successfully")
+                    .build();
+        } catch (Exception exception) {
+            throw new BadRequestException(exception.getMessage());
+        }
+    }
+
+    @Override
+    public Response<String> modifySemester(String semesterId, SemesterRequest request) {
+        try {
+            SemesterValidatorResult result = SemesterValidator
+                    .isNameValid()
+                    .and(SemesterValidator.isNameValid())
+                    .and(SemesterValidator.isStartDateValid())
+                    .and(SemesterValidator.isEndDateValid())
+                    .and(SemesterValidator.isStatusValid())
+                    .and(SemesterValidator.isTypeValid())
+                    .apply(request);
+
+            if (!result.equals(SemesterValidatorResult.VALID))
+                throw new BadRequestException(result.getMessage());
+                    
+            LocalDate currentDate = LocalDate.now();
+            if(request.getStartDate().compareTo(currentDate) == -1)
+                throw new BadRequestException("The start date cannot be less than the current date");
+
+            if(request.getEndDate().compareTo(request.getStartDate()) == -1)
+                throw new BadRequestException("The end date cannot be less than the start date");
+
+                
+
+            Optional<Semester> semesterOptional = semesterRepository.findById(semesterId);
+
+            if (!semesterOptional.isPresent()) 
+                throw new BadRequestException("Can not find Semester you need to update");
+
+            Semester semester = semesterOptional.get();
+            semester.setName(request.getName());
+            semester.setStartDate(request.getStartDate());
+            semester.setEndDate(request.getEndDate());
+            semester.setType(request.getType());
+            semester.setStatus(request.getStatus());
+
+            semesterRepository.save(semester);
+
+            return Response.<String>builder()
+                    .statusCode(HttpStatus.CREATED.value())
+                    .message("New semester has been updated successfully")
                     .build();
         } catch (Exception exception) {
             throw new BadRequestException(exception.getMessage());
