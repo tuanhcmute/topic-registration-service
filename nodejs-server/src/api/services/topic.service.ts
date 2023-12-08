@@ -496,6 +496,42 @@ class TopicService {
       .withData(data)
       .build();
   }
+
+  public async searchTopicsByTitle(title: string): Promise<IResponseModel<IListTopicResponse>> {
+    // Validate title
+    if (_.isNull(title) || _.isUndefined(title) || _.isEmpty(title))
+      throw new ValidateFailException("Title is not valid");
+
+    // Get topics
+    const topics = await Topic.findAll({
+      where: {
+        name: {
+          [Op.like]: `%${title}%`
+        }
+      },
+      include: [
+        {
+          model: User,
+          as: "lecture",
+          attributes: ["ntid", "name"]
+        },
+        {
+          model: TopicEnrollment,
+          as: "topicEnrollments",
+          include: [{ model: User, as: "student", attributes: ["ntid", "name"] }],
+          attributes: ["id"]
+        }
+      ]
+    });
+
+    // Build data
+    const data: IListTopicResponse = { topics };
+    return new ResponseModelBuilder<IListTopicResponse>()
+      .withStatusCode(StatusCodes.OK)
+      .withMessage("Topics have been successfully retrieved")
+      .withData(data)
+      .build();
+  }
 }
 
 export default new TopicService();

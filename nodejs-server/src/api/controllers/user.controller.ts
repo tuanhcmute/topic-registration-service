@@ -6,7 +6,7 @@ import { plainToInstance } from "class-transformer";
 import multer, { Multer } from "multer";
 
 import { userService } from "@services";
-import { ResponseModelBuilder, UpdatedBio } from "@interfaces";
+import { ResponseModelBuilder, UpdatedBio, UserRequest } from "@interfaces";
 import { ValidateFailException } from "@exceptions";
 import { logger, storage } from "@configs";
 
@@ -99,6 +99,48 @@ class UserController {
       res.status(StatusCodes.OK).json("ok");
     } catch (error) {
       logger.error({ error });
+      next(error);
+    }
+  }
+
+  public async findUserByName(req: Request, res: Response, next: NextFunction) {
+    try {
+      const name = req.query["name"] as string;
+      if (_.isNull(name) || _.isUndefined(name) || _.isEmpty(name))
+        throw new ValidateFailException("Name is not valid");
+      res.status(StatusCodes.OK).json(await userService.findUserByName(name));
+    } catch (error) {
+      logger.error({ error });
+      next(error);
+    }
+  }
+
+  public async createUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = req.body;
+      const requestData = plainToInstance(UserRequest, user);
+
+      const errors = await validate(requestData);
+      if (errors.length > 0) {
+        const firstError = errors[0];
+        const errorMessage = firstError.constraints
+          ? Object.values(firstError.constraints)[0]
+          : "No error message available";
+
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .json(new ResponseModelBuilder().withMessage(errorMessage).withStatusCode(StatusCodes.BAD_REQUEST).build());
+      }
+
+      const result = await userService.createUser(user);
+      if (result) {
+        return res
+          .status(StatusCodes.CREATED)
+          .json(
+            new ResponseModelBuilder().withMessage("Create user successfully.").withStatusCode(StatusCodes.OK).build()
+          );
+      }
+    } catch (error) {
       next(error);
     }
   }

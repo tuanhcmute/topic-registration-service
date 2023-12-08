@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import _ from "lodash";
-
+import { Op } from "sequelize";
+import { Transaction } from "sequelize";
 import { User, Major, Clazz, UserRole, Role, UserRoleInstance, TopicEnrollment } from "@models";
 import { UserNotFoundException, ErrorMessages, ValidateFailException } from "@exceptions";
 import {
@@ -9,9 +10,11 @@ import {
   IResponseModel,
   IUserProfile,
   IListUserResponse,
-  ResponseModelBuilder
+  ResponseModelBuilder,
+  UserRequest
 } from "@interfaces";
 import { RoleCode } from "@configs/constants";
+import { db } from "@configs";
 
 class UserService {
   public getStudentsNotEnrolledInTopic = async (): Promise<IResponseModel<IListStudent>> => {
@@ -198,6 +201,104 @@ class UserService {
         .build();
     } catch (error) {
       console.log(error);
+      throw error;
+    }
+  }
+
+  public async findUserByName(name: string): Promise<IResponseModel<IListUserResponse>> {
+    try {
+      const users = await User.findAll({
+        where: {
+          name: {
+            [Op.like]: `%${name}%`
+          }
+        },
+        attributes: ["ntid", "name", "email", "biography", "clazzId", "majorId"],
+        include: [
+          {
+            model: Major,
+            as: "major",
+            attributes: ["code", "name"]
+          },
+          {
+            model: Clazz,
+            as: "clazz",
+            attributes: ["code", "description"]
+          },
+          {
+            model: UserRole,
+            as: "userRoles",
+            include: [{ model: Role, as: "role", attributes: ["code"] }],
+            attributes: ["id"]
+          }
+        ]
+      });
+
+      const data: IListUserResponse = { users };
+
+      return new ResponseModelBuilder<IListUserResponse>()
+        .withMessage("Users have been successfully retrieved")
+        .withStatusCode(StatusCodes.OK)
+        .withData(data)
+        .build();
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  public async createUser(user: UserRequest): Promise<boolean> {
+    const t: Transaction = await db.transaction(); // assuming 'sequelize' is your Sequelize instance
+
+    try {
+      // Check for existing user with the same ntid or email
+      const existingUser = await User.findOne({
+        where: {
+          [Op.or]: [{ ntid: user.ntid }, { email: user.email }]
+        },
+        transaction: t
+      });
+
+      if (existingUser) {
+        throw new ValidateFailException("NTID or Email already exists"); // Throw error for duplicate entry
+      }
+
+      const role = await Role.findOne({
+        where: {
+          code: user.role
+        },
+        transaction: t
+      });
+
+      if (!role) {
+        throw new ValidateFailException("Role not found"); // Throw error if role does not exist
+      }
+
+      const userInstance = await User.create(
+        {
+          ntid: user.ntid,
+          email: user.email,
+          name: user.name,
+          majorId: user.majorId,
+          biography: user.biography
+        },
+        { transaction: t }
+      );
+
+      const userRole = await UserRole.create(
+        {
+          userId: userInstance.id || "",
+          roleId: role.id || ""
+        },
+        { transaction: t }
+      );
+
+      await t.commit(); // Commit the transaction if all operations are successful
+
+      return true;
+    } catch (error) {
+      await t.rollback(); // Rollback the transaction on error
+      console.error("Error in createUser:", error);
       throw error;
     }
   }
