@@ -29,7 +29,7 @@ public class SemesterController {
 
     @PostMapping("/semesters")
     @ResponseStatus(HttpStatus.OK)
-    // @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @LoggerAround
     public Response<String> createNewSemester(@RequestBody SemesterRequest semesterRequest) {
         System.out.println(semesterRequest.getName());
