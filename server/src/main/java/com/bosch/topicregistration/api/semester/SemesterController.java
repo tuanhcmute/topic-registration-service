@@ -26,4 +26,13 @@ public class SemesterController {
     public Response<List<SemesterDetailDTO>> getListSemester() {
         return semesterService.getListSemester();
     }
+
+    @PostMapping("/semesters")
+    @ResponseStatus(HttpStatus.OK)
+    // @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @LoggerAround
+    public Response<String> createNewSemester(@RequestBody SemesterRequest semesterRequest) {
+        System.out.println(semesterRequest.getName());
+        return semesterService.createNewSemester(semesterRequest);
+    }
 }

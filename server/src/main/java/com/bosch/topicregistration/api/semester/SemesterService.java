@@ -7,4 +7,6 @@ public interface SemesterService {
     Semester getActivatedSemester();
 
     Response<List<SemesterDetailDTO>> getListSemester();
+
+    Response<String> createNewSemester(SemesterRequest request);
 }
