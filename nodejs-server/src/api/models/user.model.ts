@@ -22,7 +22,7 @@ interface UserAttributes {
   updatedDate?: Date;
   clazzId?: string;
   majorId?: string;
-  emailVerified: boolean;
+  emailVerified?: boolean;
 }
 
 interface UserInstance extends Model<UserAttributes>, UserAttributes {

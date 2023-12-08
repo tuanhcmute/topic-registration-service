@@ -64,6 +64,13 @@ class TopicRoutes implements IRoutes {
       preAuthorizeFilter([RoleCode.ROLE_ADMIN]),
       topicController.getAllTopicsRoleAdmin
     );
+
+    // [GET]
+    this.router.get(
+      `${this.path}/admin/search`,
+      preAuthorizeFilter([RoleCode.ROLE_ADMIN]),
+      topicController.searchTopicsByTitle
+    );
   }
 }
 
