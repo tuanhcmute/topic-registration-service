@@ -229,6 +229,17 @@ class TopicController {
       next(err);
     }
   };
+  public async searchTopicsByTitle(req: Request, res: Response, next: NextFunction) {
+    try {
+      const title = req.query["title"] as string;
+      if (_.isNull(title) || _.isUndefined(title) || _.isEmpty(title))
+        throw new ValidateFailException("Title is not valid");
+      res.status(StatusCodes.OK).json(await topicService.searchTopicsByTitle(title));
+    } catch (error) {
+      logger.error({ error });
+      next(error);
+    }
+  }
 }
 
 export default new TopicController();

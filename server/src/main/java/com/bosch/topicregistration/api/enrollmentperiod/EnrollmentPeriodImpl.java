@@ -3,6 +3,8 @@ package com.bosch.topicregistration.api.enrollmentperiod;
 import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
 import com.bosch.topicregistration.api.response.Response;
+import com.bosch.topicregistration.api.semester.Semester;
+import com.bosch.topicregistration.api.semester.SemesterRepository;
 import com.bosch.topicregistration.api.semester.SemesterStatus;
 import com.bosch.topicregistration.api.topic.Topic;
 import com.bosch.topicregistration.api.topic.TopicRepository;
@@ -32,6 +34,7 @@ public class EnrollmentPeriodImpl implements EnrollmentPeriodService {
     private final TopicRepository topicRepository;
     private final UserRepository userRepository;
     private final TopicEnrollmentRepository topicEnrollmentRepository;
+    private final SemesterRepository semesterRepository;
 
     @Override
     @LoggerAround
@@ -93,7 +96,6 @@ public class EnrollmentPeriodImpl implements EnrollmentPeriodService {
         if (!result.equals(TopicRegistrationValidatorResult.VALID))
             throw new BadRequestException(result.getMessage());
 
-
         TopicEnrollment topicEnrollment = new TopicEnrollment();
         String topicId = newTopicRegistration.getTopicCode();
         Optional<Topic> topicOptional = topicRepository.findById(topicId);
@@ -102,7 +104,6 @@ public class EnrollmentPeriodImpl implements EnrollmentPeriodService {
             throw new BadRequestException("Topic could not be found");
         Topic topic = topicOptional.get();
 
-
         List<Map<String, String>> stduentIDs = newTopicRegistration.getStudents();
         // Check list request with max slot in topic
         if (stduentIDs.size() > topic.getMaxSlot())
@@ -110,7 +111,7 @@ public class EnrollmentPeriodImpl implements EnrollmentPeriodService {
 
         stduentIDs.stream().map(item -> item.get("code"))
                 .forEach(item -> {
-                    //  Check user
+                    // Check user
                     Optional<User> userOptional = userRepository.findByEmail(item.concat("@student.hcmute.edu.vn"));
                     if (!userOptional.isPresent())
                         throw new BadRequestException("Student could not be found");
@@ -125,12 +126,35 @@ public class EnrollmentPeriodImpl implements EnrollmentPeriodService {
                     // Student registration new topic
                     topicEnrollmentRepository.save(topicEnrollment);
                 });
-        //  Update topic status
+        // Update topic status
         topic.setStatus(TopicStatus.UPDATED);
         topicRepository.save(topic);
         return Response.<EnrollmentPeriodDTO>builder()
                 .message("The student has successfully enrolled")
                 .statusCode(HttpStatus.OK.value())
+                .build();
+    }
+
+    @Override
+    public Response<Set<EnrollmentPeriodDTO>> getListEnrollmentPeriodBySemester(String semesterId) {
+        Optional<Semester> semesterOptional = semesterRepository.findById(semesterId);
+        if (!semesterOptional.isPresent())
+            throw new BadRequestException("Semester could not be found");
+
+        Semester semester = semesterOptional.get();
+        Set<EnrollmentPeriod> enrollmentPeriods = semester.getEnrollmentPeriods();
+
+        if (enrollmentPeriods.size() == 0)
+            throw new BadRequestException("Enrollment period could not be found");
+
+        Set<EnrollmentPeriodDTO> enrollmentPeriodDTOs = enrollmentPeriodMapper.toSetDTO(enrollmentPeriods);
+        Map<String, Set<EnrollmentPeriodDTO>> data = new HashMap<>();
+        data.put("enrollmentPeriods", enrollmentPeriodDTOs);
+
+        return Response.<Set<EnrollmentPeriodDTO>>builder()
+                .message("Get enrollment periods successfull")
+                .statusCode(HttpStatus.OK.value())
+                .data(data)
                 .build();
     }
 }

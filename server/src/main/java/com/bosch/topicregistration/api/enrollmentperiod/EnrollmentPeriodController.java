@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
+import java.util.Set;
 
 import static com.bosch.topicregistration.api.enrollmentperiod.TopicRegistrationValidator.*;
 
@@ -51,5 +52,16 @@ public class EnrollmentPeriodController {
         if (!result.equals(TopicRegistrationValidatorResult.VALID))
             throw new BadRequestException(result.getMessage());
         return enrollmentPeriodService.registrationTopic(newTopicRegistration);
+    }
+
+    @GetMapping("/get")
+    @ResponseStatus(HttpStatus.OK)
+    // @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE')")
+    @LoggerAround
+    public Response<Set<EnrollmentPeriodDTO>> getListEnrollmentPeriodBySemester(@RequestParam("semesterId") String semesterId) {
+        if(semesterId.isEmpty())
+            throw new BadRequestException("Semester id is empty");
+
+        return enrollmentPeriodService.getListEnrollmentPeriodBySemester(semesterId);
     }
 }
