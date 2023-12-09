@@ -14,7 +14,7 @@ import {
   UserRequest
 } from "@interfaces";
 import { RoleCode } from "@configs/constants";
-import { db } from "@configs";
+import { db, logger } from "@configs";
 
 class UserService {
   public getStudentsNotEnrolledInTopic = async (): Promise<IResponseModel<IListStudent>> => {
@@ -114,21 +114,14 @@ class UserService {
     return true;
   };
 
-  public async getLecturesByMajor(majorCodeRequest: string): Promise<IResponseModel<IListLecture>> {
-    // Validate Major code
-    if (_.isNull(majorCodeRequest) || _.isUndefined(majorCodeRequest) || _.isEmpty(majorCodeRequest))
-      throw new ValidateFailException("Major code is not valid");
-
-    // Validate major
-    const major = await Major.findOne({ where: { code: majorCodeRequest } });
-    if (_.isNull(major)) throw new ValidateFailException("Major could not be found");
+  public async getAllLectures(): Promise<IResponseModel<IListLecture>> {
     // Get and validate role
     const lectureRole = await Role.findOne({
       where: {
         code: RoleCode.ROLE_LECTURE
       }
     });
-    if (_.isNull(lectureRole)) throw new ValidateFailException("Student role could not be found");
+    if (_.isNull(lectureRole)) throw new ValidateFailException("Lecture role could not be found");
 
     // Get lectures
     const userRoles = await UserRole.findAll({
@@ -139,7 +132,14 @@ class UserService {
         {
           model: User,
           as: "user",
-          attributes: ["ntid", "name"]
+          attributes: ["ntid", "name", "imageUrl"],
+          include: [
+            {
+              model: Major,
+              as: "major",
+              attributes: ["name", "code"]
+            }
+          ]
         }
       ],
       attributes: ["userId"],
@@ -152,8 +152,7 @@ class UserService {
     for (const item of userRoles) {
       const user = await User.findOne({
         where: {
-          id: item.userId,
-          majorId: major.id
+          id: item.userId
         }
       });
       if (!_.isNull(user)) filterLectures.push(item);
@@ -260,7 +259,7 @@ class UserService {
       });
 
       if (existingUser) {
-        throw new ValidateFailException("NTID or Email already exists"); // Throw error for duplicate entry
+        throw new ValidateFailException("Ntid or email already exists"); // Throw error for duplicate entry
       }
 
       const role = await Role.findOne({
@@ -279,13 +278,13 @@ class UserService {
           ntid: user.ntid,
           email: user.email,
           name: user.name,
-          majorId: user.majorId,
+          // majorId: user.majorId,
           biography: user.biography
         },
         { transaction: t }
       );
 
-      const userRole = await UserRole.create(
+      await UserRole.create(
         {
           userId: userInstance.id || "",
           roleId: role.id || ""
@@ -298,7 +297,7 @@ class UserService {
       return true;
     } catch (error) {
       await t.rollback(); // Rollback the transaction on error
-      console.error("Error in createUser:", error);
+      logger.error("Error in createUser:", error);
       throw error;
     }
   }

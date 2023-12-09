@@ -9,13 +9,11 @@ import { StatusCodes } from "http-status-codes";
 import _ from "lodash";
 
 class EnrollmentPeriodController {
-  public async getEnrollmentPeriod(req: Request, res: Response, next: NextFunction): Promise<void> {
+  public async getActivatedEnrollmentPeriod(req: Request, res: Response, next: NextFunction): Promise<void> {
     const topicType = req.query?.type as string;
-    const period = req.query?.period as string;
     if (_.isNull(topicType) || _.isUndefined(topicType)) throw new ValidateFailException("Type parameter is empty");
-    if (_.isNull(period) || _.isUndefined(period)) throw new ValidateFailException("Period parameter is empty");
     try {
-      res.status(StatusCodes.OK).json(await enrollmentPeriodService.getEnrollmentPeriod(topicType, period));
+      res.status(StatusCodes.OK).json(await enrollmentPeriodService.getActivatedEnrollmentPeriod(topicType));
     } catch (error) {
       next(error);
     }
