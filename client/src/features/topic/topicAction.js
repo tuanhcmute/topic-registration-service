@@ -3,6 +3,7 @@ import { HttpStatusCode } from "axios";
 import { toast } from "react-toastify";
 import { topicService } from "../../services";
 import { topicType } from "../../utils/constants";
+import { fetchStudentsNotEnrolledInTopic } from "../user";
 
 export const namespace = "topic";
 
@@ -21,16 +22,19 @@ export const fetchAllTopicsInLectureEnrollmentPeriod = createAsyncThunk(
 
 export const createNewTopicInLectureEnrollmentPeriod = createAsyncThunk(
   `${namespace}/createNewTopicInLectureEnrollmentPeriod`,
-  async ({ data, type, setOpenModal }, { dispatch }) => {
+  async ({ data, type, setOpenModal }, { dispatch, rejectWithValue }) => {
     const response = await topicService.createNewTopicInLectureEnrollmentPeriod(
       data
     );
     if (response.data?.statusCode === HttpStatusCode.Created) {
-      dispatch(fetchAllTopicsInLectureEnrollmentPeriod(type));
-      setOpenModal(undefined);
       toast.success("Tạo mới đề tài thành công");
+      dispatch(fetchAllTopicsInLectureEnrollmentPeriod(type));
+      dispatch(fetchStudentsNotEnrolledInTopic());
+      setOpenModal(undefined);
+      return response.data;
     }
-    return response.data;
+    toast.error("Tạo mới đề tài thất bại");
+    return rejectWithValue(response?.data);
   }
 );
 
@@ -44,6 +48,7 @@ export const updateTopicInLectureEnrollmentPeriod = createAsyncThunk(
       if (setOpenEditTopicModal) setOpenEditTopicModal(undefined);
       toast.success("Cập nhật đề tài thành công");
       dispatch(fetchAllTopicsInLectureEnrollmentPeriod(type));
+      dispatch(fetchStudentsNotEnrolledInTopic());
     }
   }
 );
@@ -101,7 +106,16 @@ export const fetchAllApprovedTopicsInStudentEnrollmentPeriod = createAsyncThunk(
   async ({ type }, { rejectWithValue }) => {
     const response =
       await topicService.fetchAllApprovedTopicsInStudentEnrollmentPeriod(type);
-    if (response?.data?.statusCode === HttpStatusCode.BadRequest)
+    if (response?.data?.statusCode === HttpStatusCode.Ok) return response?.data;
+    return rejectWithValue(response.data);
+  }
+);
+
+export const fetchAllTopics = createAsyncThunk(
+  `${namespace}/fetchAllTopics`,
+  async (data, { rejectWithValue }) => {
+    const response = await topicService.fetchAllTopics();
+    if (response?.data?.statusCode !== HttpStatusCode.Ok)
       return rejectWithValue(response.data);
     return response?.data;
   }

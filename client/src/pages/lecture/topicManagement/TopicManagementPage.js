@@ -8,11 +8,7 @@ import _ from "lodash";
 
 import EnrollTopicModal from "./components/EnrollTopicModal";
 import EditTopicModal from "./components/EditTopicModal";
-import {
-  enrollmentPeriodCode,
-  topicStatus,
-  topicType,
-} from "../../../utils/constants";
+import { topicStatus, topicType } from "../../../utils/constants";
 import { Dropdown } from "../../../components/dropdown1";
 import ApprovalTopicModal from "./components/ApprovalTopicModal";
 import {
@@ -21,7 +17,7 @@ import {
   updateTopicInLectureEnrollmentPeriod,
 } from "../../../features/topic";
 import { fetchStudentsNotEnrolledInTopic } from "../../../features/user";
-import { fetchEnrollmentPeriodByTopicTypeAndPeriodCode } from "../../../features/enrollmentPeriod";
+import { fetchActivatedEnrollmentPeriod } from "../../../features/enrollmentPeriod";
 
 function TopicManagementPage() {
   const [openModal, setOpenModal] = useState(undefined);
@@ -84,9 +80,8 @@ function TopicManagementPage() {
       _.isUndefined(enrollmentPeriod)
     ) {
       dispatch(
-        fetchEnrollmentPeriodByTopicTypeAndPeriodCode({
+        fetchActivatedEnrollmentPeriod({
           topicType: topicType.TLCN,
-          periodCode: enrollmentPeriodCode.LECTURE_ENROLLMENT_PERIOD,
         })
       );
     }
@@ -222,7 +217,7 @@ function TopicManagementPage() {
                                   className={`${statusColor} py-1 px-3 text-sm font-medium rounded dark:text-black-pearl`}
                                 >
                                   {
-                                    topicStatus?.[item?.status.toLowerCase()]
+                                    topicStatus?.[item?.status?.toLowerCase()]
                                       ?.label
                                   }
                                 </span>

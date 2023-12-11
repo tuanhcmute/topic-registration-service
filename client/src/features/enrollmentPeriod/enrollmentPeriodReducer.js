@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   createEnrollmentPeriod,
   fetchEnrollmentPeriodBySemesterId,
-  fetchEnrollmentPeriodByTopicTypeAndPeriodCode,
+  fetchActivatedEnrollmentPeriod,
   namespace,
   resetEnrollmentPeriodState,
   updateEnrollmentPeriod,
@@ -22,7 +22,7 @@ export const enrollmentPeriodSlide = createSlice({
   extraReducers: (builder) => {
     // fetchEnrollmentPeriodByTopicTypeAndPeriodCode
     builder.addCase(
-      fetchEnrollmentPeriodByTopicTypeAndPeriodCode.fulfilled,
+      fetchActivatedEnrollmentPeriod.fulfilled,
       (state, action) => {
         return {
           ...state,
@@ -34,7 +34,7 @@ export const enrollmentPeriodSlide = createSlice({
       }
     );
     builder.addCase(
-      fetchEnrollmentPeriodByTopicTypeAndPeriodCode.rejected,
+      fetchActivatedEnrollmentPeriod.rejected,
       (state, action) => {
         return {
           ...state,
@@ -45,18 +45,15 @@ export const enrollmentPeriodSlide = createSlice({
         };
       }
     );
-    builder.addCase(
-      fetchEnrollmentPeriodByTopicTypeAndPeriodCode.pending,
-      (state) => {
-        return {
-          ...state,
-          enrollmentPeriod: {},
-          message: "",
-          statusCode: null,
-          loading: false,
-        };
-      }
-    );
+    builder.addCase(fetchActivatedEnrollmentPeriod.pending, (state) => {
+      return {
+        ...state,
+        enrollmentPeriod: {},
+        message: "",
+        statusCode: null,
+        loading: false,
+      };
+    });
     // resetEnrollmentPeriodState
     builder.addCase(resetEnrollmentPeriodState.fulfilled, () => {
       return initialState;

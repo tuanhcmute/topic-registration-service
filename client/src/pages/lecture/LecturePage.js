@@ -1,11 +1,21 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { TextInput, Label, Button } from "flowbite-react";
 
 import { Banner } from "../../components/banner";
+import _ from "lodash";
+import { fetchAllLectures } from "../../features/user";
 
 function LecturePage() {
-  const currentUser = useSelector((state) => state.user?.currentUser);
+  const lectures = useSelector((state) => state?.user?.lectures);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // Fetch lectures
+    if (_.isEmpty(lectures) || _.isNull(lectures) || _.isUndefined(lectures)) {
+      dispatch(fetchAllLectures());
+    }
+  }, []);
 
   return (
     <React.Fragment>
@@ -36,40 +46,28 @@ function LecturePage() {
           <Button color='gray'>Tìm kiếm</Button>
         </div>
         <div className='grid xl:grid-cols-4 lg:grid-cols-3 grid-cols-1 sm:grid-cols-2 gap-3 w-full'>
-          {[...Array(10).keys()].map((item) => {
+          {lectures?.map((item) => {
             return (
               <div className='flex flex-col items-center dark:bg-sambuca py-5 px-3 rounded bg-whiteSmoke gap-2 cursor-pointer'>
                 {/* Image */}
                 <img
-                  src={currentUser?.imageUrl}
+                  src={
+                    item?.user?.imageUrl ||
+                    "https://portal.staralliance.com/cms/aux-pictures/prototype-images/avatar-default.png/@@images/image.png"
+                  }
                   alt=''
                   className='w-32 h-32 object-cover rounded-full'
                 />
                 {/* Major */}
                 <p className='text-sm font-bold text-primary dark:text-gray-300'>
-                  Giảng viên - {currentUser?.major?.name}
+                  Giảng viên - {item?.user?.major?.name}
                 </p>
                 <p className='text-sm font-bold text-primary dark:text-gray-300'>
-                  {currentUser?.name}
+                  {item?.user?.name}
                 </p>
               </div>
             );
           })}
-          <div className='flex flex-col items-center dark:bg-sambuca py-5 px-3 rounded bg-whiteSmoke gap-2 cursor-pointer'>
-            {/* Image */}
-            <img
-              src={currentUser?.imageUrl}
-              alt=''
-              className='w-32 h-32 object-cover rounded-full'
-            />
-            {/* Major */}
-            <p className='text-sm font-bold text-primary dark:text-gray-300'>
-              Giảng viên - {currentUser?.major?.name}
-            </p>
-            <p className='text-sm font-bold text-primary dark:text-gray-300'>
-              {currentUser?.name}
-            </p>
-          </div>
         </div>
       </div>
       {/* End banner */}

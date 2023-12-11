@@ -25,6 +25,13 @@ class DivisionRoutes implements IRoutes {
       preAuthorizeFilter([RoleCode.ROLE_HEAD]),
       divisionController.createDivisionByTopicType
     );
+
+    // [GET] /api/v1/division
+    this.router.get(
+      `${this.path}/:topicId`,
+      preAuthorizeFilter([RoleCode.ROLE_LECTURE, RoleCode.ROLE_ADMIN, RoleCode.ROLE_STUDENT]),
+      divisionController.getDivisionByTopic
+    );
   }
 }
 

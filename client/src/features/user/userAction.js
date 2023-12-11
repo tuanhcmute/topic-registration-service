@@ -22,10 +22,10 @@ export const removeUserInfo = createAsyncThunk(
   }
 );
 
-export const fetchLecturesByMajor = createAsyncThunk(
-  `${namespace}/fetchLecturesByMajor`,
+export const fetchAllLectures = createAsyncThunk(
+  `${namespace}/fetchAllLectures`,
   async (majorCode, { rejectWithValue }) => {
-    const response = await userService.fetchLecturesByMajor(majorCode);
+    const response = await userService.fetchAllLectures();
     if (response.data?.statusCode === HttpStatusCode.BadRequest)
       return rejectWithValue(response?.data);
     return response.data;
@@ -35,7 +35,7 @@ export const fetchLecturesByMajor = createAsyncThunk(
 export const fetchStudentsNotEnrolledInTopic = createAsyncThunk(
   `${namespace}/fetchStudentsNotEnrolledInTopic`,
   async (data, { rejectWithValue }) => {
-    const response = await userService.getStudentsNotEnrolledInTopic();
+    const response = await userService.fetchStudentsNotEnrolledInTopic();
     if (response.data?.statusCode !== HttpStatusCode.Ok)
       return rejectWithValue(response?.data);
     return response?.data;
@@ -80,5 +80,20 @@ export const fetchAllUsers = createAsyncThunk(
     if (response.data?.statusCode !== HttpStatusCode.Ok)
       return rejectWithValue(response?.data);
     return response.data;
+  }
+);
+
+export const createUser = createAsyncThunk(
+  `${namespace}/createUser`,
+  async ({ data, setOpenAddUserModal }, { rejectWithValue, dispatch }) => {
+    const response = await userService.createUser(data);
+    if (response.data?.statusCode === HttpStatusCode.Created) {
+      dispatch(fetchAllUsers());
+      setOpenAddUserModal(undefined);
+      toast.success("Thêm mới người dùng thành công");
+      return response.data;
+    }
+    toast.error("Thêm mới người dùng thất bại");
+    return rejectWithValue(response?.data);
   }
 );

@@ -1,13 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { namespace } from "../division";
 import {
   fetchAllUsers,
-  fetchLecturesByMajor,
+  fetchAllLectures,
   fetchStudentsNotEnrolledInTopic,
   fetchUserInfo,
   removeUserInfo,
   updateAvatarInUserProfile,
   updateBiographyInUserProfile,
+  namespace,
+  createUser,
 } from "./userAction";
 
 const initialState = {
@@ -78,7 +79,7 @@ export const userSlice = createSlice({
       };
     });
     // fetchLecturesByMajor
-    builder.addCase(fetchLecturesByMajor.fulfilled, (state, action) => {
+    builder.addCase(fetchAllLectures.fulfilled, (state, action) => {
       return {
         ...state,
         lectures: action.payload?.data?.lectures,
@@ -87,7 +88,7 @@ export const userSlice = createSlice({
         loading: false,
       };
     });
-    builder.addCase(fetchLecturesByMajor.rejected, (state, action) => {
+    builder.addCase(fetchAllLectures.rejected, (state, action) => {
       return {
         ...state,
         lectures: [],
@@ -96,7 +97,7 @@ export const userSlice = createSlice({
         loading: false,
       };
     });
-    builder.addCase(fetchLecturesByMajor.pending, (state) => {
+    builder.addCase(fetchAllLectures.pending, (state) => {
       return {
         ...state,
         lectures: [],
@@ -110,8 +111,8 @@ export const userSlice = createSlice({
       fetchStudentsNotEnrolledInTopic.fulfilled,
       (state, action) => {
         const data = action.payload?.data?.students?.map((item) => ({
-          value: item?.ntid,
-          label: item?.name,
+          value: item?.user?.ntid,
+          label: item?.user?.name,
         }));
         return {
           ...state,
@@ -215,6 +216,31 @@ export const userSlice = createSlice({
       return {
         ...state,
         users: [],
+        message: action.payload?.data?.message,
+        statusCode: action.payload?.data?.statusCode,
+        loading: false,
+      };
+    });
+    // createUser
+    builder.addCase(createUser.fulfilled, (state, action) => {
+      return {
+        ...state,
+        message: action.payload?.data?.message,
+        statusCode: action.payload?.data?.statusCode,
+        loading: false,
+      };
+    });
+    builder.addCase(createUser.pending, (state) => {
+      return {
+        ...state,
+        loading: true,
+        statusCode: null,
+        message: "",
+      };
+    });
+    builder.addCase(createUser.rejected, (state, action) => {
+      return {
+        ...state,
         message: action.payload?.data?.message,
         statusCode: action.payload?.data?.statusCode,
         loading: false,

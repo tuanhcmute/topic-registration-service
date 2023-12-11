@@ -3,8 +3,8 @@ import axiosClient from "./axiosClient";
 
 const baseUrl = "/enrollment-period";
 const enrollmentPeriodService = {
-  getEnrollmentPeriodByTopicTypeAndPeriodCode: (topicType, periodCode) => {
-    const requestUrl = `${baseUrl}?type=${topicType}&period=${periodCode}`;
+  fetchActivatedEnrollmentPeriod: (topicType) => {
+    const requestUrl = `${baseUrl}?type=${topicType}`;
     return axiosClient.get(requestUrl);
   },
   fetchEnrollmentPeriodBySemesterId: (semesterId) => {

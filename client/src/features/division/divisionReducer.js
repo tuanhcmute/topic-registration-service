@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   createDivisionByTopicType,
+  fetchDivisionByTopic,
   fetchDivisionByTopicType,
   namespace,
   resetDivisionState,
@@ -62,6 +63,34 @@ export const divisionSlice = createSlice({
       };
     });
     builder.addCase(fetchDivisionByTopicType.rejected, (state, action) => {
+      return {
+        ...state,
+        divisions: [],
+        message: action.payload?.data?.message,
+        statusCode: action.payload?.data?.statusCode,
+        loading: false,
+      };
+    });
+    // fetchDivisionByTopic
+    builder.addCase(fetchDivisionByTopic.fulfilled, (state, action) => {
+      return {
+        ...state,
+        divisions: action.payload?.data?.divisions,
+        message: action.payload?.message,
+        statusCode: action.payload?.statusCode,
+        loading: false,
+      };
+    });
+    builder.addCase(fetchDivisionByTopic.pending, (state) => {
+      return {
+        ...state,
+        message: "",
+        divisions: [],
+        statusCode: null,
+        loading: true,
+      };
+    });
+    builder.addCase(fetchDivisionByTopic.rejected, (state, action) => {
       return {
         ...state,
         divisions: [],

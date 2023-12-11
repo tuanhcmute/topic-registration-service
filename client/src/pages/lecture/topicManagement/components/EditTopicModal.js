@@ -33,16 +33,15 @@ function EditTopicModal(props) {
     (state) => state.enrollmentPeriod?.enrollmentPeriod
   );
   const currentUser = useSelector((state) => state.user?.currentUser);
-  const [initialValues, setInitialValues] = useState({
-    id: "",
-    maxSlot: 0,
-    topicName: "",
-    goal: "",
-    requirement: "",
-    students: [],
-  });
   const formik = useFormik({
-    initialValues,
+    initialValues: {
+      id: "",
+      maxSlot: 0,
+      topicName: "",
+      goal: "",
+      requirement: "",
+      students: [],
+    },
     enableReinitialize: true,
     onSubmit: (values) => {
       handleUpdateTopic(values);
@@ -54,10 +53,10 @@ function EditTopicModal(props) {
     if (props.length < 2) return;
     const option = props[1];
     if (option?.action === "remove-value") {
-      const isExist = data?.students?.some((item) =>
-        _.isEqual(item?.ntid, option?.removedValue?.value)
+      const isExist = data?.topicEnrollments?.some((item) =>
+        _.isEqual(item?.student?.ntid, option?.removedValue?.value)
       );
-      console.log(isExist);
+      console.log({ isExist });
       if (isExist) dispatch(deleteTopicEnrollment(option?.removedValue?.value));
     }
     if (props[0]?.length > formik.values.maxSlot) {
@@ -68,7 +67,7 @@ function EditTopicModal(props) {
   }
 
   useEffect(() => {
-    setInitialValues({
+    formik.setValues({
       id: data?.id,
       topicName: data?.name,
       goal: data?.goal,
@@ -76,9 +75,9 @@ function EditTopicModal(props) {
       maxSlot: data?.maxSlot,
     });
     setSelectedOptions(
-      data?.students?.map((item) => ({
-        label: item?.name,
-        value: item?.ntid,
+      data?.topicEnrollments?.map((item) => ({
+        label: item?.student?.name,
+        value: item?.student?.ntid,
       }))
     );
     setDisabled(

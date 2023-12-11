@@ -1,6 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { HttpStatusCode } from "axios";
-import { toast } from "react-toastify";
 import {
   namespace,
   approveTopicInLectureEnrollmentPeriod,
@@ -11,6 +9,7 @@ import {
   resetTopicState,
   updateTopicInLectureEnrollmentPeriod,
   fetchAllApprovedTopicsInStudentEnrollmentPeriod,
+  fetchAllTopics,
 } from "./topicAction";
 
 const initialState = {
@@ -70,22 +69,19 @@ export const topicSlide = createSlice({
         return {
           ...state,
           loading: true,
+          message: "",
+          statusCode: null,
         };
       }
     );
     builder.addCase(
       createNewTopicInLectureEnrollmentPeriod.fulfilled,
       (state, action) => {
-        if (action.payload?.statusCode === HttpStatusCode.Created) {
-          toast.success("Tạo đề tài thành công");
-        }
-        if (action.payload?.statusCode === HttpStatusCode.BadRequest) {
-          toast.error("Đã có lỗi xảy ra, vui lòng kiểm tra lại thông tin");
-        }
         return {
           ...state,
           message: action.payload?.message,
           loading: false,
+          statusCode: action?.payload?.statusCode,
         };
       }
     );
@@ -96,6 +92,7 @@ export const topicSlide = createSlice({
           ...state,
           message: action.payload?.message,
           loading: false,
+          statusCode: action?.payload?.statusCode,
         };
       }
     );
@@ -104,20 +101,17 @@ export const topicSlide = createSlice({
       return {
         ...state,
         loading: true,
+        message: "",
+        statusCode: null,
       };
     });
     builder.addCase(
       updateTopicInLectureEnrollmentPeriod.fulfilled,
       (state, action) => {
-        if (action.payload?.statusCode === HttpStatusCode.Ok) {
-          toast.success("Chỉnh sửa đề tài thành công");
-        }
-        if (action.payload?.statusCode === HttpStatusCode.BadRequest) {
-          toast.error("Đã có lỗi xảy ra, vui lòng kiểm tra lại thông tin");
-        }
         return {
           ...state,
           message: action.payload?.message,
+          statusCode: action?.payload?.statusCode,
           loading: false,
         };
       }
@@ -128,6 +122,7 @@ export const topicSlide = createSlice({
         return {
           ...state,
           message: action.payload?.message,
+          statusCode: action?.payload?.statusCode,
           loading: false,
         };
       }
@@ -277,6 +272,33 @@ export const topicSlide = createSlice({
         };
       }
     );
+    // fetchAllTopics
+    builder.addCase(fetchAllTopics.pending, (state) => {
+      return {
+        ...state,
+        topics: [],
+        message: "",
+        statusCode: null,
+        loading: true,
+      };
+    });
+    builder.addCase(fetchAllTopics.fulfilled, (state, action) => {
+      return {
+        ...state,
+        topics: action.payload?.data?.topics,
+        message: action.payload?.message,
+        statusCode: action.payload?.statusCode,
+        loading: false,
+      };
+    });
+    builder.addCase(fetchAllTopics.rejected, (state, action) => {
+      return {
+        ...state,
+        message: action.payload?.message,
+        statusCode: action.payload?.statusCode,
+        loading: false,
+      };
+    });
   },
 });
 

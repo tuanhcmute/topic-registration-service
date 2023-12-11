@@ -2,17 +2,26 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { HttpStatusCode } from "axios";
 import { toast } from "react-toastify";
 import { topicEnrollmentService } from "../../services";
+import { topicType } from "../../utils/constants";
+import { fetchAllApprovedTopicsInStudentEnrollmentPeriod } from "../topic/topicAction";
 
 export const namespace = "topicEnrollment";
 
 export const deleteTopicEnrollment = createAsyncThunk(
   `${namespace}/deleteTopicEnrollment`,
-  async (ntid, { rejectWithValue }) => {
+  async (ntid, { rejectWithValue, dispatch }) => {
     const response = await topicEnrollmentService.deleteTopicEnrollment(ntid);
-    if (response?.data?.statusCode !== HttpStatusCode.Ok)
-      return rejectWithValue(response.data);
-    toast.success("Xóa SVTH thành công");
-    return response.data;
+    if (response?.data?.statusCode === HttpStatusCode.Ok) {
+      toast.success("Xóa đăng ký đề tài thành công");
+      dispatch(
+        fetchAllApprovedTopicsInStudentEnrollmentPeriod({
+          type: topicType.TLCN,
+        })
+      );
+      return response.data;
+    }
+    toast.error("Xóa đăng ký đề tài thất bại");
+    return rejectWithValue(response.data);
   }
 );
 
@@ -21,11 +30,20 @@ export const createTopicEnrollment = createAsyncThunk(
   async ({ data, setOpenModal }, { dispatch, rejectWithValue }) => {
     const response = await topicEnrollmentService.createTopicEnrollment(data);
     console.log(response);
-    if (response?.data?.statusCode !== HttpStatusCode.Created)
-      return rejectWithValue(response.data);
-    setOpenModal(undefined);
-    dispatch(fetchTopicEnrollmentsByNtid());
-    return response.data;
+    if (response?.data?.statusCode === HttpStatusCode.Created) {
+      toast.success("Đăng ký đề tài thành công");
+      setOpenModal(undefined);
+      dispatch(fetchTopicEnrollmentsByNtid());
+      dispatch(
+        fetchAllApprovedTopicsInStudentEnrollmentPeriod({
+          type: topicType.TLCN,
+        })
+      );
+      return response.data;
+    }
+
+    toast.error("Đăng ký đề tài thất bại");
+    return rejectWithValue(response.data);
   }
 );
 

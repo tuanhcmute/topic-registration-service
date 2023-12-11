@@ -265,7 +265,7 @@ class TopicService {
           { model: Major, as: "major", attributes: ["code", "name"] }
         ],
         attributes: {
-          exclude: ["createdBy", "createdDate", "updatedDate", "lectureId", "semesterId", "id"]
+          exclude: ["createdBy", "createdDate", "updatedDate", "lectureId", "semesterId"]
         },
         order: ["createdDate"]
       });

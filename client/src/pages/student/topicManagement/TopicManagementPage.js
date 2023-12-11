@@ -7,19 +7,14 @@ import { IoMdCloseCircleOutline, IoMdPersonAdd } from "react-icons/io";
 import _ from "lodash";
 
 import EditTopicModal from "./components/EditTopicModal";
-import {
-  enrollmentPeriodCode,
-  positionType,
-  topicStatus,
-  topicType,
-} from "../../../utils/constants";
+import { positionType, topicStatus, topicType } from "../../../utils/constants";
 import { Dropdown } from "../../../components/dropdown1";
 import {
   fetchAllApprovedTopicsInStudentEnrollmentPeriod,
   updateTopicInLectureEnrollmentPeriod,
 } from "../../../features/topic";
 import { fetchStudentsNotEnrolledInTopic } from "../../../features/user";
-import { fetchEnrollmentPeriodByTopicTypeAndPeriodCode } from "../../../features/enrollmentPeriod";
+import { fetchActivatedEnrollmentPeriod } from "../../../features/enrollmentPeriod";
 import { fetchTopicEnrollmentsByNtid } from "../../../features/topicEnrollment/topicEnrollmentAction";
 import CancelEnrollmentTopicModal from "./components/CancelEnrollmentTopicModal";
 import AddMemberEnrollmentTopicModal from "./components/AddMemberEnrollmentTopicModal";
@@ -87,14 +82,15 @@ function TopicManagementPage() {
       _.isUndefined(enrollmentPeriod)
     ) {
       dispatch(
-        fetchEnrollmentPeriodByTopicTypeAndPeriodCode({
+        fetchActivatedEnrollmentPeriod({
           topicType: topicType.TLCN,
-          periodCode: enrollmentPeriodCode.STUDENT_ENROLLMENT_PERIOD,
         })
       );
     }
     dispatch(fetchTopicEnrollmentsByNtid());
   }, []);
+
+  console.log(topicEnrollments);
 
   return (
     <div className='flex flex-col gap-10 w-full'>
@@ -298,14 +294,14 @@ function TopicManagementPage() {
                               <span
                                 className={`${statusColor} py-1 px-3 text-sm font-medium rounded dark:text-black-pearl`}
                               >
-                                {item?.leader
+                                {item?.isLeader
                                   ? positionType.LEADER.label
                                   : positionType.MEMBER.label}
                               </span>
                             </td>
                             <td className='border border-collapse border-lightGrey'>
                               {(currentUser?.ntid === item?.student?.ntid ||
-                                !item?.leader) && (
+                                !item?.isLeader) && (
                                 <>
                                   <div className='flex justify-center flex-wrap gap-1 items-center m-2'>
                                     <LiaEditSolid
@@ -319,7 +315,7 @@ function TopicManagementPage() {
                                     anchorSelect={`#_${item?.id}`}
                                   >
                                     <div className='flex flex-col gap-2 p-3'>
-                                      {item?.leader && (
+                                      {item?.isLeader && (
                                         <div
                                           className='text-sm px-2 py-1 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer flex items-center gap-2'
                                           onClick={() => {

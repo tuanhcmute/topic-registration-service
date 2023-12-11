@@ -67,6 +67,7 @@ class DivisionService {
       .withMessage("Division has been created successfully")
       .build();
   }
+
   public async getDivisionByTopicType(topicType: string, email: string) {
     // Validate topicType
     if (_.isNull(topicType) || _.isUndefined(topicType) || _.isEmpty(topicType))
@@ -110,6 +111,32 @@ class DivisionService {
       .withMessage("Divisions have been retrieved successfully")
       .withData(data)
       .build();
+  }
+
+  public async getDivisionByTopic(topicId: string) {
+    try {
+      const topic = await Topic.findByPk(topicId);
+      if (_.isNull(topic)) throw new ValidateFailException("Topic could not be found");
+      // Get division
+      const divisions = await Division.findAll({
+        where: {
+          topicId: topic.id
+        },
+        attributes: ["id", "place", "startDate", "specifiedTime", "topicId"],
+        include: [{ model: User, as: "lecture", attributes: ["ntid", "name"] }]
+      });
+      const data: IListDivisionResponse = {
+        divisions
+      };
+      return new ResponseModelBuilder<IListDivisionResponse>()
+        .withStatusCode(StatusCodes.OK)
+        .withMessage("Divisions have been retrieved successfully")
+        .withData(data)
+        .build();
+    } catch (error) {
+      logger.error({ error });
+      throw error;
+    }
   }
 }
 
