@@ -1,6 +1,7 @@
 package com.bosch.topicregistration.api.semester;
 
 import org.apache.commons.lang3.StringUtils;
+
 import java.util.function.Function;
 public interface SemesterValidator extends Function<SemesterRequest, SemesterValidatorResult>{
     static SemesterValidator isNameValid() {
@@ -9,10 +10,6 @@ public interface SemesterValidator extends Function<SemesterRequest, SemesterVal
 
     static SemesterValidator isTypeValid() {
         return request -> StringUtils.isEmpty(request.getType().toString()) ? SemesterValidatorResult.TYPE_INVALID : SemesterValidatorResult.VALID;
-    }
-
-    static SemesterValidator isStatusValid() {
-        return request -> StringUtils.isEmpty(request.getStatus().toString()) ? SemesterValidatorResult.STATUS_INVALID : SemesterValidatorResult.VALID;
     }
 
     static SemesterValidator isStartDateValid() {

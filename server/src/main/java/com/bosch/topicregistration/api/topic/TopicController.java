@@ -3,6 +3,7 @@ package com.bosch.topicregistration.api.topic;
 import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
 import com.bosch.topicregistration.api.response.Response;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequestMapping("/topic")
 @Slf4j
 @RequiredArgsConstructor
+@Tag(name = "Topic APIs")
 public class TopicController {
 
     private final TopicService topicService;

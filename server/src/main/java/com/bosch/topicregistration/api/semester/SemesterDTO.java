@@ -10,4 +10,8 @@ import lombok.*;
 public class SemesterDTO {
     private String id;
     private String name;
+    private SemesterStatus status;
+    private String startDate;
+    private String endDate;
+    private SemesterType type;
 }

@@ -13,7 +13,10 @@ import com.bosch.topicregistration.api.topicenrollment.CreateTopicEnrollmentRequ
 import com.bosch.topicregistration.api.topicenrollment.TopicEnrollment;
 import com.bosch.topicregistration.api.topicenrollment.TopicEnrollmentRepository;
 import com.bosch.topicregistration.api.topicenrollment.TopicEnrollmentService;
-import com.bosch.topicregistration.api.user.*;
+import com.bosch.topicregistration.api.user.Major;
+import com.bosch.topicregistration.api.user.MajorRepository;
+import com.bosch.topicregistration.api.user.User;
+import com.bosch.topicregistration.api.user.UserCommon;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

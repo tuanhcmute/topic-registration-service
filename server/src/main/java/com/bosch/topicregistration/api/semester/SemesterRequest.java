@@ -3,7 +3,6 @@ package com.bosch.topicregistration.api.semester;
 import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
-
 import java.time.LocalDate;
 
 @NoArgsConstructor
@@ -11,13 +10,10 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Builder
-
 public class SemesterRequest {
+
     @NotEmpty(message = "Type is not empty")
     private SemesterType type;
-
-    @NotEmpty(message = "Status is not empty")
-    private SemesterStatus status;
 
     @NotEmpty(message = "Name is not empty")
     private String name;

@@ -1,8 +1,8 @@
 package com.bosch.topicregistration.api.enrollmentperiod;
 
-import java.util.Set;
-
 import org.mapstruct.Mapper;
+
+import java.util.Set;
 
 
 @Mapper(componentModel = "spring")

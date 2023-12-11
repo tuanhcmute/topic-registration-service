@@ -140,7 +140,7 @@ function UserManagementPage() {
                     <tbody className='text-gray-600 text-sm font-light'>
                       {users
                         ?.filter((item) => {
-                          if (_.isEqual(roleFilter, roleCode.ROLE_ALL.value))
+                          if (_.isEqual(roleFilter, roleCode?.ROLE_ALL?.value))
                             return true;
                           return item?.userRoles?.some(
                             (item2) => item2?.role?.code === roleFilter

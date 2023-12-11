@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Nationalized;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "semester_tbl")
+@EntityListeners(AuditingEntityListener.class)
 public class Semester {
     @Id
     @GeneratedValue(generator = "UUID")
