@@ -15,6 +15,8 @@ public interface FirebaseService {
 
     String save(MultipartFile file) throws IOException;
 
+    Boolean isFileExist(String filename);
+
     String save(BufferedImage bufferedImage, String originalFileName) throws IOException;
 
     void delete(String name) throws IOException;

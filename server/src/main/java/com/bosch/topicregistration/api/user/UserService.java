@@ -1,5 +1,6 @@
 package com.bosch.topicregistration.api.user;
 
+import com.bosch.topicregistration.api.response.PageResponse;
 import com.bosch.topicregistration.api.response.Response;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,4 +16,6 @@ public interface UserService {
     Response<List<LectureDTO>> getLecturesByMajor(String majorCode);
 
     Response<Void> updateAvatarInUserProfile(MultipartFile imageFile);
+
+    Response<PageResponse<List<UserDTO>>> getAllUsers(Integer pageNumber, Integer pageSize, String sortBy);
 }

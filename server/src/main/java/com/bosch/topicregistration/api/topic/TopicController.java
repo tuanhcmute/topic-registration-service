@@ -127,4 +127,14 @@ public class TopicController {
                                                                                   @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
         return topicService.getAllApprovedTopicsInStudentEnrollmentPeriod(type, pageNumber, pageSize, sortBy);
     }
+
+    @GetMapping("/admin")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
+    @LoggerAround
+    public Response<List<TopicDTO>> getAllTopics(@RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+                                                  @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                                  @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
+        return  topicService.getAllTopics(pageNumber, pageSize, sortBy);
+    }
 }

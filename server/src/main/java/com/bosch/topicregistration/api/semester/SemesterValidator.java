@@ -9,15 +9,15 @@ public interface SemesterValidator extends Function<SemesterRequest, SemesterVal
     }
 
     static SemesterValidator isTypeValid() {
-        return request -> StringUtils.isEmpty(request.getType().toString()) ? SemesterValidatorResult.TYPE_INVALID : SemesterValidatorResult.VALID;
+        return request -> StringUtils.isEmpty(request.getType()) ? SemesterValidatorResult.TYPE_INVALID : SemesterValidatorResult.VALID;
     }
 
     static SemesterValidator isStartDateValid() {
-        return request -> StringUtils.isEmpty(request.getStartDate().toString()) ? SemesterValidatorResult.START_DATE_INVALID : SemesterValidatorResult.VALID;
+        return request -> StringUtils.isEmpty(request.getStartDate()) ? SemesterValidatorResult.START_DATE_INVALID : SemesterValidatorResult.VALID;
     }
 
     static SemesterValidator isEndDateValid() {
-        return request -> StringUtils.isEmpty(request.getEndDate().toString()) ? SemesterValidatorResult.END_DATE_INVALID : SemesterValidatorResult.VALID;
+        return request -> StringUtils.isEmpty(request.getEndDate()) ? SemesterValidatorResult.END_DATE_INVALID : SemesterValidatorResult.VALID;
     }
 
     default SemesterValidator and(SemesterValidator other) {

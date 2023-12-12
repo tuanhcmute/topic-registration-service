@@ -75,9 +75,9 @@ function EditTopicModal(props) {
       maxSlot: data?.maxSlot,
     });
     setSelectedOptions(
-      data?.topicEnrollments?.map((item) => ({
-        label: item?.student?.name,
-        value: item?.student?.ntid,
+      data?.students?.map((item) => ({
+        value: item?.ntid,
+        label: item?.name,
       }))
     );
     setDisabled(
@@ -85,6 +85,8 @@ function EditTopicModal(props) {
         data?.status === topicStatus.assigned.value
     );
   }, [data]);
+
+  console.log(data);
 
   useEffect(() => {
     const studentCodes = selectedOptions?.map((item) => item.value);

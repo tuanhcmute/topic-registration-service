@@ -12,24 +12,32 @@ import { topicStatus } from "../../../utils/constants";
 import { Dropdown } from "../../../components/dropdown1";
 import { roleCode } from "../../../utils/constants/roles";
 import { createUser, fetchAllUsers } from "../../../features/user";
+import { PaginatedItems } from "../../../components/pagination";
 
 function UserManagementPage() {
   const [openAddUserModal, setOpenAddUserModal] = useState(undefined);
   const [openDetailUserModal, setOpenDetailUserModal] = useState(undefined);
   const [selectedUser, setSelectedUser] = useState(null);
   const [roleFilter, setRoleFilter] = useState(roleCode.ROLE_ALL.value);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [pageNumber, setPageNumber] = useState(0);
+  const [sortBy, setSortBy] = useState("createdDate");
 
   const dispatch = useDispatch();
-  const users = useSelector((state) => state.user?.users);
+  const pageData = useSelector((state) => state.user?.pageData);
 
   function handleCreateUser(requestData) {
-    console.log(requestData);
     dispatch(createUser({ data: requestData, setOpenAddUserModal }));
   }
 
+  function handlePageClick(newOffset) {
+    console.log({ newOffset });
+    setPageNumber(newOffset);
+  }
+
   useEffect(() => {
-    dispatch(fetchAllUsers());
-  }, []);
+    dispatch(fetchAllUsers({ pageNumber, itemsPerPage, sortBy }));
+  }, [pageNumber, itemsPerPage, sortBy]);
 
   return (
     <React.Fragment>
@@ -92,7 +100,18 @@ function UserManagementPage() {
               <span>Lọc theo ngành</span>
             </Button>
           </div>
+          <div className='w-fit'>
+            <Button
+              id='itemsPerPage'
+              color='gray'
+              className='rounded-md p-0 cursor-default flex items-center'
+            >
+              <AiOutlineFilter className='mr-1' />
+              <span>Hiển thị</span>
+            </Button>
+          </div>
         </div>
+
         <Dropdown
           place='right-right'
           className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
@@ -110,6 +129,28 @@ function UserManagementPage() {
                 </div>
               );
             })}
+          </div>
+        </Dropdown>
+
+        <Dropdown
+          place='right-right'
+          className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
+          anchorSelect='#itemsPerPage'
+        >
+          <div className='flex flex-col gap-2 p-3'>
+            {[...Array(5).keys()]
+              .filter((item) => item !== 0)
+              .map((item) => {
+                return (
+                  <div
+                    key={item}
+                    className='text-sm px-2 py-1 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer'
+                    onClick={() => setItemsPerPage(item * 5)}
+                  >
+                    {item * 5} người dùng
+                  </div>
+                );
+              })}
           </div>
         </Dropdown>
 
@@ -138,12 +179,12 @@ function UserManagementPage() {
                       </tr>
                     </thead>
                     <tbody className='text-gray-600 text-sm font-light'>
-                      {users
+                      {pageData?.users
                         ?.filter((item) => {
                           if (_.isEqual(roleFilter, roleCode?.ROLE_ALL?.value))
                             return true;
                           return item?.userRoles?.some(
-                            (item2) => item2?.role?.code === roleFilter
+                            (item2) => item2 === roleFilter
                           );
                         })
                         ?.map((item, index) => {
@@ -171,7 +212,7 @@ function UserManagementPage() {
                           return (
                             <tr
                               className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'
-                              key={item.id}
+                              key={item.ntid}
                             >
                               <td className='p-3 text-center whitespace-nowrap border w-4'>
                                 {index + 1}
@@ -196,7 +237,7 @@ function UserManagementPage() {
                                   {item?.userRoles?.map((item) => {
                                     return (
                                       <p className='w-fit bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
-                                        {roleCode[item?.role?.code]?.label}
+                                        {roleCode[item]?.label}
                                       </p>
                                     );
                                   })}
@@ -240,7 +281,11 @@ function UserManagementPage() {
         </div>
         <div className='w-full flex justify-end p-3'>
           {/* <Pagination /> */}
-          {/* <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} /> */}
+          <PaginatedItems
+            items={[...Array(pageData?.totalPages * itemsPerPage).keys()]}
+            itemsPerPage={itemsPerPage}
+            onPageClick={handlePageClick}
+          />
         </div>
         {/* End table */}
       </div>

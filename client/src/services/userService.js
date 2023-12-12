@@ -29,8 +29,8 @@ const userService = {
       },
     });
   },
-  fetchAllUsers: () => {
-    const requestUrl = `${baseUrl}/admin`;
+  fetchAllUsers: (pageNumber, itemsPerPage, sortBy) => {
+    const requestUrl = `${baseUrl}?pageNumber=${pageNumber}&pageSize=${itemsPerPage}&sortBy=${sortBy}`;
     return axiosClient.get(requestUrl);
   },
   createUser: (data) => {

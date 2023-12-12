@@ -18,4 +18,6 @@ public interface TopicService {
     Response<List<TopicDTO>> getAllTopicsApprovedDuringTheLectureEnrollmentPeriod(String type, Integer pageNumber, Integer pageSize, String sortBy);
 
     Response<List<TopicDTO>> getAllApprovedTopicsInStudentEnrollmentPeriod(String type, Integer pageNumber, Integer pageSize, String sortBy);
+
+    Response<List<TopicDTO>> getAllTopics(Integer pageNumber, Integer pageSize, String sortBy);
 }

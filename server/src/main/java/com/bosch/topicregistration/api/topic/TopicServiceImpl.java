@@ -304,6 +304,14 @@ public class TopicServiceImpl implements TopicService {
         return buildResponse(topicPage);
     }
 
+    @Override
+    public Response<List<TopicDTO>> getAllTopics( Integer pageNumber, Integer pageSize, String sortBy) {
+//        Define paging
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
+        Page<Topic> topics = topicRepository.findAll(paging);
+        return  buildResponse(topics);
+    }
+
     private Response<List<TopicDTO>> buildResponse(Page<Topic> topicPage) {
         List<TopicDTO> listTopicDTO = topicMapper.toListDTO(topicPage.getContent());
         Map<String, List<TopicDTO>> data = new HashMap<>();

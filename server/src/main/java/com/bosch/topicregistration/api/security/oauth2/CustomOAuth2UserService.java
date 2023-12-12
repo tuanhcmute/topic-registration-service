@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -70,7 +71,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private User registerNewUser(OAuth2UserRequest userRequest, OAuth2UserInfo oAuth2UserInfo) {
 //        Prepare data
         Optional<Role> roleOptional;
-        String ntid = oAuth2UserInfo.getId();
+        String ntid = oAuth2UserInfo.getId().substring(0, 8);
         Boolean emailVerified = (Boolean) oAuth2UserInfo.getAttributes().get("email_verified");
 
 //        Set ntid, get role
@@ -80,7 +81,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             ntid = oAuth2UserInfo.getEmail().substring(0, 8);
         } else if (oAuth2UserInfo.getEmail().contains(POSTFIX_LECTURE_EMAIL)) {
             roleOptional = roleRepository.findByCode(RoleCode.ROLE_LECTURE);
-            ntid = oAuth2UserInfo.getId().substring(0, 4);
         } else {
             roleOptional = roleRepository.findByCode(RoleCode.ROLE_ANONYMOUS);
         }

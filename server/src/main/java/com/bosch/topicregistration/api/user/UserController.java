@@ -2,6 +2,7 @@ package com.bosch.topicregistration.api.user;
 
 import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
+import com.bosch.topicregistration.api.response.PageResponse;
 import com.bosch.topicregistration.api.response.Response;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -76,5 +77,15 @@ public class UserController {
     public  Response<Void> updateAvatarInUserProfile(@RequestParam("image") MultipartFile imageFile) {
 
         return userService.updateAvatarInUserProfile(imageFile);
+    }
+
+    @GetMapping
+    @LoggerAround
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public  Response<PageResponse<List<UserDTO>>> getAllUsers(@RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+                                               @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                               @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
+        return userService.getAllUsers(pageNumber, pageSize, sortBy);
     }
 }

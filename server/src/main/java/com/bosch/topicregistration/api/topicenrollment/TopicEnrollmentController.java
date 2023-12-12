@@ -27,7 +27,7 @@ public class TopicEnrollmentController {
     @DeleteMapping
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE')")
+    @PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_LECTURE')")
     public Response<Void> deleteTopicEnrollment(@RequestParam("ntid") String ntid) {
         if (StringUtils.isEmpty(ntid)) throw new BadRequestException("Ntid is not valid");
         return topicEnrollmentService.deleteTopicEnrollment(ntid);
@@ -37,7 +37,7 @@ public class TopicEnrollmentController {
     @PostMapping
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE')")
+    @PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_LECTURE')")
     public Response<Void> createTopicEnrollment(@RequestBody @Valid CreateTopicEnrollmentRequest request) {
         return topicEnrollmentService.createTopicEnrollment(request);
     }

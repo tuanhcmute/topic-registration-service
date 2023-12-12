@@ -68,7 +68,7 @@ export const updateEnrollmentPeriod = createAsyncThunk(
       dispatch(fetchEnrollmentPeriodBySemesterId(semesterId));
       return response.data;
     }
-    toast.error("Thêm khoảng thời gian thất bại");
+    toast.error("Chỉnh sửa khoảng thời gian thất bại");
     return rejectWithValue(response?.data);
   }
 );

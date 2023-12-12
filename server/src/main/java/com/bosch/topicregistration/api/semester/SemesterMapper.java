@@ -12,8 +12,8 @@ public interface SemesterMapper {
     List<SemesterDTO> toListSemesterDTO(List<Semester> semesters);
 
     @Mappings({
-            @Mapping(target = "startDate", source = "semester.startDate", dateFormat = "dd-MM-yyyy"),
-            @Mapping(target = "endDate", source = "semester.endDate", dateFormat = "dd-MM-yyyy"),
+            @Mapping(target = "startDate", source = "semester.startDate", dateFormat = "yyyy-MM-dd"),
+            @Mapping(target = "endDate", source = "semester.endDate", dateFormat = "yyyy-MM-dd"),
     })
     SemesterDTO toSemesterDTO(Semester semester);
 }

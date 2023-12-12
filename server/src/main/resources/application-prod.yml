@@ -1,7 +1,7 @@
 server:
   port: 8080
   servlet:
-    context-path: /api/v1.0.0
+    context-path: /api/${app.version}
 spring:
   servlet:
     multipart:
@@ -26,16 +26,15 @@ spring:
       hibernate:
         format_sql: true
 app:
+  version: v1.0.0
   jwt:
     secretKey: ${SECRET_KEY}
   security:
     permitAll:
       antPattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status, /auth/refresh-token
     cors:
-      allowedOrigin: "*"
       allowedMethods: "*"
       allowedHeaders: "*"
-      allowedCredentials: false
       corsConfiguration: "/**"
 firebase:
   serviceAccount: ${SERVICE_ACCOUNT}

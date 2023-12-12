@@ -13,14 +13,14 @@ import java.time.LocalDate;
 public class SemesterRequest {
 
     @NotEmpty(message = "Type is not empty")
-    private SemesterType type;
+    private String type;
 
     @NotEmpty(message = "Name is not empty")
     private String name;
 
     @NotEmpty(message = "Start date is not empty")
-    private LocalDate startDate;
+    private String startDate;
 
     @NotEmpty(message = "Start date is not empty")
-    private LocalDate endDate;
+    private String endDate;
 }

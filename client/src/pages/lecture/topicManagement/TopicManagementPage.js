@@ -5,10 +5,15 @@ import { Button } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import { AiOutlineFilter } from "react-icons/ai";
 import _ from "lodash";
+import moment from "moment";
 
 import EnrollTopicModal from "./components/EnrollTopicModal";
 import EditTopicModal from "./components/EditTopicModal";
-import { topicStatus, topicType } from "../../../utils/constants";
+import {
+  enrollmentPeriodCode,
+  topicStatus,
+  topicType,
+} from "../../../utils/constants";
 import { Dropdown } from "../../../components/dropdown1";
 import ApprovalTopicModal from "./components/ApprovalTopicModal";
 import {
@@ -18,6 +23,7 @@ import {
 } from "../../../features/topic";
 import { fetchStudentsNotEnrolledInTopic } from "../../../features/user";
 import { fetchActivatedEnrollmentPeriod } from "../../../features/enrollmentPeriod";
+import { PaginatedItems } from "../../../components/pagination";
 
 function TopicManagementPage() {
   const [openModal, setOpenModal] = useState(undefined);
@@ -28,6 +34,7 @@ function TopicManagementPage() {
   const [topicStatusFilter, setTopicStatusFilter] = useState(
     topicStatus.all.value
   );
+  const [isDisabledEnrollment, setDisabledEnrollment] = useState(true);
   // Get current user from redux
   const currentUser = useSelector((state) => state.user?.currentUser);
   const topics = useSelector((state) => state.topic?.topics);
@@ -87,6 +94,23 @@ function TopicManagementPage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (enrollmentPeriod) {
+      const formatDate = "YYYY-MM-DD";
+      const startDate = moment(enrollmentPeriod?.startDate, formatDate);
+      const endDate = moment(enrollmentPeriod?.endDate, formatDate);
+      const currentDate = moment();
+      if (
+        currentDate.isAfter(startDate) &&
+        currentDate.isBefore(endDate) &&
+        enrollmentPeriod?.code ===
+          enrollmentPeriodCode.LECTURE_ENROLLMENT_PERIOD
+      ) {
+        setDisabledEnrollment(false);
+      }
+    }
+  }, [enrollmentPeriod]);
+
   return (
     <React.Fragment>
       <div className='w-full border border-lightGrey bg-white h-fit rounded-md dark:bg-sambuca dark:border-gray-500'>
@@ -95,13 +119,15 @@ function TopicManagementPage() {
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
             TIỂU LUẬN CHUYÊN NGÀNH
           </span>
-          <Button
-            color='gray'
-            className='rounded-md p-0'
-            onClick={() => setOpenModal("default")}
-          >
-            Đăng ký
-          </Button>
+          {!isDisabledEnrollment && (
+            <Button
+              color='gray'
+              className='rounded-md p-0'
+              onClick={() => setOpenModal("default")}
+            >
+              Đăng ký
+            </Button>
+          )}
         </div>
         {/* End register topic */}
         {/* Select */}
@@ -260,7 +286,7 @@ function TopicManagementPage() {
         </div>
         <div className='w-full flex justify-end p-3'>
           {/* <Pagination /> */}
-          {/* <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} /> */}
+          <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} />
         </div>
         {/* End table */}
       </div>

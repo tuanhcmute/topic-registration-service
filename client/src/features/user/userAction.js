@@ -75,8 +75,13 @@ export const updateAvatarInUserProfile = createAsyncThunk(
 
 export const fetchAllUsers = createAsyncThunk(
   `${namespace}/fetchAllUsers`,
-  async (data, { rejectWithValue }) => {
-    const response = await userService.fetchAllUsers();
+  async ({ pageNumber, itemsPerPage, sortBy }, { rejectWithValue }) => {
+    const response = await userService.fetchAllUsers(
+      pageNumber,
+      itemsPerPage,
+      sortBy
+    );
+    console.log(response);
     if (response.data?.statusCode !== HttpStatusCode.Ok)
       return rejectWithValue(response?.data);
     return response.data;

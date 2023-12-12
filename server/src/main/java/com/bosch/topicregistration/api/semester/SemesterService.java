@@ -6,9 +6,9 @@ import java.util.List;
 public interface SemesterService {
     Semester getActivatedSemester();
 
-    Response<List<SemesterDTO>> getListSemester();
+    Response<List<SemesterDTO>> getListSemester(Integer pageNumber, Integer pageSize, String sortBy);
 
     Response<Void> createSemester(SemesterRequest request);
 
-    Response<Void> modifySemester(String semesterId, SemesterRequest request);
+    Response<Void> updateSemester(String semesterId, SemesterRequest request);
 }
