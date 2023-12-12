@@ -2,15 +2,17 @@ package com.bosch.topicregistration.api.semester;
 
 import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.response.Response;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import java.time.LocalDate;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,116 +28,119 @@ public class SemesterServiceImpl implements SemesterService {
     @Override
     public Semester getActivatedSemester() {
         List<Semester> semesters = semesterRepository.findByStatus(SemesterStatus.ACTIVATED);
-        if (semesters.size() == 0)
+        if (semesters.isEmpty())
             throw new BadRequestException("Current semester is not activated");
+
+//        Get first result
         return semesters.get(0);
     }
 
     @Override
-    public Response<List<SemesterDetailDTO>> getListSemester() {
-        List<Semester> listSemester = semesterRepository.findAll();
-        if (listSemester.size() == 0)
-            throw new BadRequestException("List semester is empty");
-        List<SemesterDetailDTO> liSemesterDetailDTO = semesterMapper.toListSemesterDetailDTO(listSemester);
-        Map<String, List<SemesterDetailDTO>> data = new HashMap<>();
-        data.put("semester", liSemesterDetailDTO);
-        return Response.<List<SemesterDetailDTO>>builder()
-                .message("Approval histories have been successfully retrieved")
+    public Response<List<SemesterDTO>> getListSemester( Integer pageNumber, Integer pageSize, String sortBy) {
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
+        Page<Semester> semesterPage = semesterRepository.findAll(paging);
+        List<SemesterDTO> listSemesterDTO = semesterMapper.toListSemesterDTO(semesterPage.getContent());
+        Map<String, List<SemesterDTO>> data = new HashMap<>();
+        data.put("semesters", listSemesterDTO);
+        return Response.<List<SemesterDTO>>builder()
+                .message("Semesters have been successfully retrieved")
                 .statusCode(HttpStatus.OK.value())
                 .data(data)
                 .build();
     }
 
     @Override
-    public Response<String> createNewSemester(SemesterRequest request) {
+    public Response<Void> createSemester(SemesterRequest request) {
         try {
-            SemesterValidatorResult result = SemesterValidator
-                    .isNameValid()
-                    .and(SemesterValidator.isNameValid())
-                    .and(SemesterValidator.isStartDateValid())
-                    .and(SemesterValidator.isEndDateValid())
-                    .and(SemesterValidator.isStatusValid())
-                    .and(SemesterValidator.isTypeValid())
-                    .apply(request);
+//            Validate request
+            validateSemesterRequest(request);
 
-            if (!result.equals(SemesterValidatorResult.VALID))
-                throw new BadRequestException(result.getMessage());
-                    
+//            Convert string to semester type
+            SemesterType semesterType = SemesterType.valueOf(request.getType());
+
+//            Convert string to local date
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate currentDate = LocalDate.now();
-            if(request.getStartDate().compareTo(currentDate) == -1)
-                throw new BadRequestException("The start date cannot be less than the current date");
+            LocalDate startDate = LocalDate.parse(request.getStartDate(), formatter);
+            LocalDate endDate = LocalDate.parse(request.getEndDate(), formatter);
 
-            if(request.getEndDate().compareTo(request.getStartDate()) == -1)
+//            Validate date
+            if(startDate.isBefore(currentDate))
+                throw new BadRequestException("The start date cannot be less than the current date");
+            if(endDate.isBefore(startDate))
                 throw new BadRequestException("The end date cannot be less than the start date");
 
-                
-
             Semester semester = Semester.builder()
-                    .type(request.getType())
-                    .status(request.getStatus())
+                    .type(semesterType)
                     .name(request.getName())
-                    .startDate(request.getStartDate())
-                    .endDate(request.getEndDate())
-                    .createdBy(null)
-                    .updatedDate(LocalDateTime.now())
-                    .createdDate(LocalDateTime.now())
-                    .enrollmentPeriods(null)
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .status(SemesterStatus.SCHEDULED)
                     .build();
-
             semesterRepository.save(semester);
 
-            return Response.<String>builder()
+            return Response.<Void>builder()
                     .statusCode(HttpStatus.CREATED.value())
-                    .message("New semester has been created successfully")
+                    .message("Semester has been created successfully")
                     .build();
         } catch (Exception exception) {
+            log.error(exception.getMessage());
             throw new BadRequestException(exception.getMessage());
         }
     }
 
+    private void validateSemesterRequest(SemesterRequest request) {
+        SemesterValidatorResult result = SemesterValidator
+                .isNameValid()
+                .and(SemesterValidator.isNameValid())
+                .and(SemesterValidator.isStartDateValid())
+                .and(SemesterValidator.isEndDateValid())
+                .and(SemesterValidator.isTypeValid())
+                .apply(request);
+
+        if (!result.equals(SemesterValidatorResult.VALID))
+            throw new BadRequestException(result.getMessage());
+    }
+
     @Override
-    public Response<String> modifySemester(String semesterId, SemesterRequest request) {
+    public Response<Void> updateSemester(String semesterId, SemesterRequest request) {
         try {
-            SemesterValidatorResult result = SemesterValidator
-                    .isNameValid()
-                    .and(SemesterValidator.isNameValid())
-                    .and(SemesterValidator.isStartDateValid())
-                    .and(SemesterValidator.isEndDateValid())
-                    .and(SemesterValidator.isStatusValid())
-                    .and(SemesterValidator.isTypeValid())
-                    .apply(request);
+//            Validate request
+            validateSemesterRequest(request);
 
-            if (!result.equals(SemesterValidatorResult.VALID))
-                throw new BadRequestException(result.getMessage());
-                    
+//            Convert string to semester type
+            SemesterType semesterType = SemesterType.valueOf(request.getType());
+
+//            Convert string to local date
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate currentDate = LocalDate.now();
-            if(request.getStartDate().compareTo(currentDate) == -1)
-                throw new BadRequestException("The start date cannot be less than the current date");
+            LocalDate startDate = LocalDate.parse(request.getStartDate(), formatter);
+            LocalDate endDate = LocalDate.parse(request.getEndDate(), formatter);
 
-            if(request.getEndDate().compareTo(request.getStartDate()) == -1)
+//            Validate date
+            if(startDate.isBefore(currentDate))
+                throw new BadRequestException("The start date cannot be less than the current date");
+            if(endDate.isBefore(startDate))
                 throw new BadRequestException("The end date cannot be less than the start date");
 
-                
-
             Optional<Semester> semesterOptional = semesterRepository.findById(semesterId);
-
-            if (!semesterOptional.isPresent()) 
-                throw new BadRequestException("Can not find Semester you need to update");
-
+            if (!semesterOptional.isPresent())
+                throw new BadRequestException("Semester could not be found");
             Semester semester = semesterOptional.get();
-            semester.setName(request.getName());
-            semester.setStartDate(request.getStartDate());
-            semester.setEndDate(request.getEndDate());
-            semester.setType(request.getType());
-            semester.setStatus(request.getStatus());
 
+//            Update
+            semester.setName(request.getName());
+            semester.setStartDate(startDate);
+            semester.setEndDate(endDate);
+            semester.setType(semesterType);
             semesterRepository.save(semester);
 
-            return Response.<String>builder()
-                    .statusCode(HttpStatus.CREATED.value())
-                    .message("New semester has been updated successfully")
+            return Response.<Void>builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Semester has been updated successfully")
                     .build();
         } catch (Exception exception) {
+            log.error(exception.getMessage());
             throw new BadRequestException(exception.getMessage());
         }
     }

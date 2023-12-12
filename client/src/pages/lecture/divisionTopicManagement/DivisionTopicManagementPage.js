@@ -5,16 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { AiOutlineFilter } from "react-icons/ai";
 import _ from "lodash";
 
-import {
-  enrollmentPeriodCode,
-  topicStatus,
-  topicType,
-} from "../../../utils/constants";
+import { topicStatus, topicType } from "../../../utils/constants";
 import { Dropdown } from "../../../components/dropdown1";
 import { fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod } from "../../../features/topic";
 import DivisionTopicModal from "./components/DivisionTopicModal";
-import { fetchLecturesByMajor } from "../../../features/user";
-import { fetchEnrollmentPeriodByTopicTypeAndPeriodCode } from "../../../features/enrollmentPeriod";
+import { fetchAllLectures } from "../../../features/user";
+import { fetchActivatedEnrollmentPeriod } from "../../../features/enrollmentPeriod";
 
 function DivisionTopicManagement() {
   const [openModal, setOpenModal] = useState(undefined);
@@ -43,7 +39,7 @@ function DivisionTopicManagement() {
 
     // Fetch lectures
     if (_.isEmpty(lectures) || _.isNull(lectures) || _.isUndefined(lectures)) {
-      dispatch(fetchLecturesByMajor(currentUser?.major?.code));
+      dispatch(fetchAllLectures());
     }
 
     // Fetch enrollment period
@@ -53,9 +49,8 @@ function DivisionTopicManagement() {
       _.isUndefined(enrollmentPeriod)
     ) {
       dispatch(
-        fetchEnrollmentPeriodByTopicTypeAndPeriodCode({
+        fetchActivatedEnrollmentPeriod({
           topicType: topicType.TLCN,
-          periodCode: enrollmentPeriodCode.LECTURE_ENROLLMENT_PERIOD.value,
         })
       );
     }

@@ -1,7 +1,7 @@
 server:
   port: 8080
   servlet:
-    context-path: /v1.0.0
+    context-path: /api/${app.version}
 spring:
   servlet:
     multipart:

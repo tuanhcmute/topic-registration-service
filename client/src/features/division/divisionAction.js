@@ -46,3 +46,13 @@ export const resetDivisionState = createAsyncThunk(
     return true;
   }
 );
+
+export const fetchDivisionByTopic = createAsyncThunk(
+  `${namespace}/fetchDivisionByTopic`,
+  async (topicId, { rejectWithValue }) => {
+    const response = await divisionService.fetchDivisionByTopic(topicId);
+    console.log(response);
+    if (response?.data?.statusCode === HttpStatusCode.Ok) return response.data;
+    return rejectWithValue(response?.data);
+  }
+);

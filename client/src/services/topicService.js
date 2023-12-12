@@ -30,6 +30,10 @@ const topicService = {
     const requestUrl = `${baseUrl}/student?type=${type}`;
     return axiosClient.get(requestUrl);
   },
+  fetchAllTopics: () => {
+    const requestUrl = `${baseUrl}/admin`;
+    return axiosClient.get(requestUrl);
+  },
 };
 
 export default topicService;

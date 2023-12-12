@@ -28,14 +28,6 @@ const axiosClient = axios.create({
   paramsSerializer: (param) => queryString.stringify(param),
 });
 
-// axiosRetry(axiosClient, {
-//   retries: 1,
-//   retryCondition: (error) => {
-//     console.log({ error });
-//     return error.response.status === HttpStatusCode.Unauthorized;
-//   },
-// });
-
 // Config Authorization header
 axiosClient.interceptors.request.use(async (config) => {
   const accessToken = store.getState()?.auth?.accessToken;
@@ -72,17 +64,17 @@ axiosClient.interceptors.response.use(
       }
     }
     // Handle not found
-    if (status === HttpStatusCode.NotFound) {
-      toast.warn("Không tìm thấy tài nguyên");
-    }
+    // if (status === HttpStatusCode.NotFound) {
+    //   toast.warn("Không tìm thấy tài nguyên");
+    // }
     // Handle error server
     if (status === HttpStatusCode.InternalServerError) {
       toast.warn("Đã có lỗi xảy ra");
     }
     // Handle bad request
-    if (status === HttpStatusCode.BadRequest) {
-      toast.warn("Yêu cầu không hợp lệ");
-    }
+    // if (status === HttpStatusCode.BadRequest) {
+    //   toast.warn("Yêu cầu không hợp lệ");
+    // }
     // Handle access is denied
     if (status === HttpStatusCode.Forbidden) {
       toast.warn("Không có quyền truy câp");

@@ -126,7 +126,7 @@ function EnrollTopicModal(props) {
           </div>
           {/* Select student field*/}
           <div className='mb-2 block font-Roboto'>
-            <Label htmlFor='email1' value='SVTH' className='mb-2 block' />
+            <Label value='SVTH' className='mb-2 block' />
             <Select
               placeholder='Lựa chọn SVTH'
               options={options}
@@ -169,7 +169,7 @@ function EnrollTopicModal(props) {
               editor={ClassicEditor}
               onChange={(event, editor) => {
                 const data = editor.getData();
-                formik.values.goal = data;
+                formik.setFieldValue("goal", data);
               }}
             />
           </div>
@@ -185,7 +185,8 @@ function EnrollTopicModal(props) {
               editor={ClassicEditor}
               onChange={(event, editor) => {
                 const data = editor.getData();
-                formik.values.requirement = data;
+                // formik.values.requirement = data;
+                formik.setFieldValue("requirement", data);
               }}
             />
           </div>

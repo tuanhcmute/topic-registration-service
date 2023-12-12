@@ -17,7 +17,7 @@ function StudentHomePage() {
           Đề tài của tôi
         </NavLink>
         <NavLink
-          to={"/student/view"}
+          to={"/student/lecture"}
           className='md:w-64 w-full h-64 flex items-center justify-center bg-banner bg-no-repeat bg-cover bg-center font-Roboto font-bold text-xl text-primary shadow-md cursor-pointer hover:shadow-xl transition-shadow ease-linear'
         >
           Giảng viên

@@ -32,15 +32,10 @@ class UserController {
     }
   };
 
-  public async getLecturesByMajor(req: Request, res: Response, next: NextFunction) {
-    // Get and validate Major code
-    const majorCodeRequest = req.query["majorCode"] as string;
-    if (_.isNull(majorCodeRequest) || _.isUndefined(majorCodeRequest) || _.isEmpty(majorCodeRequest))
-      throw new ValidateFailException("Major code is not valid");
-
+  public async getAllLectures(req: Request, res: Response, next: NextFunction) {
     try {
       // Reponse
-      res.status(StatusCodes.OK).json(await userService.getLecturesByMajor(majorCodeRequest));
+      res.status(StatusCodes.OK).json(await userService.getAllLectures());
     } catch (error) {
       logger.error("Error: ", error);
       next(error);
@@ -135,9 +130,12 @@ class UserController {
       const result = await userService.createUser(user);
       if (result) {
         return res
-          .status(StatusCodes.CREATED)
+          .status(StatusCodes.OK)
           .json(
-            new ResponseModelBuilder().withMessage("Create user successfully.").withStatusCode(StatusCodes.OK).build()
+            new ResponseModelBuilder()
+              .withMessage("Create user successfully.")
+              .withStatusCode(StatusCodes.CREATED)
+              .build()
           );
       }
     } catch (error) {

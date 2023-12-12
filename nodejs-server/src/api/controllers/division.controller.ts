@@ -67,6 +67,20 @@ class DivisionController {
       next(error);
     }
   }
+
+  public async getDivisionByTopic(req: Request, res: Response, next: NextFunction) {
+    try {
+      // Validate topic type
+      const topicId = req.params["topicId"]?.toString().trim() as string;
+      if (_.isUndefined(topicId) || _.isEmpty(topicId)) throw new ValidateFailException("Topic id is not valid");
+      logger.info("Topic id request: ", topicId);
+      // Response
+      res.status(StatusCodes.OK).json(await divisionService.getDivisionByTopic(topicId));
+    } catch (error) {
+      logger.error(error);
+      next(error);
+    }
+  }
 }
 
 export default new DivisionController();

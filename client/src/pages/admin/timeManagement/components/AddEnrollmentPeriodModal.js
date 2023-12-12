@@ -203,6 +203,6 @@ export default AddEnrollmentPeriodModal;
 AddEnrollmentPeriodModal.propTypes = {
   openModal: PropTypes.any,
   setOpenModal: PropTypes.func.isRequired,
-  data: PropTypes.object.isRequired,
+  data: PropTypes.object,
   createEnrollmentPeriod: PropTypes.func.isRequired,
 };

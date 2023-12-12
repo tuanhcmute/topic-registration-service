@@ -1,5 +1,5 @@
-import axiosClient from "./axiosClient";
 import { headers } from "../utils/constants";
+import axiosClient from "./axiosClient";
 
 const baseUrl = "/user";
 const userService = {
@@ -9,18 +9,14 @@ const userService = {
   },
   updateBiographyInUserProfile: (data) => {
     const requestUrl = `${baseUrl}/profile`;
-    return axiosClient.put(requestUrl, data, {
-      headers: {
-        [headers.CONTENT_TYPE]: headers.APPLICATION_FORM_URLENCODED_VALUE,
-      },
-    });
+    return axiosClient.put(requestUrl, data);
   },
-  getStudentsNotEnrolledInTopic: () => {
+  fetchStudentsNotEnrolledInTopic: () => {
     const requestUrl = `${baseUrl}/student`;
     return axiosClient.get(requestUrl);
   },
-  fetchLecturesByMajor: (majorCode) => {
-    const requestUrl = `${baseUrl}/lecture?majorCode=${majorCode}`;
+  fetchAllLectures: () => {
+    const requestUrl = `${baseUrl}/lecture`;
     return axiosClient.get(requestUrl);
   },
   updateAvatarInUserProfile: (file) => {
@@ -33,9 +29,13 @@ const userService = {
       },
     });
   },
-  fetchAllUsers: () => {
-    const requestUrl = `${baseUrl}/admin`;
+  fetchAllUsers: (pageNumber, itemsPerPage, sortBy) => {
+    const requestUrl = `${baseUrl}?pageNumber=${pageNumber}&pageSize=${itemsPerPage}&sortBy=${sortBy}`;
     return axiosClient.get(requestUrl);
+  },
+  createUser: (data) => {
+    const requestUrl = `${baseUrl}/admin`;
+    return axiosClient.post(requestUrl, data);
   },
 };
 

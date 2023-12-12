@@ -28,6 +28,7 @@ class SemesterService {
       throw error;
     }
   }
+
   public async createSemester(request: NewSemesterRequest) {
     try {
       await Semester.create({
@@ -46,6 +47,7 @@ class SemesterService {
       throw error;
     }
   }
+
   public async getSemesterById(id: string) {
     try {
       const semester = await Semester.findByPk(id);
@@ -60,6 +62,7 @@ class SemesterService {
       throw error;
     }
   }
+
   public async updateSemester(id: string, request: UpdateSemesterRequest) {
     try {
       const semester = await Semester.findByPk(id);
@@ -73,6 +76,21 @@ class SemesterService {
         .withMessage("Semester has been successfully updated")
         .withStatusCode(StatusCodes.OK)
         .build();
+    } catch (error) {
+      logger.error({ error });
+      throw error;
+    }
+  }
+
+  public async getActivatedSemester() {
+    try {
+      const semester = await Semester.findOne({
+        where: {
+          status: SemesterStatus.ACTIVATED.toString()
+        }
+      });
+      if (_.isNull(semester)) throw new ValidateFailException("Activated semester could not be found");
+      return semester;
     } catch (error) {
       logger.error({ error });
       throw error;

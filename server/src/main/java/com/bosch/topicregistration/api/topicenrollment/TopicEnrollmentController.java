@@ -3,6 +3,7 @@ package com.bosch.topicregistration.api.topicenrollment;
 import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
 import com.bosch.topicregistration.api.response.Response;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequestMapping("/topic-enrollment")
 @Slf4j
 @RequiredArgsConstructor
+@Tag(name = "Topic enrollment APIs")
 public class TopicEnrollmentController {
 
     private final TopicEnrollmentService topicEnrollmentService;
@@ -25,7 +27,7 @@ public class TopicEnrollmentController {
     @DeleteMapping
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE')")
+    @PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_LECTURE')")
     public Response<Void> deleteTopicEnrollment(@RequestParam("ntid") String ntid) {
         if (StringUtils.isEmpty(ntid)) throw new BadRequestException("Ntid is not valid");
         return topicEnrollmentService.deleteTopicEnrollment(ntid);
@@ -35,7 +37,7 @@ public class TopicEnrollmentController {
     @PostMapping
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE')")
+    @PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_LECTURE')")
     public Response<Void> createTopicEnrollment(@RequestBody @Valid CreateTopicEnrollmentRequest request) {
         return topicEnrollmentService.createTopicEnrollment(request);
     }

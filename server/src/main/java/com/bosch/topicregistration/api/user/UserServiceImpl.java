@@ -3,17 +3,24 @@ package com.bosch.topicregistration.api.user;
 import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.firebase.FirebaseService;
 import com.bosch.topicregistration.api.logging.LoggerAround;
+import com.bosch.topicregistration.api.response.PageResponse;
 import com.bosch.topicregistration.api.response.Response;
 import com.bosch.topicregistration.api.topicenrollment.TopicEnrollmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -124,12 +131,25 @@ public class UserServiceImpl implements UserService {
             if(Objects.isNull(imageFile.getContentType()) || !imageFile.getContentType().startsWith("image/"))
                 throw new BadRequestException("File is not valid");
 
-//            Save file
+//            get user
+            User user = userCommon.getCurrentUserByCurrentAuditor();
+
+            // Get filename from image url
+            String filename = "";
+            String pattern = "/([^/]+)\\?alt=media$";
+            Pattern regex = Pattern.compile(pattern);
+            Matcher matcher = regex.matcher(user.getImageUrl());
+            if (matcher.find()) {
+                filename = matcher.group(1);
+                // Delete old image if exist
+                if(firebaseService.isFileExist(filename)) {
+                    firebaseService.delete(filename);
+                }
+            }
+
+            // Save new image
             String imageUrl = firebaseService.save(imageFile);
             log.info("Image url: {}", imageUrl);
-
-//            Update user
-            User user = userCommon.getCurrentUserByCurrentAuditor();
             user.setImageUrl(imageUrl);
             userRepository.save(user);
 
@@ -142,5 +162,23 @@ public class UserServiceImpl implements UserService {
             log.error(e.getMessage());
             throw new BadRequestException(e.getMessage());
         }
+    }
+
+    @Override
+    public Response<PageResponse<List<UserDTO>>> getAllUsers(Integer pageNumber, Integer pageSize, String sortBy) {
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
+        Page<User> userPage = userRepository.findAll(paging);
+        List<UserDTO> listUserDTO = userMapper.toListDTO(userPage.getContent());
+        PageResponse<List<UserDTO>> pageData = PageResponse.<List<UserDTO>>builder()
+                .totalPages(userPage.getTotalPages())
+                .content(listUserDTO)
+                .build();
+        Map<String, PageResponse<List<UserDTO>>> data = new HashMap<>();
+        data.put("pageData", pageData);
+        return Response.<PageResponse<List<UserDTO>>>builder()
+                .message("Users have been successfully retrieved")
+                .statusCode(HttpStatus.OK.value())
+                .data(data)
+                .build();
     }
 }

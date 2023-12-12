@@ -12,33 +12,30 @@ import {
 } from "@interfaces";
 import { EnrollmentPeriod, Semester } from "@models";
 import { logger } from "@configs";
+import semesterService from "./semester.service";
 
 class EnrollmentPeriodService {
-  public async getEnrollmentPeriod(type: string, period: string): Promise<IResponseModel<IEnrollmentPeriodResponse>> {
+  public async getActivatedEnrollmentPeriod(type: string): Promise<IResponseModel<IEnrollmentPeriodResponse>> {
     // Validate request data
     if (_.isNull(type) || _.isUndefined(type)) throw new ValidateFailException("Type parameter is empty");
-    if (_.isNull(period) || _.isUndefined(period)) throw new ValidateFailException("Period parameter is empty");
 
     // Validate topic type
     const isTypeValid = Object.values(TopicType).some((item) => _.isEqual(item, type));
     if (!isTypeValid) throw new ValidateFailException("Topic type is not valid");
 
-    // Validate Enrollment Period Code
-    const isMatchEnrollmentPeriodCode = Object.values(EnrollmentPeriodCode).some((item) => _.isEqual(item, period));
-    if (!isMatchEnrollmentPeriodCode) throw new ValidateFailException("Enrollment Period is not valid");
-
     // Get parameters from ENUM
     const topicType = type as TopicType;
-    const enrollmentPeriodCode = period as EnrollmentPeriodCode;
-    const semesterStatus = SemesterStatus.ACTIVATED;
+
+    // Get activated semester
+    const semester = await semesterService.getActivatedSemester();
 
     try {
       // Get Enrollment Period based on Topic type, Enrollment Period with Activated
       const enrollmentPeriod = await EnrollmentPeriod.findOne({
         where: {
           type: topicType.toString(),
-          code: enrollmentPeriodCode.toString(),
-          status: semesterStatus.toString()
+          status: SemesterStatus.ACTIVATED.toString(),
+          semesterId: semester.id
         },
         attributes: ["code", "name", "startDate", "endDate", "type"],
         include: [{ model: Semester, as: "semester", attributes: ["id", "name"] }]

@@ -1,13 +1,11 @@
 package com.bosch.topicregistration.api.enrollmentperiod;
 
-import java.util.Set;
-
 import com.bosch.topicregistration.api.response.Response;
 
-public interface EnrollmentPeriodService {
-    Response<EnrollmentPeriodDTO> getEnrollmentPeriod(String type, String period);
+import java.util.Set;
 
-    Response<EnrollmentPeriodDTO> registrationTopic(NewTopicRegistration newTopicRegistration);
+public interface EnrollmentPeriodService {
+    Response<EnrollmentPeriodDTO> getActivatedEnrollmentPeriod(String type);
 
     Response<Set<EnrollmentPeriodDTO>> getListEnrollmentPeriodBySemester(String semesterId);
 }

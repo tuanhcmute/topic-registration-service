@@ -13,7 +13,10 @@ import com.bosch.topicregistration.api.topicenrollment.CreateTopicEnrollmentRequ
 import com.bosch.topicregistration.api.topicenrollment.TopicEnrollment;
 import com.bosch.topicregistration.api.topicenrollment.TopicEnrollmentRepository;
 import com.bosch.topicregistration.api.topicenrollment.TopicEnrollmentService;
-import com.bosch.topicregistration.api.user.*;
+import com.bosch.topicregistration.api.user.Major;
+import com.bosch.topicregistration.api.user.MajorRepository;
+import com.bosch.topicregistration.api.user.User;
+import com.bosch.topicregistration.api.user.UserCommon;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -299,6 +302,14 @@ public class TopicServiceImpl implements TopicService {
         Page<Topic> topicPage = topicRepository.findBySemesterAndTypeAndMajorAndStatusIn(currentSemester, topicType, currentStudent.getMajor(), statuses, paging);
         log.info("Size page: {}", topicPage.getContent().size());
         return buildResponse(topicPage);
+    }
+
+    @Override
+    public Response<List<TopicDTO>> getAllTopics( Integer pageNumber, Integer pageSize, String sortBy) {
+//        Define paging
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
+        Page<Topic> topics = topicRepository.findAll(paging);
+        return  buildResponse(topics);
     }
 
     private Response<List<TopicDTO>> buildResponse(Page<Topic> topicPage) {

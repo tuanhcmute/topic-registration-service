@@ -48,7 +48,7 @@ class TopicEnrollmentService {
 
     // Build response
     return new ResponseModelBuilder<void>()
-      .withStatusCode(StatusCodes.OK)
+      .withStatusCode(StatusCodes.CREATED)
       .withMessage("Topic enrollments have been successfully created")
       .build();
   }

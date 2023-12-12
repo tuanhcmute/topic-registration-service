@@ -31,15 +31,18 @@ export class UpdatedBio {
 export class UserRequest {
   @IsEmail({}, { message: "Email is not valid" })
   public email: string;
+
   @IsNotEmpty({ message: "Name is not empty" })
   public name: string;
+
   @IsNotEmpty({ message: "Ntid is not empty" })
   public ntid: string;
-  @IsNotEmpty({ message: "Major is not empty" })
+
   public majorId: string;
-  @IsNotEmpty({ message: "Class is not empty" })
+
   public clazzId: string;
-  @IsNotEmpty({ message: "role is not empty" })
-  public role: string[];
+
+  public role: string;
+
   public biography: string;
 }

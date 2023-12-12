@@ -10,6 +10,10 @@ const divisionService = {
     const requestUrl = `${baseUrl}?topicType=${type}`;
     return axiosClient.get(requestUrl);
   },
+  fetchDivisionByTopic: (topicId) => {
+    const requestUrl = `${baseUrl}/${topicId}`;
+    return axiosClient.get(requestUrl);
+  },
 };
 
 export default divisionService;

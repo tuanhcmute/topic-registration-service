@@ -15,7 +15,7 @@ class EnrollmentPeriodRoutes implements IRoutes {
     this.router.get(
       `${this.path}`,
       preAuthorizeFilter([RoleCode.ROLE_STUDENT, RoleCode.ROLE_LECTURE]),
-      enrollmentPeriodController.getEnrollmentPeriod
+      enrollmentPeriodController.getActivatedEnrollmentPeriod
     );
 
     // [GET] /api/v1/enrollment-period/all?semesterId=${semesterId}

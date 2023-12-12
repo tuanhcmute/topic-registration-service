@@ -247,7 +247,7 @@ class TopicService {
       .build();
   }
 
-  public getAllTopicsRoleAdmin = async (): Promise<IResponseModel<IListTopicResponse>> => {
+  public getAllTopics = async (): Promise<IResponseModel<IListTopicResponse>> => {
     try {
       const topics = await Topic.findAll({
         include: [
@@ -261,10 +261,11 @@ class TopicService {
             as: "topicEnrollments",
             include: [{ model: User, as: "student", attributes: ["ntid", "name"] }],
             attributes: ["id"]
-          }
+          },
+          { model: Major, as: "major", attributes: ["code", "name"] }
         ],
         attributes: {
-          exclude: ["createdBy", "createdDate", "updatedDate", "lectureId", "majorId", "semesterId", "id"]
+          exclude: ["createdBy", "createdDate", "updatedDate", "lectureId", "semesterId"]
         },
         order: ["createdDate"]
       });

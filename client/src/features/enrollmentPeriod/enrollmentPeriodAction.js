@@ -4,11 +4,11 @@ import { toast } from "react-toastify";
 import { enrollmentPeriodService } from "../../services";
 
 export const namespace = "enrollmentPeriod";
-export const fetchEnrollmentPeriodByTopicTypeAndPeriodCode = createAsyncThunk(
-  `${namespace}/fetchEnrollmentPeriodByTopicTypeAndPeriodCode`,
+export const fetchActivatedEnrollmentPeriod = createAsyncThunk(
+  `${namespace}/fetchActivatedEnrollmentPeriod`,
   async ({ topicType, periodCode }, { rejectWithValue }) => {
     const response =
-      await enrollmentPeriodService.getEnrollmentPeriodByTopicTypeAndPeriodCode(
+      await enrollmentPeriodService.fetchActivatedEnrollmentPeriod(
         topicType,
         periodCode
       );
@@ -68,7 +68,7 @@ export const updateEnrollmentPeriod = createAsyncThunk(
       dispatch(fetchEnrollmentPeriodBySemesterId(semesterId));
       return response.data;
     }
-    toast.error("Thêm khoảng thời gian thất bại");
+    toast.error("Chỉnh sửa khoảng thời gian thất bại");
     return rejectWithValue(response?.data);
   }
 );

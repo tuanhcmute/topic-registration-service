@@ -1,11 +1,10 @@
 package com.bosch.topicregistration.api.firebase;
 
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
+import com.bosch.topicregistration.api.exception.BadRequestException;
+import com.google.cloud.storage.*;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.cloud.StorageClient;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -46,6 +45,13 @@ public class FirebaseServiceImpl implements FirebaseService {
     }
 
     @Override
+    public Boolean isFileExist(String imageUrl) {
+        BlobId blobId = BlobId.of(bucketName, "76336eae-5579-483e-9e41-33503b852005.jpg");
+        Blob blob = storage.get(blobId);
+        return Objects.nonNull(blob);
+    }
+
+    @Override
     public String save(BufferedImage bufferedImage, String originalFileName) throws IOException {
 //        byte[] bytes = getByteArrays(bufferedImage, getExtension(originalFileName));
 //
@@ -61,9 +67,8 @@ public class FirebaseServiceImpl implements FirebaseService {
 
     @Override
     public void delete(String name) {
-//        if (StringUtils.isEmpty(name)) throw new BadRequestException("File name is not valid");
-//        Blob blob = bucket.get(name);
-//        if (Objects.isNull(blob)) throw new BadRequestException("File could not be found");
-//        blob.delete();
+        if (StringUtils.isEmpty(name)) throw new BadRequestException("File name is not valid");
+        BlobId blobId = BlobId.of(bucketName, name);
+        storage.delete(blobId);
     }
 }

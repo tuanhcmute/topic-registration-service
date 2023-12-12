@@ -3,7 +3,6 @@ package com.bosch.topicregistration.api.division;
 import com.bosch.topicregistration.api.topic.Topic;
 import com.bosch.topicregistration.api.topic.TopicDTO;
 import com.bosch.topicregistration.api.topic.TopicMapper;
-import com.bosch.topicregistration.api.user.LectureDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

@@ -10,14 +10,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
 import java.util.Set;
 
-import static com.bosch.topicregistration.api.enrollmentperiod.TopicRegistrationValidator.*;
 
 @Slf4j
 @RestController
-@Tag(name = "EnrollmentPeriod APIs")
+@Tag(name = "Enrollment period APIs")
 @RequiredArgsConstructor
 @RequestMapping("/enrollment-period")
 public class EnrollmentPeriodController {
@@ -25,38 +23,17 @@ public class EnrollmentPeriodController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE')")
+    @PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_LECTURE')")
     @LoggerAround
-    public Response<EnrollmentPeriodDTO> getEnrollmentPeriod(@RequestParam("type") String type,
-                                                             @RequestParam("period") String period) {
+    public Response<EnrollmentPeriodDTO> getActivatedEnrollmentPeriod(@RequestParam("type") String type) {
         if (type.isEmpty())
             throw new BadRequestException("Type parameter is empty");
-        if (period.isEmpty())
-            throw new BadRequestException("Period parameter is empty");
-        return enrollmentPeriodService.getEnrollmentPeriod(type, period);
+        return enrollmentPeriodService.getActivatedEnrollmentPeriod(type);
     }
 
-    @PostMapping("/enrollment")
+    @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_ADMIN')")
-    @LoggerAround
-    public Response<EnrollmentPeriodDTO> registrationTopic(@RequestBody(required = false) NewTopicRegistration newTopicRegistration) {
-        if (Objects.isNull(newTopicRegistration))
-            throw new BadRequestException("Request is empty");
-
-        TopicRegistrationValidatorResult result = isTopicCodeValid()
-                .and(isStudentsValid())
-                .and(isStudentCodeValid())
-                .apply(newTopicRegistration);
-
-        if (!result.equals(TopicRegistrationValidatorResult.VALID))
-            throw new BadRequestException(result.getMessage());
-        return enrollmentPeriodService.registrationTopic(newTopicRegistration);
-    }
-
-    @GetMapping("/get")
-    @ResponseStatus(HttpStatus.OK)
-    // @PreAuthorize("hasAuthority('ROLE_STUDENT') or hasAuthority('ROLE_LECTURE')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @LoggerAround
     public Response<Set<EnrollmentPeriodDTO>> getListEnrollmentPeriodBySemester(@RequestParam("semesterId") String semesterId) {
         if(semesterId.isEmpty())

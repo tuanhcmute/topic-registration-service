@@ -44,8 +44,8 @@ class UserRoutes implements IRoutes {
     // [GET] /api/v1/user/lecture
     this.router.get(
       `${this.path}/lecture`,
-      preAuthorizeFilter([RoleCode.ROLE_LECTURE]),
-      userController.getLecturesByMajor
+      preAuthorizeFilter([RoleCode.ROLE_LECTURE, RoleCode.ROLE_STUDENT]),
+      userController.getAllLectures
     );
 
     // [GET] /api/v1/user/admin
@@ -58,7 +58,8 @@ class UserRoutes implements IRoutes {
       userController.findUserByName
     );
 
-    this.router.post(`${this.path}/admin`, preAuthorizeFilter([RoleCode.ROLE_LECTURE]), userController.createUser);
+    // [POST] /api/v1/user/admin
+    this.router.post(`${this.path}/admin`, preAuthorizeFilter([RoleCode.ROLE_ADMIN]), userController.createUser);
   }
 }
 

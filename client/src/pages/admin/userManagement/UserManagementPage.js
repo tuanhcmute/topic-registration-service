@@ -1,5 +1,4 @@
 import _ from "lodash";
-import { LiaEditSolid } from "react-icons/lia";
 import { AiOutlineFilter } from "react-icons/ai";
 import React, { useEffect, useState } from "react";
 import { Button, TextInput } from "flowbite-react";
@@ -8,23 +7,37 @@ import { BsThreeDots } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 
 import AddUserModal from "./components/AddUserModal";
-import EditUserModal from "./components/EditUserModal";
+import DetailUserModal from "./components/DetailUserModal";
 import { topicStatus } from "../../../utils/constants";
 import { Dropdown } from "../../../components/dropdown1";
 import { roleCode } from "../../../utils/constants/roles";
-import { fetchAllUsers } from "../../../features/user";
+import { createUser, fetchAllUsers } from "../../../features/user";
+import { PaginatedItems } from "../../../components/pagination";
 
 function UserManagementPage() {
   const [openAddUserModal, setOpenAddUserModal] = useState(undefined);
-  const [openEditUserModal, setOpenEditUserModal] = useState(undefined);
+  const [openDetailUserModal, setOpenDetailUserModal] = useState(undefined);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [roleFilter, setRoleFilter] = useState(roleCode.ROLE_ALL.value);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [pageNumber, setPageNumber] = useState(0);
+  const [sortBy, setSortBy] = useState("createdDate");
 
   const dispatch = useDispatch();
-  const users = useSelector((state) => state.user?.users);
+  const pageData = useSelector((state) => state.user?.pageData);
+
+  function handleCreateUser(requestData) {
+    dispatch(createUser({ data: requestData, setOpenAddUserModal }));
+  }
+
+  function handlePageClick(newOffset) {
+    console.log({ newOffset });
+    setPageNumber(newOffset);
+  }
 
   useEffect(() => {
-    dispatch(fetchAllUsers());
-  }, []);
+    dispatch(fetchAllUsers({ pageNumber, itemsPerPage, sortBy }));
+  }, [pageNumber, itemsPerPage, sortBy]);
 
   return (
     <React.Fragment>
@@ -87,7 +100,18 @@ function UserManagementPage() {
               <span>Lọc theo ngành</span>
             </Button>
           </div>
+          <div className='w-fit'>
+            <Button
+              id='itemsPerPage'
+              color='gray'
+              className='rounded-md p-0 cursor-default flex items-center'
+            >
+              <AiOutlineFilter className='mr-1' />
+              <span>Hiển thị</span>
+            </Button>
+          </div>
         </div>
+
         <Dropdown
           place='right-right'
           className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
@@ -99,11 +123,34 @@ function UserManagementPage() {
                 <div
                   key={roleCode[item].value}
                   className='text-sm px-2 py-1 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer'
+                  onClick={() => setRoleFilter(roleCode[item]?.value)}
                 >
                   {roleCode[item].label}
                 </div>
               );
             })}
+          </div>
+        </Dropdown>
+
+        <Dropdown
+          place='right-right'
+          className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
+          anchorSelect='#itemsPerPage'
+        >
+          <div className='flex flex-col gap-2 p-3'>
+            {[...Array(5).keys()]
+              .filter((item) => item !== 0)
+              .map((item) => {
+                return (
+                  <div
+                    key={item}
+                    className='text-sm px-2 py-1 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer'
+                    onClick={() => setItemsPerPage(item * 5)}
+                  >
+                    {item * 5} người dùng
+                  </div>
+                );
+              })}
           </div>
         </Dropdown>
 
@@ -132,111 +179,99 @@ function UserManagementPage() {
                       </tr>
                     </thead>
                     <tbody className='text-gray-600 text-sm font-light'>
-                      {/* {topics
+                      {pageData?.users
                         ?.filter((item) => {
-                          if (
-                            _.isEqual(topicStatusFilter, topicStatus.all.value)
-                          )
+                          if (_.isEqual(roleFilter, roleCode?.ROLE_ALL?.value))
                             return true;
-                          return item?.status === topicStatusFilter;
-                        }) */}
-                      {users?.map((item, index) => {
-                        let statusColor = "";
-                        if (
-                          _.isEqual(item?.status, topicStatus.approved.value)
-                        ) {
-                          statusColor = "bg-green-200";
-                        }
-                        if (
-                          _.isEqual(item?.status, topicStatus.rejected.value)
-                        ) {
-                          statusColor = "bg-red-300";
-                        }
-                        if (
-                          _.isEqual(item?.status, topicStatus.pending.value)
-                        ) {
-                          statusColor = "bg-teal-200";
-                        }
-                        if (
-                          _.isEqual(item?.status, topicStatus.updated.value)
-                        ) {
-                          statusColor = "bg-teal-200";
-                        } else statusColor = "bg-teal-200";
-                        return (
-                          <tr
-                            className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'
-                            key={item.id}
-                          >
-                            <td className='p-3 text-center whitespace-nowrap border w-4'>
-                              {index + 1}
-                            </td>
-                            <td className='p-3 text-left border border-collapse border-lightGrey w-20'>
-                              <span className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
-                                {item?.ntid}
-                              </span>
-                            </td>
-                            <td className='p-3 text-left border border-collapse border-lightGrey'>
-                              <p className='font-normal'>{item?.name}</p>
-                            </td>
-                            <td className='p-3 border border-collapse border-lightGrey w-48'>
-                              <p
-                                className={`${statusColor} py-1 px-3 text-sm font-medium rounded dark:text-black-pearl break-all`}
-                              >
-                                {item?.email}
-                              </p>
-                            </td>
-                            <td className='p-3 text-center border border-collapse border-lightGrey w-36'>
-                              <div className='flex gap-2 flex-col'>
-                                {item?.userRoles?.map((item) => {
-                                  return (
-                                    <p className='w-fit bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
-                                      {item?.role?.code}
-                                    </p>
-                                  );
-                                })}
-                              </div>
-                            </td>
-                            <td className='border border-collapse border-lightGrey w-20'>
-                              <div className='flex justify-center flex-col gap-3 items-center m-2'>
-                                <BsThreeDots
-                                  className='w-6 h-6 cursor-pointer'
-                                  id={`actions-${item?.id}`}
-                                />
-                              </div>
-                              <Dropdown
-                                place='right-right'
-                                className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
-                                anchorSelect={`#actions-${item?.id}`}
-                              >
-                                <div className='flex flex-col gap-3 p-3'>
-                                  <div
-                                    className='flex items-center gap-1 cursor-pointer'
-                                    onClick={() => {
-                                      setSelectedUser(item);
-                                      // setOpenEditTimeModal("default");
-                                    }}
-                                  >
-                                    <LiaEditSolid className='w-6 h-6 cursor-pointer' />
-                                    <p>Chỉnh sửa người dùng</p>
-                                  </div>
-                                  <div
-                                    className='flex items-center gap-1 cursor-pointer'
-                                    onClick={() => {
-                                      setSelectedUser(item);
-                                      // setOpenListEnrollmentPeriodModal(
-                                      //   "default"
-                                      // );
-                                    }}
-                                  >
-                                    <BiMessageRoundedError className='w-6 h-6 cursor-pointer' />
-                                    <p>DS khoảng thời gian</p>
-                                  </div>
+                          return item?.userRoles?.some(
+                            (item2) => item2 === roleFilter
+                          );
+                        })
+                        ?.map((item, index) => {
+                          let statusColor = "";
+                          if (
+                            _.isEqual(item?.status, topicStatus.approved.value)
+                          ) {
+                            statusColor = "bg-green-200";
+                          }
+                          if (
+                            _.isEqual(item?.status, topicStatus.rejected.value)
+                          ) {
+                            statusColor = "bg-red-300";
+                          }
+                          if (
+                            _.isEqual(item?.status, topicStatus.pending.value)
+                          ) {
+                            statusColor = "bg-teal-200";
+                          }
+                          if (
+                            _.isEqual(item?.status, topicStatus.updated.value)
+                          ) {
+                            statusColor = "bg-teal-200";
+                          } else statusColor = "bg-teal-200";
+                          return (
+                            <tr
+                              className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'
+                              key={item.ntid}
+                            >
+                              <td className='p-3 text-center whitespace-nowrap border w-4'>
+                                {index + 1}
+                              </td>
+                              <td className='p-3 text-left border border-collapse border-lightGrey w-20'>
+                                <span className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
+                                  {item?.ntid}
+                                </span>
+                              </td>
+                              <td className='p-3 text-left border border-collapse border-lightGrey'>
+                                <p className='font-normal'>{item?.name}</p>
+                              </td>
+                              <td className='p-3 border border-collapse border-lightGrey w-48'>
+                                <p
+                                  className={`${statusColor} py-1 px-3 text-sm font-medium rounded dark:text-black-pearl break-all`}
+                                >
+                                  {item?.email}
+                                </p>
+                              </td>
+                              <td className='p-3 text-center border border-collapse border-lightGrey w-36'>
+                                <div className='flex gap-2 flex-col'>
+                                  {item?.userRoles?.map((item) => {
+                                    return (
+                                      <p className='w-fit bg-orange-200 py-1 px-3 text-sm font-normal rounded dark:text-black-pearl'>
+                                        {roleCode[item]?.label}
+                                      </p>
+                                    );
+                                  })}
                                 </div>
-                              </Dropdown>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                              </td>
+                              <td className='border border-collapse border-lightGrey w-20'>
+                                <div className='flex justify-center flex-col gap-3 items-center m-2'>
+                                  <BsThreeDots
+                                    className='w-6 h-6 cursor-pointer'
+                                    id={`actions-${item?.ntid}`}
+                                  />
+                                </div>
+                                <Dropdown
+                                  place='right-right'
+                                  className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
+                                  anchorSelect={`#actions-${item?.ntid}`}
+                                >
+                                  <div className='flex flex-col gap-3 p-3'>
+                                    <div
+                                      className='flex items-center gap-1 cursor-pointer'
+                                      onClick={() => {
+                                        setSelectedUser(item);
+                                        setOpenDetailUserModal("default");
+                                      }}
+                                    >
+                                      <BiMessageRoundedError className='w-6 h-6 cursor-pointer' />
+                                      <p>Xem chi tiết</p>
+                                    </div>
+                                  </div>
+                                </Dropdown>
+                              </td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </table>
                 </div>
@@ -246,7 +281,11 @@ function UserManagementPage() {
         </div>
         <div className='w-full flex justify-end p-3'>
           {/* <Pagination /> */}
-          {/* <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} /> */}
+          <PaginatedItems
+            items={[...Array(pageData?.totalPages * itemsPerPage).keys()]}
+            itemsPerPage={itemsPerPage}
+            onPageClick={handlePageClick}
+          />
         </div>
         {/* End table */}
       </div>
@@ -254,11 +293,12 @@ function UserManagementPage() {
       <AddUserModal
         openModal={openAddUserModal}
         setOpenModal={setOpenAddUserModal}
+        createUser={handleCreateUser}
       />
-      <EditUserModal
+      <DetailUserModal
         data={selectedUser}
-        openModal={openEditUserModal}
-        setOpenModal={setOpenEditUserModal}
+        openModal={openDetailUserModal}
+        setOpenModal={setOpenDetailUserModal}
       />
       {/* End content */}
     </React.Fragment>

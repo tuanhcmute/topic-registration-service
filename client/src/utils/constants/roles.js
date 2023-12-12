@@ -25,4 +25,8 @@ export const roleCode = {
     value: ROLE_ADMIN,
     label: "Admin",
   },
+  ROLE_ALL: {
+    value: "ROLE_ALL",
+    label: "Tất cả",
+  },
 };
