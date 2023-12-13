@@ -51,7 +51,7 @@ function AppreciationManagementPage() {
                           Đề tài phản biện
                         </th>
                         <th className='p-3 text-center border'>GVHD</th>
-                        <th className='p-3 text-center'>Thời gian</th>
+                        <th className='p-3 text-center border'>Thời gian</th>
                         <th className='p-3 text-center border'>Phòng</th>
                         <th className='py-3 px-6 text-center border'></th>
                       </tr>

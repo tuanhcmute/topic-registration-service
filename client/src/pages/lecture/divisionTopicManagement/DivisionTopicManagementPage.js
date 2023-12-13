@@ -11,6 +11,7 @@ import { fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod } from "../../..
 import DivisionTopicModal from "./components/DivisionTopicModal";
 import { fetchAllLectures } from "../../../features/user";
 import { fetchActivatedEnrollmentPeriod } from "../../../features/enrollmentPeriod";
+import { PaginatedItems } from "../../../components/pagination";
 
 function DivisionTopicManagement() {
   const [openModal, setOpenModal] = useState(undefined);
@@ -24,7 +25,6 @@ function DivisionTopicManagement() {
   const enrollmentPeriod = useSelector(
     (state) => state?.enrollmentPeriod?.enrollmentPeriod
   );
-  const lectures = useSelector((state) => state?.user?.lectures);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -38,9 +38,7 @@ function DivisionTopicManagement() {
     }
 
     // Fetch lectures
-    if (_.isEmpty(lectures) || _.isNull(lectures) || _.isUndefined(lectures)) {
-      dispatch(fetchAllLectures());
-    }
+    dispatch(fetchAllLectures());
 
     // Fetch enrollment period
     if (
@@ -201,7 +199,7 @@ function DivisionTopicManagement() {
         </div>
         <div className='w-full flex justify-end p-3'>
           {/* <Pagination /> */}
-          {/* <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} /> */}
+          <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} />
         </div>
         {/* End table */}
       </div>

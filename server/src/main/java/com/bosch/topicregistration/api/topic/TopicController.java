@@ -78,7 +78,7 @@ public class TopicController {
     @PreAuthorize("hasAuthority('ROLE_LECTURE')")
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
-    public Response<Void> createNewTopicInLectureEnrollmentPeriod(@RequestBody @Valid NewTopicRequest request) {
+    public Response<Void> createTopic(@RequestBody @Valid NewTopicRequest request) {
 //        Validate request
         TopicValidatorResult result = TopicRequestValidator.isMajorCodeValid()
                 .and(TopicRequestValidator.isGoalValid())
@@ -90,7 +90,7 @@ public class TopicController {
                 .apply(request);
         if (!result.equals(TopicValidatorResult.VALID)) throw new BadRequestException(result.getMessage());
 //        Call service
-        return topicService.createNewTopicInLectureEnrollmentPeriod(request);
+        return topicService.createTopic(request);
     }
 
     //    [PUT] /api/v1/topic/lecture

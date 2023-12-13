@@ -55,6 +55,9 @@ function TopicManagementPage() {
         data,
         setOpenModal,
         type: topicType.TLCN,
+        itemsPerPage,
+        pageNumber,
+        sortBy,
       })
     );
   }
@@ -64,19 +67,15 @@ function TopicManagementPage() {
         data,
         type: topicType.TLCN,
         setOpenEditTopicModal,
+        itemsPerPage,
+        pageNumber,
+        sortBy,
       })
     );
   }
 
   useEffect(() => {
-    // Fetch student options
-    if (
-      _.isEmpty(studentOptions) ||
-      _.isNull(studentOptions) ||
-      _.isUndefined(studentOptions)
-    ) {
-      dispatch(fetchStudentsNotEnrolledInTopic());
-    }
+    dispatch(fetchStudentsNotEnrolledInTopic());
 
     // Fetch enrollment period
     if (
@@ -129,7 +128,7 @@ function TopicManagementPage() {
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
             TIỂU LUẬN CHUYÊN NGÀNH
           </span>
-          {!isDisabledEnrollment && (
+          {isDisabledEnrollment && (
             <Button
               color='gray'
               className='rounded-md p-0'
@@ -239,14 +238,9 @@ function TopicManagementPage() {
                                 <p className='font-normal'>{item.name}</p>
                               </td>
                               <td className='p-3 text-left border border-collapse border-lightGrey'>
-                                <div className=''>
-                                  <span className='bg-pink-200 dark:bg-gray-300 py-1 px-2 text-sm font-normal rounded dark:text-black-pearl'>
-                                    {currentUser?.ntid}
-                                  </span>
-                                  <span className='block mt-2 font-normal'>
-                                    {currentUser?.name}
-                                  </span>
-                                </div>
+                                <span className='block mt-2 font-normal'>
+                                  {currentUser?.name}
+                                </span>
                               </td>
                               <td className='p-3 text-center border border-collapse border-lightGrey'>
                                 <span
@@ -299,6 +293,7 @@ function TopicManagementPage() {
           <PaginatedItems
             items={[...Array(pageResponse?.totalElements).keys()]}
             itemsPerPage={itemsPerPage}
+            onPageClick={setPageNumber}
           />
         </div>
         {/* End table */}

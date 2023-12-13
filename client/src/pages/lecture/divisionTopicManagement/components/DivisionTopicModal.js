@@ -45,6 +45,8 @@ function DivisionTopicModal(props) {
     formik.setFieldValue("lectureCode", selectedOption?.value);
   }
 
+  console.log(options);
+
   return (
     <Modal
       size='5xl'
@@ -156,7 +158,7 @@ function DivisionTopicModal(props) {
             />
             <div
               dangerouslySetInnerHTML={{ __html: data?.goal }}
-              className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500'
+              className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500 dark:bg-transparent'
             ></div>
           </div>
           {/* End goal field */}
@@ -169,7 +171,7 @@ function DivisionTopicModal(props) {
             />
             <div
               dangerouslySetInnerHTML={{ __html: data?.requirement }}
-              className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500'
+              className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500 dark:bg-transparent'
             ></div>
           </div>
           {/* End requirement field */}
@@ -249,7 +251,6 @@ function DivisionTopicModal(props) {
                   label: item?.name,
                 }))}
                 onChange={(selectedOption) => changeSelect(selectedOption)}
-                isSearchable
               />
             </div>
           </div>

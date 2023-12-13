@@ -65,9 +65,8 @@ public class UserController {
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ROLE_LECTURE')")
-    public Response<List<LectureDTO>> getLecturesByMajor(@RequestParam("majorCode") String majorCode) {
-        if (StringUtils.isBlank(majorCode)) throw new BadRequestException("Major code is not valid");
-        return userService.getLecturesByMajor(majorCode);
+    public Response<List<LectureDTO>> getAllLectures() {
+        return userService.getAllLectures();
     }
 
     @PutMapping(path = "/profile/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

@@ -8,7 +8,7 @@ import java.util.List;
 public interface TopicService {
     Response<PageResponse<List<TopicDTO>>> getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(String type, Integer pageNumber, Integer pageSize, String sortBy);
 
-    Response<Void> createNewTopicInLectureEnrollmentPeriod(NewTopicRequest request);
+    Response<Void> createTopic(NewTopicRequest request);
 
     Response<Void> updateTopicInLectureEnrollmentPeriod(UpdateTopicRequest request);
 

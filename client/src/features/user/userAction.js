@@ -24,7 +24,7 @@ export const removeUserInfo = createAsyncThunk(
 
 export const fetchAllLectures = createAsyncThunk(
   `${namespace}/fetchAllLectures`,
-  async (majorCode, { rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     const response = await userService.fetchAllLectures();
     if (response.data?.statusCode === HttpStatusCode.BadRequest)
       return rejectWithValue(response?.data);

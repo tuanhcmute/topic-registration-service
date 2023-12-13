@@ -8,6 +8,7 @@ import {
   approveTopicInLectureEnrollmentPeriod,
   fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod,
 } from "../../../features/topic";
+import { PaginatedItems } from "../../../components/pagination";
 
 function ApprovalTopicManagementPage() {
   const [openEditTopicModal, setOpenEditTopicModal] = useState(undefined);
@@ -128,7 +129,7 @@ function ApprovalTopicManagementPage() {
         </div>
         <div className='w-full flex justify-end p-3'>
           {/* <Pagination /> */}
-          {/* <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} /> */}
+          <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} />
         </div>
         {/* End table */}
       </div>

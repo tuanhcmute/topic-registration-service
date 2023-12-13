@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "topic_enrollment_tbl")
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners({AuditingEntityListener.class, AuditTopicEnrollmentListener.class})
 public class TopicEnrollment {
     @Id
     @GeneratedValue(generator = "UUID")

@@ -26,7 +26,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "topic_tbl")
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners({AuditingEntityListener.class, AuditTopicListener.class})
 public class Topic implements Serializable {
     @Id
     @GeneratedValue(generator = "UUID")

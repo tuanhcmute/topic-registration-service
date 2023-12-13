@@ -82,7 +82,7 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public Response<Void> createNewTopicInLectureEnrollmentPeriod(NewTopicRequest request) {
+    public Response<Void> createTopic(NewTopicRequest request) {
 //        Validate request
         TopicValidatorResult result = TopicRequestValidator.isMajorCodeValid()
                 .and(TopicRequestValidator.isGoalValid())

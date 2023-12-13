@@ -8,7 +8,6 @@ import com.bosch.topicregistration.api.response.Response;
 import com.bosch.topicregistration.api.topicenrollment.TopicEnrollmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,8 +30,9 @@ public class UserServiceImpl implements UserService {
     private final UserCommon userCommon;
     private final UserRepository userRepository;
     private final TopicEnrollmentRepository topicEnrollmentRepository;
-    private final MajorRepository majorRepository;
     private final FirebaseService firebaseService;
+    private final RoleRepository roleRepository;
+    private final UserRoleRepository userRoleRepository;
 
     @Override
     @LoggerAround
@@ -90,28 +90,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @LoggerAround
-    public Response<List<LectureDTO>> getLecturesByMajor(String majorCode) {
-//        Validate major code
-        if (StringUtils.isBlank(majorCode)) throw new BadRequestException("Major code is not valid");
-        Optional<Major> majorOptional = majorRepository.findByCode(majorCode);
-        if (!majorOptional.isPresent()) throw new BadRequestException("Major could not be found");
-        Major major = majorOptional.get();
+    public Response<List<LectureDTO>> getAllLectures() {
+//        Get role
+        Optional<Role> roleOptional = roleRepository.findByCode(RoleCode.ROLE_LECTURE);
+        if(!roleOptional.isPresent()) throw new BadRequestException("Role could not be found");
+
+        List<UserRole> userRoles = userRoleRepository.findByRole(roleOptional.get());
+
 //        Get lectures
-        List<User> users = userRepository.findByMajor(major);
-//        Filter lectures
-        List<User> filterLectures = new ArrayList<>();
-        for(User user : users) {
-            boolean isLecture = false;
-            for(UserRole userRole : user.getUserRoles()) {
-                if(userRole.getRole().getCode().equals(RoleCode.ROLE_LECTURE)) {
-                    isLecture = true;
-                    break;
-                }
-            }
-            if(isLecture) filterLectures.add(user);
-        }
-//        Mapper to DTO
-        List<LectureDTO> lectures = userMapper.toListLectureDTO(filterLectures);
+        List<User> users = userRoles.stream().map(UserRole::getUser).collect(Collectors.toList());
+        List<LectureDTO> lectures = userMapper.toListLectureDTO(users);
+
 //        Build data
         Map<String, List<LectureDTO>> data = new HashMap<>();
         data.put("lectures", lectures);
@@ -135,7 +124,7 @@ public class UserServiceImpl implements UserService {
             User user = userCommon.getCurrentUserByCurrentAuditor();
 
             // Get filename from image url
-            String filename = "";
+            String filename;
             String pattern = "/([^/]+)\\?alt=media$";
             Pattern regex = Pattern.compile(pattern);
             Matcher matcher = regex.matcher(user.getImageUrl());

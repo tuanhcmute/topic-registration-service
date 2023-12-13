@@ -25,13 +25,23 @@ export const fetchAllTopicsInLectureEnrollmentPeriod = createAsyncThunk(
 
 export const createNewTopicInLectureEnrollmentPeriod = createAsyncThunk(
   `${namespace}/createNewTopicInLectureEnrollmentPeriod`,
-  async ({ data, type, setOpenModal }, { dispatch, rejectWithValue }) => {
+  async (
+    { data, type, setOpenModal, itemsPerPage, pageNumber, sortBy },
+    { dispatch, rejectWithValue }
+  ) => {
     const response = await topicService.createNewTopicInLectureEnrollmentPeriod(
       data
     );
     if (response.data?.statusCode === HttpStatusCode.Created) {
       toast.success("Tạo mới đề tài thành công");
-      dispatch(fetchAllTopicsInLectureEnrollmentPeriod(type));
+      dispatch(
+        fetchAllTopicsInLectureEnrollmentPeriod({
+          type,
+          itemsPerPage,
+          pageNumber,
+          sortBy,
+        })
+      );
       dispatch(fetchStudentsNotEnrolledInTopic());
       setOpenModal(undefined);
       return response.data;
@@ -43,14 +53,24 @@ export const createNewTopicInLectureEnrollmentPeriod = createAsyncThunk(
 
 export const updateTopicInLectureEnrollmentPeriod = createAsyncThunk(
   `${namespace}/updateTopicInLectureEnrollmentPeriod`,
-  async ({ data, type, setOpenEditTopicModal }, { dispatch }) => {
+  async (
+    { data, type, setOpenEditTopicModal, itemsPerPage, pageNumber, sortBy },
+    { dispatch }
+  ) => {
     const response = await topicService.updateTopicInLectureEnrollmentPeriod(
       data
     );
     if (response?.data?.statusCode === HttpStatusCode.Ok) {
       if (setOpenEditTopicModal) setOpenEditTopicModal(undefined);
       toast.success("Cập nhật đề tài thành công");
-      dispatch(fetchAllTopicsInLectureEnrollmentPeriod(type));
+      dispatch(
+        fetchAllTopicsInLectureEnrollmentPeriod({
+          type,
+          itemsPerPage,
+          pageNumber,
+          sortBy,
+        })
+      );
       dispatch(fetchStudentsNotEnrolledInTopic());
     }
   }

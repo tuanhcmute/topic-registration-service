@@ -13,7 +13,7 @@ public interface UserService {
 
     Response<List<StudentDTO>> getStudentsNotEnrolledInTopic();
 
-    Response<List<LectureDTO>> getLecturesByMajor(String majorCode);
+    Response<List<LectureDTO>> getAllLectures();
 
     Response<Void> updateAvatarInUserProfile(MultipartFile imageFile);
 

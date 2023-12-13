@@ -7,11 +7,10 @@ import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-
-import { topicStatus } from "../../../../utils/constants";
-import { toast } from "react-toastify";
-import { deleteTopicEnrollment } from "../../../../features/topicEnrollment/topicEnrollmentAction";
 import _ from "lodash";
+import { toast } from "react-toastify";
+
+import { deleteTopicEnrollment } from "../../../../features/topicEnrollment/topicEnrollmentAction";
 
 const validationSchema = Yup.object().shape({
   id: Yup.string().required(),
@@ -53,10 +52,9 @@ function EditTopicModal(props) {
     if (props.length < 2) return;
     const option = props[1];
     if (option?.action === "remove-value") {
-      const isExist = data?.topicEnrollments?.some((item) =>
-        _.isEqual(item?.student?.ntid, option?.removedValue?.value)
+      const isExist = data?.students?.some((item) =>
+        _.isEqual(item?.ntid, option?.removedValue?.value)
       );
-      console.log({ isExist });
       if (isExist) dispatch(deleteTopicEnrollment(option?.removedValue?.value));
     }
     if (props[0]?.length > formik.values.maxSlot) {
@@ -80,10 +78,10 @@ function EditTopicModal(props) {
         label: item?.name,
       }))
     );
-    setDisabled(
-      data?.status === topicStatus.approved.value ||
-        data?.status === topicStatus.assigned.value
-    );
+    // setDisabled(
+    //   data?.status === topicStatus.approved.value ||
+    //     data?.status === topicStatus.assigned.value
+    // );
   }, [data]);
 
   useEffect(() => {
@@ -147,7 +145,6 @@ function EditTopicModal(props) {
           <div className='mb-2 block font-Roboto'>
             <Label value='SVTH' className='mb-2 block' />
             <Select
-              isDisabled={isDisabled}
               options={options}
               isSearchable
               isMulti
@@ -173,7 +170,7 @@ function EditTopicModal(props) {
               id='topicName'
               onChange={formik.handleChange}
               value={formik.values.topicName}
-              disabled={isDisabled}
+              disabled
             />
           </div>
           {/* End topic field */}
@@ -185,11 +182,10 @@ function EditTopicModal(props) {
               value='Yêu cầu đề tài (*)'
               className='mb-2 block'
             />
-            {data?.status === topicStatus.approved.value ||
-            data?.status === topicStatus.assigned.value ? (
+            {isDisabled ? (
               <div
                 dangerouslySetInnerHTML={{ __html: data?.goal }}
-                className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500'
+                className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500 dark:bg-transparent'
               ></div>
             ) : (
               <CKEditor
@@ -212,11 +208,10 @@ function EditTopicModal(props) {
               value='Kiến thức cần có (*)'
               className='mb-2 block'
             />
-            {data?.status === topicStatus.approved.value ||
-            data?.status === topicStatus.assigned.value ? (
+            {isDisabled ? (
               <div
                 dangerouslySetInnerHTML={{ __html: data?.requirement }}
-                className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500'
+                className='border dark:border-gray-500 p-3 dark:text-gray-400 text-sm rounded-md cursor-not-allowed bg-whiteSmoke text-gray-500 dark:bg-transparent'
               ></div>
             ) : (
               <CKEditor
