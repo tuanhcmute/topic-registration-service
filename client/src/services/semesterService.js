@@ -2,8 +2,8 @@ import axiosClient from "./axiosClient";
 
 const baseUrl = "/semester";
 const semesterService = {
-  fetchAllSemesters: () => {
-    const requestUrl = `${baseUrl}`;
+  fetchAllSemesters: (pageNumber, itemsPerPage, sortBy) => {
+    const requestUrl = `${baseUrl}?pageNumber=${pageNumber}&pageSize=${itemsPerPage}&sortBy=${sortBy}`;
     return axiosClient.get(requestUrl);
   },
   createSemester: (data) => {

@@ -1,11 +1,12 @@
 package com.bosch.topicregistration.api.topic;
 
+import com.bosch.topicregistration.api.response.PageResponse;
 import com.bosch.topicregistration.api.response.Response;
 
 import java.util.List;
 
 public interface TopicService {
-    Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(String type, Integer pageNumber, Integer pageSize, String sortBy);
+    Response<PageResponse<List<TopicDTO>>> getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(String type, Integer pageNumber, Integer pageSize, String sortBy);
 
     Response<Void> createNewTopicInLectureEnrollmentPeriod(NewTopicRequest request);
 
@@ -19,5 +20,5 @@ public interface TopicService {
 
     Response<List<TopicDTO>> getAllApprovedTopicsInStudentEnrollmentPeriod(String type, Integer pageNumber, Integer pageSize, String sortBy);
 
-    Response<List<TopicDTO>> getAllTopics(Integer pageNumber, Integer pageSize, String sortBy);
+    Response<PageResponse<List<TopicDTO>>> getAllTopics(Integer pageNumber, Integer pageSize, String sortBy);
 }

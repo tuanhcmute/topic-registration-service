@@ -35,9 +35,12 @@ function TopicManagementPage() {
     topicStatus.all.value
   );
   const [isDisabledEnrollment, setDisabledEnrollment] = useState(true);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [pageNumber, setPageNumber] = useState(0);
+  const [sortBy, setSortBy] = useState("createdDate");
   // Get current user from redux
   const currentUser = useSelector((state) => state.user?.currentUser);
-  const topics = useSelector((state) => state.topic?.topics);
+  const pageResponse = useSelector((state) => state.topic?.topicsPage);
   const studentOptions = useSelector(
     (state) => state.user?.studentsNotEnrolledInTopic
   );
@@ -66,11 +69,6 @@ function TopicManagementPage() {
   }
 
   useEffect(() => {
-    // Fetch topics
-    if (_.isEmpty(topics) || _.isNull(topics) || _.isUndefined(topics)) {
-      dispatch(fetchAllTopicsInLectureEnrollmentPeriod(topicType.TLCN));
-    }
-
     // Fetch student options
     if (
       _.isEmpty(studentOptions) ||
@@ -110,6 +108,18 @@ function TopicManagementPage() {
       }
     }
   }, [enrollmentPeriod]);
+
+  useEffect(() => {
+    // Fetch topics
+    dispatch(
+      fetchAllTopicsInLectureEnrollmentPeriod({
+        type: topicType.TLCN,
+        itemsPerPage,
+        pageNumber,
+        sortBy,
+      })
+    );
+  }, [dispatch, itemsPerPage, pageNumber, sortBy]);
 
   return (
     <React.Fragment>
@@ -187,7 +197,7 @@ function TopicManagementPage() {
                       </tr>
                     </thead>
                     <tbody className='text-gray-600 text-sm font-light'>
-                      {topics
+                      {pageResponse?.content
                         ?.filter((item) => {
                           if (
                             _.isEqual(topicStatusFilter, topicStatus.all.value)
@@ -286,7 +296,10 @@ function TopicManagementPage() {
         </div>
         <div className='w-full flex justify-end p-3'>
           {/* <Pagination /> */}
-          <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} />
+          <PaginatedItems
+            items={[...Array(pageResponse?.totalElements).keys()]}
+            itemsPerPage={itemsPerPage}
+          />
         </div>
         {/* End table */}
       </div>

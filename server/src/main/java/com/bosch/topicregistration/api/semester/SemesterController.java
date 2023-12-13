@@ -1,6 +1,7 @@
 package com.bosch.topicregistration.api.semester;
 
 import com.bosch.topicregistration.api.logging.LoggerAround;
+import com.bosch.topicregistration.api.response.PageResponse;
 import com.bosch.topicregistration.api.response.Response;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +27,9 @@ public class SemesterController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @LoggerAround
-    public Response<List<SemesterDTO>> getListSemester(@RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
-                                                       @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
-                                                       @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
+    public Response<PageResponse<List<SemesterDTO>>> getListSemester(@RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+                                                  @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                                  @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
         return semesterService.getListSemester(pageNumber, pageSize, sortBy);
     }
 

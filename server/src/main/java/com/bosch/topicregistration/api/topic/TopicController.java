@@ -2,6 +2,7 @@ package com.bosch.topicregistration.api.topic;
 
 import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
+import com.bosch.topicregistration.api.response.PageResponse;
 import com.bosch.topicregistration.api.response.Response;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class TopicController {
     @PreAuthorize("hasAuthority('ROLE_LECTURE')")
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
-    public Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(@RequestParam("type") String type,
+    public Response<PageResponse<List<TopicDTO>>> getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(@RequestParam("type") String type,
                                                                                           @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
                                                                                           @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
                                                                                           @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
@@ -132,9 +133,9 @@ public class TopicController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
-    public Response<List<TopicDTO>> getAllTopics(@RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
-                                                  @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
-                                                  @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
+    public Response<PageResponse<List<TopicDTO>>> getAllTopics(@RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+                                                               @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                                               @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
         return  topicService.getAllTopics(pageNumber, pageSize, sortBy);
     }
 }

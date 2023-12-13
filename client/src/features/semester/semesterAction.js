@@ -7,8 +7,12 @@ export const namespace = "semester";
 
 export const fetchAllSemesters = createAsyncThunk(
   `${namespace}/fetchAllSemesters`,
-  async (data, { rejectWithValue }) => {
-    const response = await semesterService.fetchAllSemesters();
+  async ({ pageNumber, itemsPerPage, sortBy }, { rejectWithValue }) => {
+    const response = await semesterService.fetchAllSemesters(
+      pageNumber,
+      itemsPerPage,
+      sortBy
+    );
     if (response?.data?.statusCode === HttpStatusCode.Ok) {
       return response?.data;
     }

@@ -4,6 +4,7 @@ import com.bosch.topicregistration.api.approvalhistory.ApprovalHistory;
 import com.bosch.topicregistration.api.approvalhistory.ApprovalHistoryRepository;
 import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
+import com.bosch.topicregistration.api.response.PageResponse;
 import com.bosch.topicregistration.api.response.Response;
 import com.bosch.topicregistration.api.semester.Semester;
 import com.bosch.topicregistration.api.semester.SemesterRepository;
@@ -47,7 +48,7 @@ public class TopicServiceImpl implements TopicService {
 
     @LoggerAround
     @Override
-    public Response<List<TopicDTO>> getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(String type, Integer pageNumber, Integer pageSize, String sortBy) {
+    public Response<PageResponse<List<TopicDTO>>> getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(String type, Integer pageNumber, Integer pageSize, String sortBy) {
 //         Validate type
         boolean isMatch = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
         if (!isMatch) throw new BadRequestException("Topic type is not valid");
@@ -63,8 +64,21 @@ public class TopicServiceImpl implements TopicService {
         Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
 
 //         Get topics
-        Page<Topic> topicPage = topicRepository.findBySemesterAndTypeAndLecture(currentSemester, topicType, lecture, paging);
-        return buildResponse(topicPage);
+        Page<Topic> page = topicRepository.findBySemesterAndTypeAndLecture(currentSemester, topicType, lecture, paging);
+        PageResponse<List<TopicDTO>> pageResponse = PageResponse.<List<TopicDTO>>builder()
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .content(topicMapper.toListDTO(page.getContent()))
+                .build();
+
+//        Build data
+        Map<String, PageResponse<List<TopicDTO>>> data = new HashMap<>();
+        data.put("page", pageResponse);
+        return Response.<PageResponse<List<TopicDTO>>>builder()
+                .message("Topics have been successfully retrieved")
+                .statusCode(HttpStatus.OK.value())
+                .data(data)
+                .build();
     }
 
     @Override
@@ -305,11 +319,26 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public Response<List<TopicDTO>> getAllTopics( Integer pageNumber, Integer pageSize, String sortBy) {
+    public Response<PageResponse<List<TopicDTO>>> getAllTopics(Integer pageNumber, Integer pageSize, String sortBy) {
 //        Define paging
         Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
-        Page<Topic> topics = topicRepository.findAll(paging);
-        return  buildResponse(topics);
+
+        Page<Topic> page = topicRepository.findAll(paging);
+        PageResponse<List<TopicDTO>> pageResponse = PageResponse.<List<TopicDTO>>builder()
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .content(topicMapper.toListDTO(page.getContent()))
+                .build();
+
+//        Build data
+        Map<String, PageResponse<List<TopicDTO>>> data = new HashMap<>();
+        data.put("page", pageResponse);
+
+        return Response.<PageResponse<List<TopicDTO>>>builder()
+                .message("Topics have been successfully retrieved")
+                .statusCode(HttpStatus.OK.value())
+                .data(data)
+                .build();
     }
 
     private Response<List<TopicDTO>> buildResponse(Page<Topic> topicPage) {

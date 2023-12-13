@@ -7,8 +7,9 @@ import _ from "lodash";
 
 import DetailTopicModal from "./components/DetailTopicModal";
 import { topicStatus } from "../../../utils/constants";
-import { Dropdown } from "../../../components/dropdown1";
 import { fetchAllTopics } from "../../../features/topic";
+import { PaginatedItems } from "../../../components/pagination";
+import TopicFilter from "./components/TopicFilter";
 
 function TopicManagementPage() {
   const [openDetailTopicModal, setOpenDetailTopicModal] = useState(undefined);
@@ -16,12 +17,15 @@ function TopicManagementPage() {
   const [topicStatusFilter, setTopicStatusFilter] = useState(
     topicStatus.all.value
   );
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [pageNumber, setPageNumber] = useState(0);
+  const [sortBy, setSortBy] = useState("createdDate");
   const dispatch = useDispatch();
-  const topics = useSelector((state) => state.topic?.topics);
+  const pageResponse = useSelector((state) => state.topic?.topicsPage);
 
   useEffect(() => {
-    dispatch(fetchAllTopics());
-  }, []);
+    dispatch(fetchAllTopics({ pageNumber, itemsPerPage, sortBy }));
+  }, [dispatch, itemsPerPage, pageNumber, sortBy]);
 
   return (
     <React.Fragment>
@@ -47,64 +51,17 @@ function TopicManagementPage() {
         {/* End select */}
         {/* Topic status filter */}
         <div className='px-3 py-1 flex gap-2'>
-          <div className='w-fit' id='topicStatusFilter'>
+          <div className='w-fit' id='topicFilter'>
             <Button
               color='gray'
               className='rounded-md p-0 cursor-default flex items-center'
             >
               <AiOutlineFilter className='mr-1' />
-              <span>Lọc theo GVHD</span>
-            </Button>
-          </div>
-          <div className='w-fit' id='topicStatusFilter'>
-            <Button
-              color='gray'
-              className='rounded-md p-0 cursor-default flex items-center'
-            >
-              <AiOutlineFilter className='mr-1' />
-              <span>Lọc theo chuyên ngành</span>
-            </Button>
-          </div>
-          <div className='w-fit' id='topicStatusFilter'>
-            <Button
-              color='gray'
-              className='rounded-md p-0 cursor-default flex items-center'
-            >
-              <AiOutlineFilter className='mr-1' />
-              <span>Lọc theo năm học</span>
-            </Button>
-          </div>
-          <div className='w-fit' id='topicStatusFilter'>
-            <Button
-              color='gray'
-              className='rounded-md p-0 cursor-default flex items-center'
-            >
-              <AiOutlineFilter className='mr-1' />
-              <span>Lọc theo loại</span>
+              <span>Lọc đề tài</span>
             </Button>
           </div>
         </div>
-        <Dropdown
-          place='right-right'
-          className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
-          anchorSelect='#topicStatusFilter'
-        >
-          <div className='flex flex-col gap-2 p-3'>
-            {Object.keys(topicStatus).map((item) => {
-              return (
-                <div
-                  key={item}
-                  className='text-sm px-2 py-1 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer'
-                  onClick={() =>
-                    setTopicStatusFilter(topicStatus?.[item]?.value)
-                  }
-                >
-                  {topicStatus?.[item]?.label}
-                </div>
-              );
-            })}
-          </div>
-        </Dropdown>
+        <TopicFilter anchorSelect='topicFilter' />
 
         {/* End topic status filter */}
         {/* Table */}
@@ -127,7 +84,7 @@ function TopicManagementPage() {
                       </tr>
                     </thead>
                     <tbody className='text-gray-600 text-sm font-light'>
-                      {topics
+                      {pageResponse?.content
                         ?.filter((item) => {
                           if (
                             _.isEqual(topicStatusFilter, topicStatus.all.value)
@@ -213,7 +170,11 @@ function TopicManagementPage() {
         </div>
         <div className='w-full flex justify-end p-3'>
           {/* <Pagination /> */}
-          {/* <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} /> */}
+          <PaginatedItems
+            items={[...Array(pageResponse?.totalElements).keys()]}
+            itemsPerPage={itemsPerPage}
+            onPageClick={setPageNumber}
+          />
         </div>
         {/* End table */}
       </div>

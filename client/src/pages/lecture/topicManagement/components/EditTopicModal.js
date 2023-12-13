@@ -86,8 +86,6 @@ function EditTopicModal(props) {
     );
   }, [data]);
 
-  console.log(data);
-
   useEffect(() => {
     const studentCodes = selectedOptions?.map((item) => item.value);
     formik.setFieldValue("students", studentCodes);

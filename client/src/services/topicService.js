@@ -2,8 +2,13 @@ import axiosClient from "./axiosClient";
 
 const baseUrl = "/topic";
 const topicService = {
-  fetchAllTopicsInLectureEnrollmentPeriodByTypeAndLecture: (type) => {
-    const requestUrl = `${baseUrl}/lecture?type=${type}`;
+  fetchAllTopicsInLectureEnrollmentPeriodByTypeAndLecture: (
+    type,
+    itemsPerPage,
+    pageNumber,
+    sortBy
+  ) => {
+    const requestUrl = `${baseUrl}/lecture?type=${type}&pageNumber=${pageNumber}&pageSize=${itemsPerPage}&sortBy=${sortBy}`;
     return axiosClient.get(requestUrl);
   },
   createNewTopicInLectureEnrollmentPeriod: (data) => {
@@ -30,8 +35,8 @@ const topicService = {
     const requestUrl = `${baseUrl}/student?type=${type}`;
     return axiosClient.get(requestUrl);
   },
-  fetchAllTopics: () => {
-    const requestUrl = `${baseUrl}/admin`;
+  fetchAllTopics: (pageNumber, itemsPerPage, sortBy) => {
+    const requestUrl = `${baseUrl}/admin?pageNumber=${pageNumber}&pageSize=${itemsPerPage}&sortBy=${sortBy}`;
     return axiosClient.get(requestUrl);
   },
 };

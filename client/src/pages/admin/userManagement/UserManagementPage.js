@@ -25,6 +25,7 @@ function UserManagementPage() {
 
   const dispatch = useDispatch();
   const pageData = useSelector((state) => state.user?.pageData);
+  console.log(pageData);
 
   function handleCreateUser(requestData) {
     dispatch(createUser({ data: requestData, setOpenAddUserModal }));
@@ -282,7 +283,7 @@ function UserManagementPage() {
         <div className='w-full flex justify-end p-3'>
           {/* <Pagination /> */}
           <PaginatedItems
-            items={[...Array(pageData?.totalPages * itemsPerPage).keys()]}
+            items={[...Array(pageData?.totalElements).keys()]}
             itemsPerPage={itemsPerPage}
             onPageClick={handlePageClick}
           />

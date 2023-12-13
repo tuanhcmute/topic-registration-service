@@ -15,7 +15,7 @@ import {
 const initialState = {
   approvedTopics: [],
   notApprovedTopics: [],
-  topics: [],
+  topicsPage: {},
   statusCode: null,
   message: "",
   loading: false,
@@ -31,7 +31,6 @@ export const topicSlide = createSlice({
       (state) => {
         return {
           ...state,
-          topics: [],
           message: "",
           statusCode: null,
           loading: true,
@@ -44,7 +43,7 @@ export const topicSlide = createSlice({
         return {
           ...state,
           message: action.payload?.message,
-          topics: action.payload?.data?.topics,
+          topicsPage: action.payload?.data?.page,
           statusCode: action.payload?.statusCode,
           loading: false,
         };
@@ -55,7 +54,7 @@ export const topicSlide = createSlice({
       (state) => {
         return {
           ...state,
-          topics: [],
+          topicsPage: {},
           message: "",
           statusCode: null,
           loading: true,
@@ -276,7 +275,6 @@ export const topicSlide = createSlice({
     builder.addCase(fetchAllTopics.pending, (state) => {
       return {
         ...state,
-        topics: [],
         message: "",
         statusCode: null,
         loading: true,
@@ -285,7 +283,7 @@ export const topicSlide = createSlice({
     builder.addCase(fetchAllTopics.fulfilled, (state, action) => {
       return {
         ...state,
-        topics: action.payload?.data?.topics,
+        topicsPage: action.payload?.data?.page,
         message: action.payload?.message,
         statusCode: action.payload?.statusCode,
         loading: false,

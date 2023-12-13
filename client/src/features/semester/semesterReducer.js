@@ -10,7 +10,7 @@ const initialState = {
   statusCode: null,
   message: "",
   loading: false,
-  semesters: [],
+  semestersPage: [],
 };
 
 export const semesterSlice = createSlice({
@@ -21,7 +21,7 @@ export const semesterSlice = createSlice({
     builder.addCase(fetchAllSemesters.fulfilled, (state, action) => {
       return {
         ...state,
-        semesters: action.payload?.data?.semesters,
+        semestersPage: action.payload?.data?.page,
         message: action.payload?.message,
         statusCode: action.payload?.statusCode,
         loading: false,
@@ -30,7 +30,6 @@ export const semesterSlice = createSlice({
     builder.addCase(fetchAllSemesters.rejected, (state, action) => {
       return {
         ...state,
-        semesters: [],
         message: action.payload?.message,
         statusCode: action.payload?.statusCode,
         loading: false,
@@ -39,7 +38,6 @@ export const semesterSlice = createSlice({
     builder.addCase(fetchAllSemesters.pending, (state) => {
       return {
         ...state,
-        semesters: [],
         message: "",
         statusCode: null,
         loading: false,

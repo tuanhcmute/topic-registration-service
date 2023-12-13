@@ -9,5 +9,6 @@ import lombok.*;
 @Builder
 public class PageResponse<T> {
     private Integer totalPages;
+    private Long totalElements;
     private T content;
 }

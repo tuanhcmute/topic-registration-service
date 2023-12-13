@@ -171,6 +171,7 @@ public class UserServiceImpl implements UserService {
         List<UserDTO> listUserDTO = userMapper.toListDTO(userPage.getContent());
         PageResponse<List<UserDTO>> pageData = PageResponse.<List<UserDTO>>builder()
                 .totalPages(userPage.getTotalPages())
+                .totalElements(userPage.getTotalElements())
                 .content(listUserDTO)
                 .build();
         Map<String, PageResponse<List<UserDTO>>> data = new HashMap<>();

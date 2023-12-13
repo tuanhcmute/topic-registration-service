@@ -205,6 +205,7 @@ export const userSlice = createSlice({
           ...state.pageData,
           totalPages: action.payload?.data?.pageData?.totalPages,
           users: action.payload?.data?.pageData?.content,
+          totalElements: action.payload?.data?.pageData?.totalElements,
         },
         message: action.payload?.data?.message,
         statusCode: action.payload?.data?.statusCode,

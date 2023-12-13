@@ -19,6 +19,7 @@ import {
 } from "../../../features/semester";
 import AddEnrollmentPeriodModal from "./components/AddEnrollmentPeriodModal";
 import { createEnrollmentPeriod } from "../../../features/enrollmentPeriod/enrollmentPeriodAction";
+import { PaginatedItems } from "../../../components/pagination";
 
 function TimeManagementPage() {
   const [openModal, setOpenModal] = useState(undefined);
@@ -28,7 +29,10 @@ function TimeManagementPage() {
   const [openAddEnrollmentPeriodModal, setOpenAddEnrollmentPeriodModal] =
     useState(undefined);
   const [selectedSemester, setSelectedSemester] = useState(null);
-  const semesters = useSelector((state) => state.semester.semesters);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [pageNumber, setPageNumber] = useState(0);
+  const [sortBy, setSortBy] = useState("createdDate");
+  const pageResponse = useSelector((state) => state.semester.semestersPage);
   const dispatch = useDispatch();
 
   function handleCreateSemester(data) {
@@ -56,7 +60,7 @@ function TimeManagementPage() {
   }
 
   useEffect(() => {
-    dispatch(fetchAllSemesters());
+    dispatch(fetchAllSemesters({ pageNumber, itemsPerPage, sortBy }));
   }, []);
 
   return (
@@ -152,7 +156,7 @@ function TimeManagementPage() {
                       </tr>
                     </thead>
                     <tbody className='text-gray-600 text-sm font-light'>
-                      {semesters?.map((item, index) => {
+                      {pageResponse?.content?.map((item, index) => {
                         let statusColor = "bg-teal-200";
                         return (
                           <tr
@@ -244,7 +248,10 @@ function TimeManagementPage() {
         </div>
         <div className='w-full flex justify-end p-3'>
           {/* <Pagination /> */}
-          {/* <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} /> */}
+          <PaginatedItems
+            items={[...Array(pageResponse?.totalElements).keys()]}
+            itemsPerPage={itemsPerPage}
+          />
         </div>
         {/* End table */}
       </div>

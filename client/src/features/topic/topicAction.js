@@ -9,10 +9,13 @@ export const namespace = "topic";
 
 export const fetchAllTopicsInLectureEnrollmentPeriod = createAsyncThunk(
   `${namespace}/fetchAllTopicsInLectureEnrollmentPeriod`,
-  async (type) => {
+  async ({ type, itemsPerPage, pageNumber, sortBy }) => {
     const response =
       await topicService.fetchAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(
-        type
+        type,
+        itemsPerPage,
+        pageNumber,
+        sortBy
       );
     if (response?.data?.statusCode === HttpStatusCode.Ok) {
       return response.data;
@@ -113,8 +116,12 @@ export const fetchAllApprovedTopicsInStudentEnrollmentPeriod = createAsyncThunk(
 
 export const fetchAllTopics = createAsyncThunk(
   `${namespace}/fetchAllTopics`,
-  async (data, { rejectWithValue }) => {
-    const response = await topicService.fetchAllTopics();
+  async ({ pageNumber, itemsPerPage, sortBy }, { rejectWithValue }) => {
+    const response = await topicService.fetchAllTopics(
+      pageNumber,
+      itemsPerPage,
+      sortBy
+    );
     if (response?.data?.statusCode !== HttpStatusCode.Ok)
       return rejectWithValue(response.data);
     return response?.data;

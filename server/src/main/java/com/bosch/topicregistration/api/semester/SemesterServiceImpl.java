@@ -1,6 +1,7 @@
 package com.bosch.topicregistration.api.semester;
 
 import com.bosch.topicregistration.api.exception.BadRequestException;
+import com.bosch.topicregistration.api.response.PageResponse;
 import com.bosch.topicregistration.api.response.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,13 +37,18 @@ public class SemesterServiceImpl implements SemesterService {
     }
 
     @Override
-    public Response<List<SemesterDTO>> getListSemester( Integer pageNumber, Integer pageSize, String sortBy) {
+    public Response<PageResponse<List<SemesterDTO>>> getListSemester(Integer pageNumber, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
-        Page<Semester> semesterPage = semesterRepository.findAll(paging);
-        List<SemesterDTO> listSemesterDTO = semesterMapper.toListSemesterDTO(semesterPage.getContent());
-        Map<String, List<SemesterDTO>> data = new HashMap<>();
-        data.put("semesters", listSemesterDTO);
-        return Response.<List<SemesterDTO>>builder()
+        Page<Semester> page = semesterRepository.findAll(paging);
+        PageResponse<List<SemesterDTO>> pageResponse = PageResponse.<List<SemesterDTO>>builder()
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .content(semesterMapper.toListSemesterDTO(page.getContent()))
+                .build();
+
+        Map<String, PageResponse<List<SemesterDTO>>> data = new HashMap<>();
+        data.put("page", pageResponse);
+        return Response.<PageResponse<List<SemesterDTO>>>builder()
                 .message("Semesters have been successfully retrieved")
                 .statusCode(HttpStatus.OK.value())
                 .data(data)
