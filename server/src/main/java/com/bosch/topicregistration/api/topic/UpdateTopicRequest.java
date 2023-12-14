@@ -15,9 +15,6 @@ import java.util.Set;
 @Setter
 @Builder
 public class UpdateTopicRequest {
-    @NotEmpty(message = "Id is not valid")
-    private String id;
-
     @NotEmpty(message = "Topic name is not valid")
     private String topicName;
 

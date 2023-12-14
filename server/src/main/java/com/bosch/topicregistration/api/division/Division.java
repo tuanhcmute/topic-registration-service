@@ -10,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "division_tbl")
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners({AuditingEntityListener.class, AuditDivisionListener.class})
 public class Division {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -31,7 +32,7 @@ public class Division {
     private String createdBy;
 
     @Column(name = "start_date_column", nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Nationalized
     @Column(name = "specified_time_column", nullable = false)

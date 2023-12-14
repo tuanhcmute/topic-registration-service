@@ -13,7 +13,6 @@ import { toast } from "react-toastify";
 import { deleteTopicEnrollment } from "../../../../features/topicEnrollment/topicEnrollmentAction";
 
 const validationSchema = Yup.object().shape({
-  id: Yup.string().required(),
   topicName: Yup.string().required("Tên đề tài là bắt buộc"),
   goal: Yup.string().required("Yêu cầu đề tài là bắt buộc"),
   requirement: Yup.string().required("Kiến thức cần có là bắt buộc"),
@@ -34,7 +33,6 @@ function EditTopicModal(props) {
   const currentUser = useSelector((state) => state.user?.currentUser);
   const formik = useFormik({
     initialValues: {
-      id: "",
       maxSlot: 0,
       topicName: "",
       goal: "",
@@ -43,7 +41,7 @@ function EditTopicModal(props) {
     },
     enableReinitialize: true,
     onSubmit: (values) => {
-      handleUpdateTopic(values);
+      handleUpdateTopic(data?.id, values);
     },
     validationSchema,
   });
@@ -66,7 +64,6 @@ function EditTopicModal(props) {
 
   useEffect(() => {
     formik.setValues({
-      id: data?.id,
       topicName: data?.name,
       goal: data?.goal,
       requirement: data?.requirement,

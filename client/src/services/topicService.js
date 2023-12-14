@@ -12,15 +12,15 @@ const topicService = {
     return axiosClient.get(requestUrl);
   },
   createNewTopicInLectureEnrollmentPeriod: (data) => {
-    const requestUrl = `${baseUrl}/lecture`;
+    const requestUrl = `${baseUrl}`;
     return axiosClient.post(requestUrl, data);
   },
-  updateTopicInLectureEnrollmentPeriod: (data) => {
-    const requestUrl = `${baseUrl}/lecture`;
+  updateTopicInLectureEnrollmentPeriod: (id, data) => {
+    const requestUrl = `${baseUrl}/${id}`;
     return axiosClient.put(requestUrl, data);
   },
-  approveTopicInLectureEnrollmentPeriod: (data) => {
-    const requestUrl = `${baseUrl}/lecture/approval`;
+  approveTopicInLectureEnrollmentPeriod: (id, data) => {
+    const requestUrl = `${baseUrl}/approval/${id}`;
     return axiosClient.put(requestUrl, data);
   },
   fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod: (type) => {
@@ -28,7 +28,7 @@ const topicService = {
     return axiosClient.get(requestUrl);
   },
   fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod: (type) => {
-    const requestUrl = `${baseUrl}/head/division?type=${type}`;
+    const requestUrl = `${baseUrl}/division?type=${type}`;
     return axiosClient.get(requestUrl);
   },
   fetchAllApprovedTopicsInStudentEnrollmentPeriod: (type) => {
@@ -36,7 +36,7 @@ const topicService = {
     return axiosClient.get(requestUrl);
   },
   fetchAllTopics: (pageNumber, itemsPerPage, sortBy) => {
-    const requestUrl = `${baseUrl}/admin?pageNumber=${pageNumber}&pageSize=${itemsPerPage}&sortBy=${sortBy}`;
+    const requestUrl = `${baseUrl}?pageNumber=${pageNumber}&pageSize=${itemsPerPage}&sortBy=${sortBy}`;
     return axiosClient.get(requestUrl);
   },
 };

@@ -57,10 +57,6 @@ public class TopicEnrollmentServiceImpl implements TopicEnrollmentService {
             }
         }
 
-//        Update available slot
-//        topic.setAvailableSlot(topic.getAvailableSlot() + 1);
-//        topicRepository.save(topic);
-
 //        Delete
         topicEnrollmentRepository.delete(topicEnrollment);
 
@@ -107,9 +103,6 @@ public class TopicEnrollmentServiceImpl implements TopicEnrollmentService {
         topicEnrollmentRepository.save(topicEnrollment);
         log.info("Topic enrollment: {}", topicEnrollment.getId());
 
-//        Update available slot
-//        topic.setAvailableSlot(topic.getAvailableSlot() - 1);
-//        topicRepository.save(topic);
         return Response.<Void>builder()
                 .statusCode(HttpStatus.CREATED.value())
                 .message("Topic enrollment has been created successfully")

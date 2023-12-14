@@ -22,14 +22,13 @@ function ApprovalTopicModal(props) {
   const currentUser = useSelector((state) => state.user?.currentUser);
   const formik = useFormik({
     initialValues: {
-      id: data?.id,
       status: topicStatus.rejected.value,
       reason: "",
     },
     validationSchema,
     enableReinitialize: true,
     onSubmit: (values) => {
-      handleUpdateTopic(values);
+      handleUpdateTopic(data?.id, values);
     },
   });
 
@@ -203,8 +202,7 @@ function ApprovalTopicModal(props) {
                 className='p-0'
                 color='green'
                 onClick={() => {
-                  handleUpdateTopic({
-                    id: data?.id,
+                  handleUpdateTopic(data?.id, {
                     status: topicStatus.approved.value,
                     reason: topicStatus.approved.label,
                   });

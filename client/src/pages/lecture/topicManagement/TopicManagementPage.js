@@ -61,9 +61,10 @@ function TopicManagementPage() {
       })
     );
   }
-  async function handleUpdateTopicInLectureEnrollmentPeriod(data) {
+  async function handleUpdateTopicInLectureEnrollmentPeriod(id, data) {
     dispatch(
       updateTopicInLectureEnrollmentPeriod({
+        id,
         data,
         type: topicType.TLCN,
         setOpenEditTopicModal,

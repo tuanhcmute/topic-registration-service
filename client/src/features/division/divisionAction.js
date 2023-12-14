@@ -15,8 +15,6 @@ export const createDivisionByTopicType = createAsyncThunk(
       type,
       data
     );
-    if (response?.data?.statusCode === HttpStatusCode.BadRequest)
-      return rejectWithValue(response?.data);
     if (response?.data?.statusCode === HttpStatusCode.Created) {
       toast.success("Phân công phản biện thành công");
       dispatch(
@@ -24,8 +22,10 @@ export const createDivisionByTopicType = createAsyncThunk(
       );
       dispatch(fetchAllTopicsInLectureEnrollmentPeriod(type));
       setOpenModal(undefined);
+      return response.data;
     }
-    return response.data;
+    toast.error("Phân công phản biện thất bại");
+    return rejectWithValue(response?.data);
   }
 );
 
@@ -51,8 +51,9 @@ export const fetchDivisionByTopic = createAsyncThunk(
   `${namespace}/fetchDivisionByTopic`,
   async (topicId, { rejectWithValue }) => {
     const response = await divisionService.fetchDivisionByTopic(topicId);
-    console.log(response);
-    if (response?.data?.statusCode === HttpStatusCode.Ok) return response.data;
+    if (response?.data?.statusCode === HttpStatusCode.Ok) {
+      return response.data;
+    }
     return rejectWithValue(response?.data);
   }
 );

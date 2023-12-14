@@ -5,6 +5,7 @@ import { Button } from "flowbite-react";
 import { topicType } from "../../../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDivisionByTopicType } from "../../../features/division";
+import { PaginatedItems } from "../../../components/pagination";
 
 function AppreciationManagementPage() {
   const enrollmentPeriod = useSelector(
@@ -109,7 +110,7 @@ function AppreciationManagementPage() {
         </div>
         <div className='w-full flex justify-end p-3'>
           {/* <Pagination /> */}
-          {/* <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} /> */}
+          <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} />
         </div>
         {/* End table */}
       </div>

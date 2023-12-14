@@ -22,9 +22,10 @@ function ApprovalTopicManagementPage() {
   );
   const topics = useSelector((state) => state.topic?.notApprovedTopics);
 
-  function handleUpdateTopicInLectureEnrollmentPeriod(data) {
+  function handleUpdateTopicInLectureEnrollmentPeriod(id, data) {
     dispatch(
       approveTopicInLectureEnrollmentPeriod({
+        id,
         values: data,
         setOpenEditTopicModal,
       })

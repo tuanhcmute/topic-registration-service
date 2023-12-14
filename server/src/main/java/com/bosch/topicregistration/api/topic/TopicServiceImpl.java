@@ -1,6 +1,5 @@
 package com.bosch.topicregistration.api.topic;
 
-import com.bosch.topicregistration.api.approvalhistory.ApprovalHistory;
 import com.bosch.topicregistration.api.approvalhistory.ApprovalHistoryRepository;
 import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
@@ -48,7 +47,7 @@ public class TopicServiceImpl implements TopicService {
 
     @LoggerAround
     @Override
-    public Response<PageResponse<List<TopicDTO>>> getAllTopicsInLectureEnrollmentPeriodByTypeAndLecture(String type, Integer pageNumber, Integer pageSize, String sortBy) {
+    public Response<PageResponse<List<TopicDTO>>> getAllTopicsByLecture(String type, Integer pageNumber, Integer pageSize, String sortBy) {
 //         Validate type
         boolean isMatch = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
         if (!isMatch) throw new BadRequestException("Topic type is not valid");
@@ -153,7 +152,7 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public Response<Void> updateTopicInLectureEnrollmentPeriod(UpdateTopicRequest request) {
+    public Response<Void> updateTopic(String id, UpdateTopicRequest request) {
         TopicValidatorResult result = UpdateTopicRequestValidator.isTopicNameValid()
                 .and(UpdateTopicRequestValidator.isGoalValid())
                 .and(UpdateTopicRequestValidator.isRequirementValid())
@@ -162,7 +161,7 @@ public class TopicServiceImpl implements TopicService {
         if (!result.equals(TopicValidatorResult.VALID)) throw new BadRequestException(result.getMessage());
 
 //        Find topic by id
-        Optional<Topic> topicOptional = topicRepository.findById(request.getId());
+        Optional<Topic> topicOptional = topicRepository.findById(id);
         if (!topicOptional.isPresent()) throw new BadRequestException("Topic could not be found");
         Topic topic = topicOptional.get();
 
@@ -200,13 +199,13 @@ public class TopicServiceImpl implements TopicService {
         topic.setStatus(TopicStatus.UPDATED);
         topicRepository.save(topic);
 
-//        Store approval history
-        ApprovalHistory approvalHistory = ApprovalHistory.builder()
-                .status(TopicStatus.UPDATED)
-                .reason("Đã được cập nhật")
-                .topic(topic)
-                .build();
-        approvalHistoryRepository.save(approvalHistory);
+////        Store approval history
+//        ApprovalHistory approvalHistory = ApprovalHistory.builder()
+//                .status(TopicStatus.UPDATED)
+//                .reason("Đã được cập nhật")
+//                .topic(topic)
+//                .build();
+//        approvalHistoryRepository.save(approvalHistory);
 
 //        Return data
         return Response.<Void>builder()
@@ -215,7 +214,7 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public Response<Void> approveTopicInLectureEnrollmentPeriod(ApprovalTopicRequest request) {
+    public Response<Void> approveTopic(String id, ApprovalTopicRequest request) {
 //        TODO: Validate request
 //        Get topic status
         boolean isMatch = Arrays.stream(TopicStatus.values()).anyMatch(topicStatus -> topicStatus.name().equals(request.getStatus()));
@@ -223,7 +222,7 @@ public class TopicServiceImpl implements TopicService {
         TopicStatus status = TopicStatus.valueOf(request.getStatus());
 
 //        Get topic
-        Optional<Topic> topicOptional = topicRepository.findById(request.getId());
+        Optional<Topic> topicOptional = topicRepository.findById(id);
         if (!topicOptional.isPresent()) throw new BadRequestException("Topic could not be found");
         Topic topic = topicOptional.get();
 
@@ -234,14 +233,14 @@ public class TopicServiceImpl implements TopicService {
             topicRepository.save(topic);
             log.info("Topic status: {}", topic.getStatus().name());
 
-//        Store approval history
-            ApprovalHistory approvalHistory = ApprovalHistory.builder()
-                    .status(status)
-                    .reason(request.getReason())
-                    .topic(topic)
-                    .build();
-            approvalHistoryRepository.save(approvalHistory);
-            log.info("Approval history: {}", approvalHistory.getId());
+////        Store approval history
+//            ApprovalHistory approvalHistory = ApprovalHistory.builder()
+//                    .status(status)
+//                    .reason(request.getReason())
+//                    .topic(topic)
+//                    .build();
+//            approvalHistoryRepository.save(approvalHistory);
+//            log.info("Approval history: {}", approvalHistory.getId());
         }
         return Response.<Void>builder()
                 .statusCode(HttpStatus.OK.value())
@@ -251,7 +250,7 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     @LoggerAround
-    public Response<List<TopicDTO>> getAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod(String type, Integer pageNumber, Integer pageSize, String sortBy) {
+    public Response<List<TopicDTO>> getAllTopicsIsNotApproved(String type, Integer pageNumber, Integer pageSize, String sortBy) {
 //                Validate type
         boolean hasType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
         if (!hasType) throw new BadRequestException("Topic type is not valid");
@@ -273,7 +272,7 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public Response<List<TopicDTO>> getAllTopicsApprovedDuringTheLectureEnrollmentPeriod(String type, Integer pageNumber, Integer pageSize, String sortBy) {
+    public Response<List<TopicDTO>> getAllApprovedTopics(String type, Integer pageNumber, Integer pageSize, String sortBy) {
 //      Validate type
         boolean hasType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
         if (!hasType) throw new BadRequestException("Topic type is not valid");
@@ -283,37 +282,13 @@ public class TopicServiceImpl implements TopicService {
         Semester currentSemester = semesterService.getActivatedSemester();
 
 //        Get current user
-        User currentHead = userCommon.getCurrentUserByCurrentAuditor();
+        User currentUser = userCommon.getCurrentUserByCurrentAuditor();
 
 //        Define paging
         Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
 
         Page<Topic> topicPage = topicRepository.findBySemesterAndTypeAndMajorAndStatusIn(currentSemester, topicType,
-                currentHead.getMajor(), Collections.singletonList(TopicStatus.APPROVED), paging);
-        log.info("Size page: {}", topicPage.getContent().size());
-        return buildResponse(topicPage);
-    }
-
-    @Override
-    public Response<List<TopicDTO>> getAllApprovedTopicsInStudentEnrollmentPeriod(String type, Integer pageNumber, Integer pageSize, String sortBy) {
-        //      Validate type
-        boolean hasType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
-        if (!hasType) throw new BadRequestException("Topic type is not valid");
-        TopicType topicType = TopicType.valueOf(type);
-
-//        Get current semester
-        Semester currentSemester = semesterService.getActivatedSemester();
-
-//        Get current user
-        User currentStudent = userCommon.getCurrentUserByCurrentAuditor();
-
-//        Get status
-        List<TopicStatus> statuses = Arrays.asList(TopicStatus.APPROVED, TopicStatus.ASSIGNED);
-
-//        Define paging
-        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
-
-        Page<Topic> topicPage = topicRepository.findBySemesterAndTypeAndMajorAndStatusIn(currentSemester, topicType, currentStudent.getMajor(), statuses, paging);
+                currentUser.getMajor(), Collections.singletonList(TopicStatus.APPROVED), paging);
         log.info("Size page: {}", topicPage.getContent().size());
         return buildResponse(topicPage);
     }

@@ -10,7 +10,7 @@ import EditTopicModal from "./components/EditTopicModal";
 import { positionType, topicStatus, topicType } from "../../../utils/constants";
 import { Dropdown } from "../../../components/dropdown1";
 import {
-  fetchAllApprovedTopicsInStudentEnrollmentPeriod,
+  fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod,
   updateTopicInLectureEnrollmentPeriod,
 } from "../../../features/topic";
 import { fetchStudentsNotEnrolledInTopic } from "../../../features/user";
@@ -58,13 +58,11 @@ function TopicManagementPage() {
 
   useEffect(() => {
     // Fetch topics
-    if (_.isEmpty(topics) || _.isNull(topics) || _.isUndefined(topics)) {
-      dispatch(
-        fetchAllApprovedTopicsInStudentEnrollmentPeriod({
-          type: topicType.TLCN,
-        })
-      );
-    }
+    dispatch(
+      fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod({
+        type: topicType.TLCN,
+      })
+    );
 
     // Fetch student options
     if (

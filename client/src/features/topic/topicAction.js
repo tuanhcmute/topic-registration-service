@@ -54,10 +54,11 @@ export const createNewTopicInLectureEnrollmentPeriod = createAsyncThunk(
 export const updateTopicInLectureEnrollmentPeriod = createAsyncThunk(
   `${namespace}/updateTopicInLectureEnrollmentPeriod`,
   async (
-    { data, type, setOpenEditTopicModal, itemsPerPage, pageNumber, sortBy },
+    { id, data, type, setOpenEditTopicModal, itemsPerPage, pageNumber, sortBy },
     { dispatch }
   ) => {
     const response = await topicService.updateTopicInLectureEnrollmentPeriod(
+      id,
       data
     );
     if (response?.data?.statusCode === HttpStatusCode.Ok) {
@@ -92,8 +93,12 @@ export const fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod =
 
 export const approveTopicInLectureEnrollmentPeriod = createAsyncThunk(
   `${namespace}/approveTopicInLectureEnrollmentPeriod`,
-  async ({ values, setOpenEditTopicModal }, { rejectWithValue, dispatch }) => {
+  async (
+    { id, values, setOpenEditTopicModal },
+    { rejectWithValue, dispatch }
+  ) => {
     const response = await topicService.approveTopicInLectureEnrollmentPeriod(
+      id,
       values
     );
     if (response?.data?.statusCode === HttpStatusCode.BadRequest)

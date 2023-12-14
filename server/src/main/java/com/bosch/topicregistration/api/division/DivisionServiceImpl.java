@@ -13,6 +13,7 @@ import com.bosch.topicregistration.api.topic.TopicType;
 import com.bosch.topicregistration.api.user.RoleCode;
 import com.bosch.topicregistration.api.user.User;
 import com.bosch.topicregistration.api.user.UserCommon;
+import com.bosch.topicregistration.api.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,7 @@ public class DivisionServiceImpl implements DivisionService {
     private final SemesterRepository semesterRepository;
     private final DivisionMapper divisionMapper;
     private final TopicRepository topicRepository;
+    private final UserRepository userRepository;
 
     @Override
     @LoggerAround
@@ -96,34 +99,41 @@ public class DivisionServiceImpl implements DivisionService {
         if (!hasHeadRole)
             throw new AccessDeniedException("User could not permission to access this resource. Access is denied");
 
+        // Get assigned lecture;
+        Optional<User> userOptional = userRepository.findByNtid(request.getLectureCode());
+        if(!userOptional.isPresent()) throw new BadRequestException("Lecture could not be found");
+
         Optional<Topic> topicOptional = topicRepository.findById(request.getTopicId());
         if (!topicOptional.isPresent()) throw new BadRequestException("Topic could not be found");
         Topic currentTopic = topicOptional.get();
+
+        // Validate head with assigned user
+        if(StringUtils.equals(currentTopic.getLecture().getNtid(), userOptional.get().getNtid()))
+            throw new BadRequestException("Could not assigned. Please check again");
 
         if (currentTopic.getStatus().equals(TopicStatus.ASSIGNED))
             throw new BadRequestException("Topic has been assigned");
         if (!currentTopic.getStatus().equals(TopicStatus.APPROVED))
             throw new BadRequestException("Topic has been approved");
+
+//        Convert string to local date
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDate = LocalDate.parse(request.getStartDate(), formatter);
+
 //        Build Division
         Division division = Division.builder()
-                .lecture(currentUser)
+                .lecture(userOptional.get())
                 .topic(currentTopic)
                 .place(request.getPlace())
                 .specifiedTime(request.getSpecifiedTime())
-//                hard code start date
-                .startDate(LocalDateTime.now())
+                .startDate(startDate)
                 .build();
         divisionRepository.save(division);
         log.info("Division: {}", division.getId());
-
-//        Update topic status
-        currentTopic.setStatus(TopicStatus.ASSIGNED);
-        topicRepository.save(currentTopic);
 
         return Response.<Void>builder()
                 .statusCode(HttpStatus.CREATED.value())
                 .message("Division has been created successfully")
                 .build();
     }
-
 }

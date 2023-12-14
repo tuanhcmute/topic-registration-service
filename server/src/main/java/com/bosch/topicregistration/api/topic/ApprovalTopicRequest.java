@@ -10,9 +10,6 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 @Builder
 public class ApprovalTopicRequest {
-    @NotEmpty(message = "Topic id is not valid")
-    private String id;
-
     @NotEmpty(message = "Status is not valid")
     private String status;
 
