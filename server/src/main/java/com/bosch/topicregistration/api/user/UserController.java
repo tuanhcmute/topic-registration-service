@@ -7,7 +7,6 @@ import com.bosch.topicregistration.api.response.Response;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -73,7 +72,7 @@ public class UserController {
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyAuthority('ROLE_STUDENT', 'ROLE_LECTURE', 'ROLE_ADMIN', 'ROLE_HEAD', 'ROLE_ANONYMOUS')")
-    public  Response<Void> updateAvatarInUserProfile(@RequestParam("image") MultipartFile imageFile) {
+    public Response<Void> updateAvatarInUserProfile(@RequestParam("image") MultipartFile imageFile) {
 
         return userService.updateAvatarInUserProfile(imageFile);
     }
@@ -82,9 +81,9 @@ public class UserController {
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public  Response<PageResponse<List<UserDTO>>> getAllUsers(@RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
-                                               @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
-                                               @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
+    public Response<PageResponse<List<UserDTO>>> getAllUsers(@RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+                                                             @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                                             @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
         return userService.getAllUsers(pageNumber, pageSize, sortBy);
     }
 }

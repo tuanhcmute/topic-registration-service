@@ -2,6 +2,7 @@ package com.bosch.topicregistration.api.division;
 
 import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
+import com.bosch.topicregistration.api.response.PageResponse;
 import com.bosch.topicregistration.api.response.Response;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +28,16 @@ public class DivisionController {
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ROLE_LECTURE')")
-    public Response<List<DivisionDTO>> getDivisionByTopicType(@RequestParam("topicType") String topicType) {
+    public Response<PageResponse<List<DivisionDTO>>> getDivisionByTopicType(@RequestParam("topicType") String topicType,
+                                                                            @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+                                                                            @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                                                            @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy
+                                                                            ) {
 //        Validate
         if (StringUtils.isBlank(topicType)) throw new BadRequestException("Topic type is not valid");
         log.info("Topic type is not blank");
 //        Call service
-        return divisionService.getDivisionByTopicType(topicType);
+        return divisionService.getDivisionByTopicType(topicType, pageNumber, pageSize, sortBy);
     }
 
     @PostMapping

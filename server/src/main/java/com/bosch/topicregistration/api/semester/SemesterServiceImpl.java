@@ -71,9 +71,9 @@ public class SemesterServiceImpl implements SemesterService {
             LocalDate endDate = LocalDate.parse(request.getEndDate(), formatter);
 
 //            Validate date
-            if(startDate.isBefore(currentDate))
+            if (startDate.isBefore(currentDate))
                 throw new BadRequestException("The start date cannot be less than the current date");
-            if(endDate.isBefore(startDate))
+            if (endDate.isBefore(startDate))
                 throw new BadRequestException("The end date cannot be less than the start date");
 
             Semester semester = Semester.builder()
@@ -124,9 +124,9 @@ public class SemesterServiceImpl implements SemesterService {
             LocalDate endDate = LocalDate.parse(request.getEndDate(), formatter);
 
 //            Validate date
-            if(startDate.isBefore(currentDate))
+            if (startDate.isBefore(currentDate))
                 throw new BadRequestException("The start date cannot be less than the current date");
-            if(endDate.isBefore(startDate))
+            if (endDate.isBefore(startDate))
                 throw new BadRequestException("The end date cannot be less than the start date");
 
             Optional<Semester> semesterOptional = semesterRepository.findById(semesterId);

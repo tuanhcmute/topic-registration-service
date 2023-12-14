@@ -80,14 +80,17 @@ export const updateTopicInLectureEnrollmentPeriod = createAsyncThunk(
 export const fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod =
   createAsyncThunk(
     `${namespace}/fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod`,
-    async ({ type }, { rejectWithValue }) => {
+    async ({ type, itemsPerPage, pageNumber, sortBy }, { rejectWithValue }) => {
       const response =
         await topicService.fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod(
-          type
+          type,
+          itemsPerPage,
+          pageNumber,
+          sortBy
         );
-      if (response?.data?.statusCode === HttpStatusCode.BadRequest)
-        return rejectWithValue(response.data);
-      return response?.data;
+      if (response?.data?.statusCode === HttpStatusCode.Ok)
+        return response?.data;
+      return rejectWithValue(response.data);
     }
   );
 
@@ -118,14 +121,17 @@ export const approveTopicInLectureEnrollmentPeriod = createAsyncThunk(
 export const fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod =
   createAsyncThunk(
     `${namespace}/fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod`,
-    async ({ type }, { rejectWithValue }) => {
+    async ({ type, itemsPerPage, pageNumber, sortBy }, { rejectWithValue }) => {
       const response =
         await topicService.fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod(
-          type
+          type,
+          itemsPerPage,
+          pageNumber,
+          sortBy
         );
-      if (response?.data?.statusCode === HttpStatusCode.BadRequest)
-        return rejectWithValue(response.data);
-      return response?.data;
+      if (response?.data?.statusCode === HttpStatusCode.Ok)
+        return response?.data;
+      return rejectWithValue(response.data);
     }
   );
 

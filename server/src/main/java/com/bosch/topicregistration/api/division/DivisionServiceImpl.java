@@ -2,10 +2,9 @@ package com.bosch.topicregistration.api.division;
 
 import com.bosch.topicregistration.api.exception.BadRequestException;
 import com.bosch.topicregistration.api.logging.LoggerAround;
+import com.bosch.topicregistration.api.response.PageResponse;
 import com.bosch.topicregistration.api.response.Response;
-import com.bosch.topicregistration.api.semester.Semester;
 import com.bosch.topicregistration.api.semester.SemesterRepository;
-import com.bosch.topicregistration.api.semester.SemesterStatus;
 import com.bosch.topicregistration.api.topic.Topic;
 import com.bosch.topicregistration.api.topic.TopicRepository;
 import com.bosch.topicregistration.api.topic.TopicStatus;
@@ -17,6 +16,10 @@ import com.bosch.topicregistration.api.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -24,7 +27,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -33,14 +35,13 @@ public class DivisionServiceImpl implements DivisionService {
 
     private final DivisionRepository divisionRepository;
     private final UserCommon userCommon;
-    private final SemesterRepository semesterRepository;
     private final DivisionMapper divisionMapper;
     private final TopicRepository topicRepository;
     private final UserRepository userRepository;
 
     @Override
     @LoggerAround
-    public Response<List<DivisionDTO>> getDivisionByTopicType(String topicType) {
+    public Response<PageResponse<List<DivisionDTO>>> getDivisionByTopicType(String topicType, Integer pageNumber, Integer pageSize, String sortBy) {
 //        Validate request
         if (StringUtils.isBlank(topicType)) throw new BadRequestException("Topic type is not valid");
         log.info("Topic type is not blank");
@@ -59,23 +60,24 @@ public class DivisionServiceImpl implements DivisionService {
         if (!hasLectureRole)
             throw new AccessDeniedException("User could not permission to access this resource. Access is denied");
 
-//        Get activated semester
-        List<Semester> semesters = semesterRepository.findByStatus(SemesterStatus.ACTIVATED);
-        if (semesters.isEmpty()) throw new BadRequestException("Current semester could not be found");
-        Semester currentSemester = semesters.get(0);
+        //        Define paging
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
 
-        List<Division> divisions = divisionRepository.findByLecture(currentUser);
-        List<Division> currentDivisions = divisions.stream()
-                .filter(division -> division.getTopic().getSemester().equals(currentSemester))
-                .collect(Collectors.toList());
-        List<DivisionDTO> divisionDTOList = divisionMapper.toListDTO(currentDivisions);
+        Page<Division> page = divisionRepository.findByLecture(currentUser, paging);
 
-//        Build response
-        Map<String, List<DivisionDTO>> data = new HashMap<>();
-        data.put("divisions", divisionDTOList);
+        //        Build page response
+        PageResponse<List<DivisionDTO>> pageResponse = PageResponse
+                .<List<DivisionDTO>>builder()
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .content(divisionMapper.toListDTO(page.getContent()))
+                .build();
 
-        return Response.<List<DivisionDTO>>builder()
-                .message("Divisions have been retrieved successfully")
+//        Build data
+        Map<String, PageResponse<List<DivisionDTO>>> data = new HashMap<>();
+        data.put("page", pageResponse);
+        return Response.<PageResponse<List<DivisionDTO>>>builder()
+                .message("Topics have been successfully retrieved")
                 .statusCode(HttpStatus.OK.value())
                 .data(data)
                 .build();
@@ -101,14 +103,14 @@ public class DivisionServiceImpl implements DivisionService {
 
         // Get assigned lecture;
         Optional<User> userOptional = userRepository.findByNtid(request.getLectureCode());
-        if(!userOptional.isPresent()) throw new BadRequestException("Lecture could not be found");
+        if (!userOptional.isPresent()) throw new BadRequestException("Lecture could not be found");
 
         Optional<Topic> topicOptional = topicRepository.findById(request.getTopicId());
         if (!topicOptional.isPresent()) throw new BadRequestException("Topic could not be found");
         Topic currentTopic = topicOptional.get();
 
         // Validate head with assigned user
-        if(StringUtils.equals(currentTopic.getLecture().getNtid(), userOptional.get().getNtid()))
+        if (StringUtils.equals(currentTopic.getLecture().getNtid(), userOptional.get().getNtid()))
             throw new BadRequestException("Could not assigned. Please check again");
 
         if (currentTopic.getStatus().equals(TopicStatus.ASSIGNED))

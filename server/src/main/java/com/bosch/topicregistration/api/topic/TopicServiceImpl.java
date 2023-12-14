@@ -64,20 +64,9 @@ public class TopicServiceImpl implements TopicService {
 
 //         Get topics
         Page<Topic> page = topicRepository.findBySemesterAndTypeAndLecture(currentSemester, topicType, lecture, paging);
-        PageResponse<List<TopicDTO>> pageResponse = PageResponse.<List<TopicDTO>>builder()
-                .totalPages(page.getTotalPages())
-                .totalElements(page.getTotalElements())
-                .content(topicMapper.toListDTO(page.getContent()))
-                .build();
 
 //        Build data
-        Map<String, PageResponse<List<TopicDTO>>> data = new HashMap<>();
-        data.put("page", pageResponse);
-        return Response.<PageResponse<List<TopicDTO>>>builder()
-                .message("Topics have been successfully retrieved")
-                .statusCode(HttpStatus.OK.value())
-                .data(data)
-                .build();
+        return buildResponse(page);
     }
 
     @Override
@@ -141,7 +130,7 @@ public class TopicServiceImpl implements TopicService {
                         .topicId(topic.getId())
                         .ntid(ntid)
                         .build();
-            topicEnrollmentService.createTopicEnrollment(req);
+                topicEnrollmentService.createTopicEnrollment(req);
             });
         }
 
@@ -170,9 +159,9 @@ public class TopicServiceImpl implements TopicService {
         List<TopicEnrollment> currentTopicEnrollments = topicEnrollmentRepository.findByTopicOrderByIsLeaderDesc(topic);
         if (!currentTopicEnrollments.isEmpty()) {
             currentTopicEnrollments.forEach(topicEnrollment -> request.getStudents().forEach(item -> {
-                if(topicEnrollment.getStudent().getNtid().equals(item)) request.getStudents().remove(item);
+                if (topicEnrollment.getStudent().getNtid().equals(item)) request.getStudents().remove(item);
             }));
-            if(request.getStudents().isEmpty()) isAllMatch = true;
+            if (request.getStudents().isEmpty()) isAllMatch = true;
             log.info(request.getStudents().toString());
         }
         log.info("Is all match: {}", isAllMatch);
@@ -250,7 +239,7 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     @LoggerAround
-    public Response<List<TopicDTO>> getAllTopicsIsNotApproved(String type, Integer pageNumber, Integer pageSize, String sortBy) {
+    public Response<PageResponse<List<TopicDTO>>> getAllTopicsIsNotApproved(String type, Integer pageNumber, Integer pageSize, String sortBy) {
 //                Validate type
         boolean hasType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
         if (!hasType) throw new BadRequestException("Topic type is not valid");
@@ -272,10 +261,9 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public Response<List<TopicDTO>> getAllApprovedTopics(String type, Integer pageNumber, Integer pageSize, String sortBy) {
+    public Response<PageResponse<List<TopicDTO>>> getAllApprovedTopics(String type, Integer pageNumber, Integer pageSize, String sortBy) {
 //      Validate type
-        boolean hasType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
-        if (!hasType) throw new BadRequestException("Topic type is not valid");
+        validateTopicType(type);
         TopicType topicType = TopicType.valueOf(type);
 
 //        Get current semester
@@ -297,18 +285,18 @@ public class TopicServiceImpl implements TopicService {
     public Response<PageResponse<List<TopicDTO>>> getAllTopics(Integer pageNumber, Integer pageSize, String sortBy) {
 //        Define paging
         Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
-
         Page<Topic> page = topicRepository.findAll(paging);
-        PageResponse<List<TopicDTO>> pageResponse = PageResponse.<List<TopicDTO>>builder()
-                .totalPages(page.getTotalPages())
-                .totalElements(page.getTotalElements())
-                .content(topicMapper.toListDTO(page.getContent()))
-                .build();
+        return buildResponse(page);
+    }
+
+    private Response<PageResponse<List<TopicDTO>>> buildResponse(Page<Topic> page) {
+
+//        Build page response
+        PageResponse<List<TopicDTO>> pageResponse = buildPageResponse(page);
 
 //        Build data
         Map<String, PageResponse<List<TopicDTO>>> data = new HashMap<>();
         data.put("page", pageResponse);
-
         return Response.<PageResponse<List<TopicDTO>>>builder()
                 .message("Topics have been successfully retrieved")
                 .statusCode(HttpStatus.OK.value())
@@ -316,14 +304,11 @@ public class TopicServiceImpl implements TopicService {
                 .build();
     }
 
-    private Response<List<TopicDTO>> buildResponse(Page<Topic> topicPage) {
-        List<TopicDTO> listTopicDTO = topicMapper.toListDTO(topicPage.getContent());
-        Map<String, List<TopicDTO>> data = new HashMap<>();
-        data.put("topics", listTopicDTO);
-        return Response.<List<TopicDTO>>builder()
-                .message("Topics have been successfully retrieved")
-                .statusCode(HttpStatus.OK.value())
-                .data(data)
+    private PageResponse<List<TopicDTO>> buildPageResponse(Page<Topic> page) {
+        return PageResponse.<List<TopicDTO>>builder()
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .content(topicMapper.toListDTO(page.getContent()))
                 .build();
     }
 }

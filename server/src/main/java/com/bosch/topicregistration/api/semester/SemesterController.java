@@ -28,8 +28,8 @@ public class SemesterController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @LoggerAround
     public Response<PageResponse<List<SemesterDTO>>> getListSemester(@RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
-                                                  @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
-                                                  @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
+                                                                     @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                                                     @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
         return semesterService.getListSemester(pageNumber, pageSize, sortBy);
     }
 

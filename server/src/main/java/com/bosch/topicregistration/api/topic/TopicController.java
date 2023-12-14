@@ -45,10 +45,10 @@ public class TopicController {
     @PreAuthorize("hasAuthority('ROLE_HEAD')")
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
-    public Response<List<TopicDTO>> getAllTopicsIsNotApproved(@RequestParam("type") String type,
-                                                                                              @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
-                                                                                              @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
-                                                                                              @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
+    public Response<PageResponse<List<TopicDTO>>> getAllTopicsIsNotApproved(@RequestParam("type") String type,
+                                                                            @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+                                                                            @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                                                            @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
 //                Validate type
         log.info("Type: {}", type);
         boolean hasType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
@@ -61,10 +61,10 @@ public class TopicController {
     @PreAuthorize("hasAnyAuthority('ROLE_HEAD', 'ROLE_STUDENT')")
     @ResponseStatus(HttpStatus.OK)
     @LoggerAround
-    public Response<List<TopicDTO>> getAllApprovedTopics(@RequestParam("type") String type,
-                                                                                         @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
-                                                                                         @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
-                                                                                         @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
+    public Response<PageResponse<List<TopicDTO>>> getAllApprovedTopics(@RequestParam("type") String type,
+                                                                       @RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
+                                                                       @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
+                                                                       @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
 //                Validate type
         log.info("Type: {}", type);
         boolean hasType = Arrays.stream(TopicType.values()).anyMatch(item -> StringUtils.equals(item.name(), type));
@@ -108,7 +108,7 @@ public class TopicController {
         return topicService.updateTopic(id, request);
     }
 
-    //    [PUT] /api/v1/topic/lecture/approval
+    //    [PUT] /api/v1/topic/approval
     @PutMapping("/approval/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_HEAD')")
     @ResponseStatus(HttpStatus.OK)
@@ -124,6 +124,6 @@ public class TopicController {
     public Response<PageResponse<List<TopicDTO>>> getAllTopics(@RequestParam(defaultValue = "0", name = "pageNumber") Integer pageNumber,
                                                                @RequestParam(defaultValue = "100", name = "pageSize") Integer pageSize,
                                                                @RequestParam(defaultValue = "createdDate", name = "sortBy") String sortBy) {
-        return  topicService.getAllTopics(pageNumber, pageSize, sortBy);
+        return topicService.getAllTopics(pageNumber, pageSize, sortBy);
     }
 }

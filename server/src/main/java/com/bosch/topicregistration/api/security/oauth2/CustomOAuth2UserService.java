@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -84,7 +83,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         } else {
             roleOptional = roleRepository.findByCode(RoleCode.ROLE_ANONYMOUS);
         }
-        if(!roleOptional.isPresent()) throw new BadRequestException("Role could not be found");
+        if (!roleOptional.isPresent()) throw new BadRequestException("Role could not be found");
 
 //        Build user
         User user = User.builder()

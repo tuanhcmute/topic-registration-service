@@ -3,7 +3,6 @@ package com.bosch.topicregistration.api.semester;
 import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
-import java.time.LocalDate;
 
 @NoArgsConstructor
 @AllArgsConstructor

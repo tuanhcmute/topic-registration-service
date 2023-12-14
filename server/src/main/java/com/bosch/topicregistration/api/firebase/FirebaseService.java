@@ -20,6 +20,7 @@ public interface FirebaseService {
     String save(BufferedImage bufferedImage, String originalFileName) throws IOException;
 
     void delete(String name) throws IOException;
+
     default String getExtension(String originalFileName) {
         return StringUtils.getFilenameExtension(originalFileName);
     }

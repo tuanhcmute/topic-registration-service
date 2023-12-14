@@ -1,4 +1,5 @@
 package com.bosch.topicregistration.api.semester;
+
 import com.bosch.topicregistration.api.response.PageResponse;
 import com.bosch.topicregistration.api.response.Response;
 

@@ -36,7 +36,7 @@ public class EnrollmentPeriodController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @LoggerAround
     public Response<Set<EnrollmentPeriodDTO>> getListEnrollmentPeriodBySemester(@RequestParam("semesterId") String semesterId) {
-        if(semesterId.isEmpty())
+        if (semesterId.isEmpty())
             throw new BadRequestException("Semester id is empty");
 
         return enrollmentPeriodService.getListEnrollmentPeriodBySemester(semesterId);

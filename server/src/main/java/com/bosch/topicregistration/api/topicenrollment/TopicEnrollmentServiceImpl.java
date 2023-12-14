@@ -46,7 +46,7 @@ public class TopicEnrollmentServiceImpl implements TopicEnrollmentService {
         Topic topic = topicEnrollment.getTopic();
 
 //        Grant is leader to member
-        if(topicEnrollment.getIsLeader()) {
+        if (topicEnrollment.getIsLeader()) {
             List<TopicEnrollment> topicEnrollments = topicEnrollmentRepository.findByTopicOrderByIsLeaderDesc(topic);
             for (TopicEnrollment item : topicEnrollments) {
                 if (!item.getIsLeader()) {
@@ -77,29 +77,30 @@ public class TopicEnrollmentServiceImpl implements TopicEnrollmentService {
 //        Get topic enrollment
         List<TopicEnrollment> topicEnrollments = topicEnrollmentRepository.findByTopicOrderByIsLeaderDesc(topic);
         if (!topicEnrollments.isEmpty()) {
-           if(topic.getMaxSlot() == topicEnrollments.size() && topic.getAvailableSlot() == 0)
-               throw new BadRequestException("Topic enrollment is full");
+            if (topic.getMaxSlot() == topicEnrollments.size() && topic.getAvailableSlot() == 0)
+                throw new BadRequestException("Topic enrollment is full");
 //           Validate user has already existed in topic enrollment
             boolean isAnyMatch = topicEnrollments.stream().anyMatch(topicEnrollment -> topicEnrollment.getStudent().getNtid().equals(request.getNtid()));
-            if(isAnyMatch) throw new BadRequestException("The student has already enrolled");
+            if (isAnyMatch) throw new BadRequestException("The student has already enrolled");
         }
 
 //        Get student
         Optional<User> userOptional = userRepository.findByNtid(request.getNtid());
-        if(!userOptional.isPresent()) throw new BadRequestException("Student could not be found");
+        if (!userOptional.isPresent()) throw new BadRequestException("Student could not be found");
         User student = userOptional.get();
 
 //           Validate user has already existed in another topic enrollment
         Optional<TopicEnrollment> topicEnrollmentOptional = topicEnrollmentRepository.findByStudent(student);
         topicEnrollmentOptional.ifPresent(topicEnrollment -> {
-            throw new BadRequestException("The student has already enrolled in another topic");});
+            throw new BadRequestException("The student has already enrolled in another topic");
+        });
 
 //        Enrollment
         TopicEnrollment topicEnrollment = TopicEnrollment.builder()
                 .topic(topic)
                 .student(student)
                 .build();
-        if(topicEnrollments.isEmpty()) topicEnrollment.setIsLeader(true);
+        if (topicEnrollments.isEmpty()) topicEnrollment.setIsLeader(true);
         topicEnrollmentRepository.save(topicEnrollment);
         log.info("Topic enrollment: {}", topicEnrollment.getId());
 
@@ -116,7 +117,7 @@ public class TopicEnrollmentServiceImpl implements TopicEnrollmentService {
 
 //         Get topic enrollment
         Optional<TopicEnrollment> topicEnrollmentOptional = topicEnrollmentRepository.findByStudent(student);
-        if(!topicEnrollmentOptional.isPresent()) throw new BadRequestException("Student has not enrolled yet");
+        if (!topicEnrollmentOptional.isPresent()) throw new BadRequestException("Student has not enrolled yet");
 
 //        Get list
         List<TopicEnrollment> topicEnrollments = topicEnrollmentRepository

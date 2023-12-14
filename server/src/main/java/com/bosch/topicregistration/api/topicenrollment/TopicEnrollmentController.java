@@ -42,7 +42,7 @@ public class TopicEnrollmentController {
         return topicEnrollmentService.createTopicEnrollment(request);
     }
 
-//    [GET] /api/v1/topic-enrollment
+    //    [GET] /api/v1/topic-enrollment
     @GetMapping
     @LoggerAround
     @ResponseStatus(HttpStatus.OK)

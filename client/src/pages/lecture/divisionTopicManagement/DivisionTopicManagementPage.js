@@ -3,10 +3,8 @@ import { LiaEditSolid } from "react-icons/lia";
 import { Button } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import { AiOutlineFilter } from "react-icons/ai";
-import _ from "lodash";
 
 import { topicStatus, topicType } from "../../../utils/constants";
-import { Dropdown } from "../../../components/dropdown1";
 import { fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod } from "../../../features/topic";
 import DivisionTopicModal from "./components/DivisionTopicModal";
 import { fetchAllLectures } from "../../../features/user";
@@ -19,40 +17,42 @@ function DivisionTopicManagement() {
   const [topicStatusFilter, setTopicStatusFilter] = useState(
     topicStatus.all.value
   );
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [pageNumber, setPageNumber] = useState(0);
+  const [sortBy, setSortBy] = useState("createdDate");
   // Get current user from redux
   const currentUser = useSelector((state) => state.user?.currentUser);
-  const topics = useSelector((state) => state.topic?.approvedTopics);
+  const approvedTopicsPage = useSelector(
+    (state) => state.topic?.approvedTopicsPage
+  );
   const enrollmentPeriod = useSelector(
     (state) => state?.enrollmentPeriod?.enrollmentPeriod
   );
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Fetch topics
-    if (_.isEmpty(topics) || _.isNull(topics) || _.isUndefined(topics)) {
-      dispatch(
-        fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod({
-          type: topicType.TLCN,
-        })
-      );
-    }
-
     // Fetch lectures
     dispatch(fetchAllLectures());
 
     // Fetch enrollment period
-    if (
-      _.isEmpty(enrollmentPeriod) ||
-      _.isNull(enrollmentPeriod) ||
-      _.isUndefined(enrollmentPeriod)
-    ) {
-      dispatch(
-        fetchActivatedEnrollmentPeriod({
-          topicType: topicType.TLCN,
-        })
-      );
-    }
+    dispatch(
+      fetchActivatedEnrollmentPeriod({
+        topicType: topicType.TLCN,
+      })
+    );
   }, []);
+
+  useEffect(() => {
+    // Fetch topics
+    dispatch(
+      fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod({
+        type: topicType.TLCN,
+        itemsPerPage,
+        pageNumber,
+        sortBy,
+      })
+    );
+  }, [itemsPerPage, pageNumber, sortBy, dispatch]);
 
   return (
     <React.Fragment>
@@ -60,7 +60,7 @@ function DivisionTopicManagement() {
         {/* Register topic */}
         <div className='flex items-center justify-between p-3 border-b border-lightGrey'>
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
-            TIỂU LUẬN CHUYÊN NGÀNH
+            PHÂN CÔNG TIỂU LUẬN CHUYÊN NGÀNH
           </span>
         </div>
         {/* End register topic */}
@@ -76,30 +76,9 @@ function DivisionTopicManagement() {
             className='rounded-md p-0 cursor-default flex items-center'
           >
             <AiOutlineFilter className='mr-1' />
-            <span>Lọc theo trạng thái</span>
+            <span>Đề tài chưa phân công</span>
           </Button>
         </div>
-        <Dropdown
-          place='right-right'
-          className='p-0 bg-whiteSmoke rounded border border-gray-300 dark:bg-sambuca dark:opacity-100 opacity-100'
-          anchorSelect='#topicStatusFilter'
-        >
-          <div className='flex flex-col gap-2 p-3'>
-            {Object.keys(topicStatus).map((item) => {
-              return (
-                <div
-                  key={item}
-                  className='text-sm px-2 py-1 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer'
-                  onClick={() =>
-                    setTopicStatusFilter(topicStatus?.[item]?.value)
-                  }
-                >
-                  {topicStatus?.[item]?.label}
-                </div>
-              );
-            })}
-          </div>
-        </Dropdown>
         {/* End topic status filter */}
         {/* Table */}
         <div className='p-3'>
@@ -121,7 +100,7 @@ function DivisionTopicManagement() {
                       </tr>
                     </thead>
                     <tbody className='text-gray-600 text-sm font-light'>
-                      {topics
+                      {approvedTopicsPage?.content
                         ?.filter((item) => {
                           if (topicStatusFilter === "ALL") return true;
                           return item?.status === topicStatusFilter;
@@ -199,7 +178,10 @@ function DivisionTopicManagement() {
         </div>
         <div className='w-full flex justify-end p-3'>
           {/* <Pagination /> */}
-          <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} />
+          <PaginatedItems
+            items={[...Array(approvedTopicsPage?.totalElements).keys()]}
+            itemsPerPage={itemsPerPage}
+          />
         </div>
         {/* End table */}
       </div>

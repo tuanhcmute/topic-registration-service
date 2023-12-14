@@ -23,12 +23,22 @@ const topicService = {
     const requestUrl = `${baseUrl}/approval/${id}`;
     return axiosClient.put(requestUrl, data);
   },
-  fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod: (type) => {
-    const requestUrl = `${baseUrl}/head?type=${type}`;
+  fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod: (
+    type,
+    itemsPerPage,
+    pageNumber,
+    sortBy
+  ) => {
+    const requestUrl = `${baseUrl}/head?type=${type}&pageNumber=${pageNumber}&pageSize=${itemsPerPage}&sortBy=${sortBy}`;
     return axiosClient.get(requestUrl);
   },
-  fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod: (type) => {
-    const requestUrl = `${baseUrl}/division?type=${type}`;
+  fetchAllTopicsApprovedDuringTheLectureEnrollmentPeriod: (
+    type,
+    itemsPerPage,
+    pageNumber,
+    sortBy
+  ) => {
+    const requestUrl = `${baseUrl}/division?type=${type}&pageNumber=${pageNumber}&pageSize=${itemsPerPage}&sortBy=${sortBy}`;
     return axiosClient.get(requestUrl);
   },
   fetchAllApprovedTopicsInStudentEnrollmentPeriod: (type) => {

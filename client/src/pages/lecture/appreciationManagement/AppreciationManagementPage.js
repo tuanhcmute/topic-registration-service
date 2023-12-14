@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { LiaEditSolid } from "react-icons/lia";
 import { Button } from "flowbite-react";
 
@@ -8,6 +8,9 @@ import { fetchDivisionByTopicType } from "../../../features/division";
 import { PaginatedItems } from "../../../components/pagination";
 
 function AppreciationManagementPage() {
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [pageNumber, setPageNumber] = useState(0);
+  const [sortBy, setSortBy] = useState("createdDate");
   const enrollmentPeriod = useSelector(
     (state) => state.enrollmentPeriod?.enrollmentPeriod
   );
@@ -16,7 +19,7 @@ function AppreciationManagementPage() {
 
   useEffect(() => {
     dispatch(fetchDivisionByTopicType(topicType.TLCN));
-  }, [dispatch]);
+  }, [dispatch, itemsPerPage, pageNumber, sortBy]);
 
   return (
     <React.Fragment>
@@ -24,7 +27,7 @@ function AppreciationManagementPage() {
         {/* Register topic */}
         <div className='flex items-center justify-between p-3 border-b border-lightGrey'>
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
-            TIỂU LUẬN CHUYÊN NGÀNH
+            PHẢN BIỆN TIỂU LUẬN CHUYÊN NGÀNH
           </span>
           <Button color='gray' className='rounded-md p-0'>
             Xuất Excel
@@ -110,7 +113,10 @@ function AppreciationManagementPage() {
         </div>
         <div className='w-full flex justify-end p-3'>
           {/* <Pagination /> */}
-          <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} />
+          <PaginatedItems
+            items={[...Array(100).keys()]}
+            itemsPerPage={itemsPerPage}
+          />
         </div>
         {/* End table */}
       </div>

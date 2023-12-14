@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService {
     public Response<List<LectureDTO>> getAllLectures() {
 //        Get role
         Optional<Role> roleOptional = roleRepository.findByCode(RoleCode.ROLE_LECTURE);
-        if(!roleOptional.isPresent()) throw new BadRequestException("Role could not be found");
+        if (!roleOptional.isPresent()) throw new BadRequestException("Role could not be found");
 
         List<UserRole> userRoles = userRoleRepository.findByRole(roleOptional.get());
 
@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
     public Response<Void> updateAvatarInUserProfile(MultipartFile imageFile) {
         try {
 //            Validate image file
-            if(Objects.isNull(imageFile.getContentType()) || !imageFile.getContentType().startsWith("image/"))
+            if (Objects.isNull(imageFile.getContentType()) || !imageFile.getContentType().startsWith("image/"))
                 throw new BadRequestException("File is not valid");
 
 //            get user
@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
             if (matcher.find()) {
                 filename = matcher.group(1);
                 // Delete old image if exist
-                if(firebaseService.isFileExist(filename)) {
+                if (firebaseService.isFileExist(filename)) {
                     firebaseService.delete(filename);
                 }
             }

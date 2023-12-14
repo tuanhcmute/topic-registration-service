@@ -127,7 +127,7 @@ function TopicManagementPage() {
         {/* Register topic */}
         <div className='flex items-center justify-between p-3 border-b border-lightGrey'>
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
-            TIỂU LUẬN CHUYÊN NGÀNH
+            ĐĂNG KÝ TIỂU LUẬN CHUYÊN NGÀNH
           </span>
           {isDisabledEnrollment && (
             <Button

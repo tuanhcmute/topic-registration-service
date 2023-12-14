@@ -3,7 +3,8 @@ package com.bosch.topicregistration.api.semester;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.Function;
-public interface SemesterValidator extends Function<SemesterRequest, SemesterValidatorResult>{
+
+public interface SemesterValidator extends Function<SemesterRequest, SemesterValidatorResult> {
     static SemesterValidator isNameValid() {
         return request -> StringUtils.isEmpty(request.getName()) ? SemesterValidatorResult.NAME_INVALID : SemesterValidatorResult.VALID;
     }

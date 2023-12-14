@@ -14,6 +14,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface TopicEnrollmentMapper {
     TopicEnrollmentDTO toDTO(TopicEnrollment topicEnrollment);
+
     List<TopicEnrollmentDTO> toListDTO(List<TopicEnrollment> topicEnrollments);
 
     default StudentDTO mapStudentDTO(User student) {

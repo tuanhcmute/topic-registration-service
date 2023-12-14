@@ -1,7 +1,10 @@
 package com.bosch.topicregistration.api.firebase;
 
 import com.bosch.topicregistration.api.exception.BadRequestException;
-import com.google.cloud.storage.*;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.cloud.StorageClient;
 import org.apache.commons.lang3.StringUtils;

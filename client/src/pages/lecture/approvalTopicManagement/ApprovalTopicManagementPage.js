@@ -13,6 +13,9 @@ import { PaginatedItems } from "../../../components/pagination";
 function ApprovalTopicManagementPage() {
   const [openEditTopicModal, setOpenEditTopicModal] = useState(undefined);
   const [selectedTopic, setSelectedTopic] = useState(null);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [pageNumber, setPageNumber] = useState(0);
+  const [sortBy, setSortBy] = useState("createdDate");
   const dispatch = useDispatch();
   const studentOptions = useSelector(
     (state) => state.user?.studentsNotEnrolledInTopic
@@ -20,7 +23,9 @@ function ApprovalTopicManagementPage() {
   const enrollmentPeriod = useSelector(
     (state) => state?.enrollmentPeriod?.enrollmentPeriod
   );
-  const topics = useSelector((state) => state.topic?.notApprovedTopics);
+  const notApprovedTopicsPage = useSelector(
+    (state) => state.topic?.notApprovedTopicsPage
+  );
 
   function handleUpdateTopicInLectureEnrollmentPeriod(id, data) {
     dispatch(
@@ -36,9 +41,12 @@ function ApprovalTopicManagementPage() {
     dispatch(
       fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod({
         type: topicType.TLCN,
+        itemsPerPage,
+        pageNumber,
+        sortBy,
       })
     );
-  }, []);
+  }, [itemsPerPage, pageNumber, sortBy, dispatch]);
 
   return (
     <React.Fragment>
@@ -46,7 +54,7 @@ function ApprovalTopicManagementPage() {
         {/* Register topic */}
         <div className='flex items-center justify-between p-3 border-b border-lightGrey'>
           <span className='uppercase font-bold text-base text-primary dark:text-gray-100'>
-            TIỂU LUẬN CHUYÊN NGÀNH
+            XÉT DUYỆT TIỂU LUẬN CHUYÊN NGÀNH
           </span>
         </div>
         {/* End register topic */}
@@ -75,7 +83,7 @@ function ApprovalTopicManagementPage() {
                       </tr>
                     </thead>
                     <tbody className='text-gray-600 text-sm font-light'>
-                      {topics?.map((item, index) => {
+                      {notApprovedTopicsPage?.content?.map((item, index) => {
                         return (
                           <tr
                             className='bg-whiteSmoke dark:bg-sambuca dark:text-gray-300'
@@ -130,7 +138,11 @@ function ApprovalTopicManagementPage() {
         </div>
         <div className='w-full flex justify-end p-3'>
           {/* <Pagination /> */}
-          <PaginatedItems items={[...Array(100).keys()]} itemsPerPage={10} />
+          <PaginatedItems
+            items={[...Array(notApprovedTopicsPage?.totalElements).keys()]}
+            itemsPerPage={itemsPerPage}
+            onPageClick={setPageNumber}
+          />
         </div>
         {/* End table */}
       </div>

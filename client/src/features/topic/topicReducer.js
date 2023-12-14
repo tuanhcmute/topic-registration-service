@@ -8,13 +8,12 @@ import {
   fetchAllTopicsIsNotApprovedDuringTheLectureEnrollmentPeriod,
   resetTopicState,
   updateTopicInLectureEnrollmentPeriod,
-  fetchAllApprovedTopicsInStudentEnrollmentPeriod,
   fetchAllTopics,
 } from "./topicAction";
 
 const initialState = {
-  approvedTopics: [],
-  notApprovedTopics: [],
+  approvedTopicsPage: {},
+  notApprovedTopicsPage: {},
   topicsPage: {},
   statusCode: null,
   message: "",
@@ -163,7 +162,6 @@ export const topicSlide = createSlice({
       (state) => {
         return {
           ...state,
-          notApprovedTopics: [],
           message: "",
           statusCode: null,
           loading: false,
@@ -175,7 +173,7 @@ export const topicSlide = createSlice({
       (state, action) => {
         return {
           ...state,
-          notApprovedTopics: action.payload?.data?.topics,
+          notApprovedTopicsPage: action.payload?.data?.page,
           message: action.payload?.message,
           statusCode: action.payload?.statusCode,
           loading: false,
@@ -200,7 +198,6 @@ export const topicSlide = createSlice({
       (state) => {
         return {
           ...state,
-          approvedTopics: [],
           message: "",
           statusCode: null,
           loading: true,
@@ -212,7 +209,7 @@ export const topicSlide = createSlice({
       (state, action) => {
         return {
           ...state,
-          approvedTopics: action.payload?.data?.topics,
+          approvedTopicsPage: action.payload?.data?.page,
           message: action.payload?.message,
           statusCode: action.payload?.statusCode,
           loading: false,
@@ -224,7 +221,6 @@ export const topicSlide = createSlice({
       (state, action) => {
         return {
           ...state,
-          approvedTopics: [],
           message: action.payload?.message,
           statusCode: action.payload?.statusCode,
           loading: false,
@@ -234,43 +230,6 @@ export const topicSlide = createSlice({
     builder.addCase(resetTopicState.fulfilled, () => {
       return initialState;
     });
-    // fetchAllApprovedTopicsInStudentEnrollmentPeriod
-    builder.addCase(
-      fetchAllApprovedTopicsInStudentEnrollmentPeriod.pending,
-      (state) => {
-        return {
-          ...state,
-          approvedTopics: [],
-          message: "",
-          statusCode: null,
-          loading: true,
-        };
-      }
-    );
-    builder.addCase(
-      fetchAllApprovedTopicsInStudentEnrollmentPeriod.fulfilled,
-      (state, action) => {
-        return {
-          ...state,
-          approvedTopics: action.payload?.data?.topics,
-          message: action.payload?.message,
-          statusCode: action.payload?.statusCode,
-          loading: false,
-        };
-      }
-    );
-    builder.addCase(
-      fetchAllApprovedTopicsInStudentEnrollmentPeriod.rejected,
-      (state, action) => {
-        return {
-          ...state,
-          approvedTopics: [],
-          message: action.payload?.message,
-          statusCode: action.payload?.statusCode,
-          loading: false,
-        };
-      }
-    );
     // fetchAllTopics
     builder.addCase(fetchAllTopics.pending, (state) => {
       return {
