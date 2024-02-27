@@ -5,16 +5,16 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: 
-    username: 
-    password: 
+    url: jdbc:mysql://mysql_db:3306/topic_registration_dev?createDatabaseIfNotExist=true
+    username: root
+    password: root
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: 
-            client-secret: 
+            client-id: 191541386637-kctjg1nopsvtj3l814h52htasavdji33.apps.googleusercontent.com
+            client-secret: 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
             scope:
               - email
               - profile
@@ -27,7 +27,7 @@ spring:
         format_sql: true
 app:
   jwt:
-    secretKey: 
+    secretKey: 54e1ac0d-820a-453b-aef5-2840f4b004dd
   security:
     permitAll:
       antPattern: /v3/api-docs/**, /swagger-ui/**, /oauth2/**, /healthcheck/status

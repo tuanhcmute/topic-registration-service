@@ -1,0 +1,60 @@
+version: '3.8'
+
+volumes:
+  mysql:
+
+services:
+  mysql_db:
+    build:
+      context: ./.build/mysql
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    # ports:
+    #   - '127.0.0.1:3306:3306'
+
+  # java_backend:
+  #   build:
+  #     dockerfile: ./.build/backend/java/Dockerfile
+  #   depends_on:
+  #     - mysql_db
+  #   environment:
+      # MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      # MYSQL_DATABASE: ${MYSQL_DATABASE}
+      # MYSQL_USER: ${MYSQL_USER}
+      # MYSQL_HOST: ${MYSQL_HOST}
+      # MYSQL_PORT: ${MYSQL_PORT}
+      # CLIENT_ID: ${CLIENT_ID}
+      # CLIENT_SECRET: ${CLIENT_SECRET}
+      # SECRET_KEY: ${SECRET_KEY}
+      # APPLICATION_PROPERTIES: ${APPLICATION_PROPERTIES}
+    # ports:
+    #   - '8080:8080'
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/healthcheck/status"]
+    #   interval: 5s
+    #   timeout: 5s
+    #   retries: 10
+    #   start_period: 10s
+  
+  frontend:
+    build:
+      dockerfile: ./.build/frontend/Dockerfile
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  app:
+    build:
+      context: ./.build/nginx
+      dockerfile: Dockerfile
+    depends_on:
+      - frontend
+      - mysql_db
+    ports:
+      - 80:80
